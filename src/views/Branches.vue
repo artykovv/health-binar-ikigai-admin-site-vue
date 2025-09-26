@@ -56,7 +56,7 @@
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       <button @click="openEditModal(branch)" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Редактировать</button>
-                      <button @click="deleteBranch(branch.id)" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-xs hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Удалить</button>
+                      <button @click="openConfirm(branch.id)" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-xs hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Удалить</button>
                     </td>
                   </tr>
                 </tbody>
@@ -67,6 +67,28 @@
       </div>
     </div>
     
+    <!-- Confirm Delete Modal -->
+    <div v-if="confirm.visible" class="fixed inset-0 z-50 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/40" @click="closeConfirm"></div>
+      <div class="relative z-10 w-full max-w-md mx-4 overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700">
+        <div class="px-4 py-3 border-b dark:border-gray-700">
+          <h5 class="m-0 dark:text-white">Подтверждение</h5>
+        </div>
+        <div class="p-4 text-sm text-gray-700 dark:text-white">
+          <p class="mb-2">Удалить филиал? Это действие необратимо.</p>
+          <p>Подтвердите действие.</p>
+        </div>
+        <div class="flex items-center justify-end gap-2 px-4 py-3 border-t dark:border-gray-700">
+          <button @click="closeConfirm" class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">Отмена</button>
+          <button @click="confirmDelete" :disabled="deleting"
+            class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-white text-sm hover:bg-red-700 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52]">
+            <span v-if="deleting" class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white dark:border-gray-600 dark:border-t-white"></span>
+            Удалить
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Модальное окно добавления/редактирования (Tailwind) -->
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="absolute inset-0 bg-black/40" @click="closeModal"></div>
@@ -149,6 +171,25 @@ const isEditing = ref(false)
 const errorMessage = ref('')
 const modalOpen = ref(false)
 
+// Подтверждение удаления
+const confirm = ref({ visible: false, id: null })
+const deleting = ref(false)
+const openConfirm = (id) => { confirm.value = { visible: true, id } }
+const closeConfirm = () => { confirm.value = { visible: false, id: null } }
+const confirmDelete = async () => {
+  if (!confirm.value.id) return
+  deleting.value = true
+  try {
+    await api.delete(`branches/${confirm.value.id}/`)
+    await loadBranches()
+  } catch (e) {
+    console.error('Ошибка удаления филиала:', e)
+  } finally {
+    deleting.value = false
+    closeConfirm()
+  }
+}
+
 // Форма филиала
 const form = ref({
   code: '',
@@ -208,7 +249,7 @@ const submitForm = async () => {
   
   try {
     if (isEditing.value) {
-      await api.patch(`branches/${editingId.value}/`, form.value)
+      await api.patch(`branches/${editingId.value}`, form.value)
     } else {
       await api.post(`branches/`, form.value)
     }
@@ -229,7 +270,7 @@ const submitForm = async () => {
 // Переключение статуса филиала
 const toggleBranchStatus = async (branch) => {
   try {
-    await api.patch(`branches/${branch.id}/`, {
+    await api.patch(`branches/${branch.id}`, {
       is_active: !branch.is_active
     })
     branch.is_active = !branch.is_active
@@ -239,18 +280,7 @@ const toggleBranchStatus = async (branch) => {
   }
 }
 
-// Удаление филиала
-const deleteBranch = async (branchId) => {
-  if (confirm('Вы уверены, что хотите удалить этот филиал?')) {
-    try {
-      await api.delete(`branches/${branchId}/`)
-      await loadBranches()
-    } catch (error) {
-      console.error('Ошибка удаления филиала:', error)
-      alert('Ошибка при удалении филиала')
-    }
-  }
-}
+// Удаление переведено на кастомное подтверждение (см. openConfirm/confirmDelete)
 
 // Закрытие модального окна
 const closeModal = () => {
