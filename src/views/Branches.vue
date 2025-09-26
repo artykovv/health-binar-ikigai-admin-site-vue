@@ -56,7 +56,7 @@
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       <button @click="openEditModal(branch)" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Редактировать</button>
-                      <button @click="openConfirm(branch.id)" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-xs hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Удалить</button>
+                      <button @click="openConfirm(branch.id)" class="inline-flex items-center rounded-md bg-danger px-3 py-2 text-white text-xs hover:bg-gray-900 dark:hover:bg-[#4a4a52] dark:text-white">Удалить</button>
                     </td>
                   </tr>
                 </tbody>
@@ -81,7 +81,7 @@
         <div class="flex items-center justify-end gap-2 px-4 py-3 border-t dark:border-gray-700">
           <button @click="closeConfirm" class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">Отмена</button>
           <button @click="confirmDelete" :disabled="deleting"
-            class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-white text-sm hover:bg-red-700 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52]">
+            class="inline-flex items-center rounded-md bg-danger px-3 py-2 text-white text-sm hover:bg-red-700 disabled:opacity-40 dark:hover:bg-[#4a4a52]">
             <span v-if="deleting" class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white dark:border-gray-600 dark:border-t-white"></span>
             Удалить
           </button>
@@ -180,7 +180,7 @@ const confirmDelete = async () => {
   if (!confirm.value.id) return
   deleting.value = true
   try {
-    await api.delete(`branches/${confirm.value.id}/`)
+    await api.delete(`branches/${confirm.value.id}`)
     await loadBranches()
   } catch (e) {
     console.error('Ошибка удаления филиала:', e)
