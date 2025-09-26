@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Bootstrap compatibility shims (minimal) */
+/* Buttons */
+.btn { @apply inline-flex items-center justify-center rounded-[3px] text-[12px] font-normal px-2 py-1; }
+.btn-primary { @apply bg-blue-600 text-white hover:bg-blue-700; }
+.btn-secondary { @apply bg-gray-600 text-white hover:bg-gray-700; }
+.btn-light { @apply bg-white text-gray-900 border border-gray-300; }
+.btn-outline-secondary { @apply border border-gray-400 text-gray-700 hover:bg-gray-100; }
+.btn-warning { @apply bg-amber-500 text-white hover:bg-amber-600; }
+.btn-info { @apply bg-sky-500 text-white hover:bg-sky-600; }
+.btn-success { @apply bg-green-600 text-white hover:bg-green-700; }
+.btn-sm { @apply text-[12px] px-2 py-1; }
+
+/* Typography & spacing */
+.h1, h1 { @apply text-2xl font-normal text-black mb-5; }
+.me-1 { @apply mr-1; }
+.me-2 { @apply mr-2; }
+.me-3 { @apply mr-3; }
+.ms-3 { @apply ml-3; }
+.w-100 { @apply w-full; }
+.d-grid { @apply grid; }
+.d-flex { @apply flex; }
+.text-start { @apply text-left; }
+
+.text-muted { @apply text-gray-500; }
+.text-primary { @apply text-blue-600; }
+.text-success { @apply text-green-600; }
+.text-warning { @apply text-amber-500; }
+.text-info { @apply text-sky-500; }
+.fw-bold { @apply font-bold; }
+.border-0 { border-width: 0; }
+.rounded-0 { @apply rounded-none; }
+.h-100 { @apply h-full; }
+
+/* Grid (very light shims) */
+.container-fluid { @apply w-full px-4; }
+.row { @apply flex flex-wrap -mx-2; }
+.col-12 { @apply w-full px-2; }
+.col-md-4 { @apply w-full md:w-1/3 px-2; }
+.col-md-6 { @apply w-full md:w-1/2 px-2; }
+.col-md-8 { @apply w-full md:w-2/3 px-2; }
+
+.justify-content-between { @apply justify-between; }
+.align-items-center { @apply items-center; }
+
+/* Forms */
+.form-label { @apply block text-sm text-gray-700 mb-1; }
+.form-control, .form-select { @apply block w-full rounded border border-gray-300 bg-white text-black px-2 py-1; }
+.form-control-plaintext { @apply bg-gray-100 border border-gray-300 rounded px-2 py-1; }
+.form-select-sm, .form-control-sm { @apply text-[12px] px-2 py-1; }
+.form-check { @apply flex items-center gap-2; }
+.form-check-input { @apply mr-2; }
+
+/* Input group */
+.input-group { @apply flex w-full; }
+.input-group > .form-control { @apply flex-1; }
+.input-group > .btn { @apply ml-2; }
+.input-group-sm > .form-control { @apply text-[12px] px-2 py-1; }
+.input-group-sm > .btn { @apply text-[12px] px-2 py-1; }
+
+/* Lists */
+.list-group { @apply flex flex-col rounded border border-gray-300; }
+.list-group-item { @apply px-3 py-2 border-b last:border-b-0; }
+.list-group-item-action { @apply cursor-pointer hover:bg-gray-50; }
+.badge { @apply inline-flex items-center px-2 py-0.5 text-xs font-medium rounded; }
+.bg-primary { @apply bg-blue-600 text-white; }
+.bg-success { @apply bg-green-600 text-white; }
+.bg-warning { @apply bg-amber-500 text-white; }
+.bg-danger { @apply bg-red-600 text-white; }
+.bg-info { @apply bg-sky-500 text-white; }
+.bg-secondary { @apply bg-gray-600 text-white; }
+
+/* Cards */
+.card { @apply border border-gray-300 rounded shadow-none; }
+.card-header { @apply bg-gray-100 border-b border-gray-300 px-3 py-2; }
+.card-body { @apply p-3; }
+
+/* Tables */
+.table-responsive { @apply overflow-x-auto; }
+.table { @apply w-full border border-gray-300; }
+.table th { @apply bg-gray-100 border border-gray-300 font-normal text-black; }
+.table td { @apply border border-gray-300 text-black; }
+.table-striped tbody tr:nth-of-type(odd) { @apply bg-gray-100; }
+
+/* Alerts */
+.alert { @apply px-3 py-2 rounded border; }
+.alert-danger { @apply border-red-300 bg-red-50 text-red-700; }
+.alert-info { @apply border-sky-300 bg-sky-50 text-sky-700; }
+.alert-warning { @apply border-amber-300 bg-amber-50 text-amber-700; }
+
+/* Spinner */
+.spinner-border { @apply inline-block w-8 h-8 rounded-full border-4 border-blue-600 border-r-transparent animate-spin; }
+.spinner-border-sm { @apply w-4 h-4 border-2; }
+.visually-hidden { @apply sr-only; }
+
+/* Tabs */
+.nav { @apply flex flex-wrap list-none p-0 m-0; }
+.nav-tabs { @apply border-b border-gray-300; }
+.nav-item { @apply -mb-px; }
+.nav-link { @apply inline-flex items-center px-3 py-2 text-gray-600 border border-transparent rounded-t; }
+.nav-link:hover { @apply border-gray-200 text-gray-700; }
+.nav-link.active { @apply text-gray-700 bg-white border border-gray-300 border-b-white; }
+.tab-content { @apply border border-gray-300 rounded-t-none rounded px-0; border-top: none; }
+.tab-pane { @apply p-0; }
+
+/* Utility */
+.text-decoration-none { @apply no-underline; }
+.display-4 { @apply text-4xl; }
+
+/* Minimal icon fallbacks for common Bootstrap Icons used */
+ i.bi { @apply inline-block align-middle; }
+ .bi-house-door::before { content: "🏠"; }
+ .bi-people-fill::before { content: "👥"; }
+ .bi-person-plus-fill::before { content: "➕"; }
+ .bi-building::before { content: "🏢"; }
+ .bi-gift-fill::before, .bi-gift::before { content: "🎁"; }
+ .bi-gear-fill::before { content: "⚙️"; }
+ .bi-diagram-3::before { content: "📊"; }
+ .bi-people::before { content: "👥"; }
+ .bi-arrow-left::before { content: "⬅️"; }
+ .bi-arrow-right::before { content: "➡️"; }
+ .bi-arrows-left-right::before { content: "↔️"; }
+ .bi-question-circle::before { content: "❓"; }
+
+/* Dropdown reveal inside pill navbar */
+.header .group:hover ul { display: block; }
+
+

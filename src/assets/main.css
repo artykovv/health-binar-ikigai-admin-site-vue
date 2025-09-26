@@ -1,0 +1,190 @@
+@import './base.css';
+
+/* Основные стили для приложения */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  background-color: #ffffff;
+  color: #000000;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Стили для навигации */
+.navbar {
+  background-color: #007bff !important;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Стили для основного контента */
+main {
+  flex: 1;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+/* Стили для таблиц */
+.table {
+  margin-bottom: 0;
+  border: 1px solid #ccc;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  font-weight: normal;
+  color: #000000;
+}
+
+.table td {
+  border: 1px solid #ccc;
+  color: #000000;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f8f9fa;
+}
+
+/* Стили для кнопок */
+.btn {
+  border-radius: 3px;
+  font-weight: normal;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* Стили для заголовков */
+h1 {
+  font-size: 24px;
+  font-weight: normal;
+  color: #000000;
+  margin-bottom: 20px;
+}
+
+/* Убираем все цвета и делаем простой дизайн */
+.card {
+  border: 1px solid #ccc;
+  box-shadow: none;
+  border-radius: 3px;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Стили для спиннера загрузки */
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+  border: 0.25em solid #007bff;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Стили для форм */
+.form-select-sm, .form-control-sm {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+/* Стили для уведомлений */
+#success-notification {
+  transition: opacity 0.3s ease;
+}
+
+/* Стили для модальных окон */
+.modal-content {
+  border-radius: 0.5rem;
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+/* Dark theme overrides */
+.dark body {
+  background-color: #18181b;
+  color: #ffffff;
+}
+
+.dark main {
+  background-color: #18181b;
+}
+
+/* Keep UI surfaces white in dark mode */
+.dark .card,
+.dark .table,
+.dark .modal-content {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #e5e7eb !important;
+}
+
+.dark .table th,
+.dark .table td,
+.dark .card-header,
+.dark .card-body,
+.dark .modal-header,
+.dark .modal-footer {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Buttons stay white in dark mode */
+.dark .btn,
+.dark .btn-primary,
+.dark .btn-secondary,
+.dark .btn-success,
+.dark .btn-info,
+.dark .btn-warning,
+.dark .btn-danger,
+.dark button.btn {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border-color: #e5e7eb !important;
+}
+
+/* (Removed global white inputs in dark mode to allow page-level dark styles) */
+
+/* Keep table striping subtle on white */
+.dark .table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f8f9fa !important;
+}
+
