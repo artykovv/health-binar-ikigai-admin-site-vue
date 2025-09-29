@@ -269,7 +269,6 @@ const searchSponsors = async () => {
   try {
     const response = await api.get(`participants/`, {
       params: {
-        registered: true,
         page: 1,
         page_size: 20,
         search: sponsorSearch.value
