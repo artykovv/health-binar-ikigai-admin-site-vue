@@ -349,7 +349,7 @@ const submitRegistration = async () => {
       // Перенаправляем на страницу просмотра участника
       if (response.data && response.data.id) {
         setTimeout(() => {
-          router.push(`/participants/${response.data.id}`)
+          router.push(`/registration`)
         }, 1500) // Небольшая задержка для показа сообщения об успехе
       } else {
         resetForm()
