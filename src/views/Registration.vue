@@ -103,6 +103,7 @@
                       <router-link :to="`/participants/${registration.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
                       <router-link :to="`/purchase/${registration.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Покупки</router-link>
                       <router-link :to="`/registration/add-to-structure/${registration.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">+ Cтруктуру</router-link>
+                      <router-link :to="`/registration/edit/${registration.id}`" class="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Изменить</router-link>
                       <button class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-white text-xs hover:bg-red-700" @click="openConfirm(registration.id)">Удалить</button>
                     </td>
                   </tr>

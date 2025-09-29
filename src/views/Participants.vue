@@ -71,6 +71,7 @@
                       <router-link :to="`/participants/${participant.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
                       <router-link :to="`/purchase/${participant.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Покупки</router-link>
                       <router-link :to="`/structure/${participant.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Структура</router-link>
+                      <router-link :to="`/registration/edit/${participant.id}`" class="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-white text-xs hover:bg-gray-900">Изменить</router-link>
                       <!-- <button class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-xs hover:bg-gray-900">Редактировать</button> -->
                     </td>
                   </tr>

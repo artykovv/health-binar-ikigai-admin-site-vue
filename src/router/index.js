@@ -10,6 +10,7 @@ import Purchase from '../views/Purchase.vue'
 import Purchases from '../views/Purchases.vue'
 import Report from '../views/Report.vue'
 import UserRegistration from '../views/UserRegistration.vue'
+import UserEdit from '../views/UserEdit.vue'
 import Structure from '../views/Structure.vue'
 import AddToStructure from '../views/AddToStructure.vue'
 
@@ -86,6 +87,11 @@ const routes = [
     path: '/registration/new',
     name: 'UserRegistration',
     component: UserRegistration
+  },
+  {
+    path: '/registration/edit/:id',
+    name: 'UserEdit',
+    component: UserEdit
   },
   {
     path: '/structure/:id?',
