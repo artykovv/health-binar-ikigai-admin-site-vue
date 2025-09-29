@@ -1,12 +1,38 @@
 <template>
   <div>
     <div class="flex items-center justify-between mb-3">
-      <h1>Бонусы</h1>
-    </div>
-
+      <h1 class="dark:text-white">Бонусы</h1>
+        </div>
+        
     <!-- Tailwind Tabs -->
     <div class="mb-3 border-b border-gray-200 dark:border-gray-700">
       <div class="flex gap-2 relative tabs-list" ref="tabsContainer">
+            <button 
+              type="button"
+          :class="[
+            'px-3 py-2 -mb-px text-sm transition border-b-2',
+            activeTab === 'structural'
+              ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
+              : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
+          ]"
+              @click="setActiveTab('structural')"
+          :ref="el => setTabRef('structural', el)"
+            >
+              Структурный бонус
+            </button>
+            <button 
+          type="button"
+          :class="[
+            'px-3 py-2 -mb-px text-sm transition border-b-2',
+            activeTab === 'sponsor'
+              ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
+              : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
+          ]"
+              @click="setActiveTab('sponsor')"
+          :ref="el => setTabRef('sponsor', el)"
+            >
+              Спонсорский бонус
+            </button>
         <button
           type="button"
           :class="[
@@ -20,32 +46,6 @@
         >
           Мультибонус
         </button>
-        <button
-          type="button"
-          :class="[
-            'px-3 py-2 -mb-px text-sm transition border-b-2',
-            activeTab === 'structural'
-              ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
-              : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
-          ]"
-          @click="setActiveTab('structural')"
-          :ref="el => setTabRef('structural', el)"
-        >
-          Структурный бонус
-        </button>
-        <button
-          type="button"
-          :class="[
-            'px-3 py-2 -mb-px text-sm transition border-b-2',
-            activeTab === 'sponsor'
-              ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
-              : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
-          ]"
-          @click="setActiveTab('sponsor')"
-          :ref="el => setTabRef('sponsor', el)"
-        >
-          Спонсорский бонус
-        </button>
         <span
           class="tab-indicator"
           :style="{
@@ -58,57 +58,57 @@
       </div>
     </div>
 
-    <!-- Мультибонус -->
+          <!-- Мультибонус -->
     <div v-show="activeTab === 'multibonus'" class="mt-3 bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700">
       <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
         <h5 class="m-0 dark:text-white">Мультибонус</h5>
-      </div>
+              </div>
       <div class="p-4">
-        <!-- Фильтры и сортировка -->
+                <!-- Фильтры и сортировка -->
         <div class="grid md:grid-cols-12 gap-3 mb-3">
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
             <select v-model="multibonusFilters.page_size" @change="loadMultibonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="50">50</option>
-            </select>
-          </div>
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="30">30</option>
+                      <option value="50">50</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сортировка:</label>
             <select v-model="multibonusFilters.order_by" @change="loadMultibonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="created_at">Дата создания</option>
-              <option value="received_at">Дата получения</option>
-              <option value="reward">Сумма</option>
-              <option value="cycle_number">Номер цикла</option>
-              <option value="stage_number">Номер этапа</option>
-            </select>
-          </div>
+                      <option value="created_at">Дата создания</option>
+                      <option value="received_at">Дата получения</option>
+                      <option value="reward">Сумма</option>
+                      <option value="cycle_number">Номер цикла</option>
+                      <option value="stage_number">Номер этапа</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Направление:</label>
             <select v-model="multibonusFilters.order_dir" @change="loadMultibonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="desc">По убыванию</option>
-              <option value="asc">По возрастанию</option>
-            </select>
-          </div>
+                      <option value="desc">По убыванию</option>
+                      <option value="asc">По возрастанию</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3 flex items-end">
             <button @click="loadMultibonuses"
               class="inline-flex w-full items-center justify-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">
               Обновить
             </button>
-          </div>
-        </div>
-
-        <!-- Загрузка -->
+                  </div>
+                </div>
+                
+                <!-- Загрузка -->
         <div v-if="multibonusLoading" class="py-6 text-center">
           <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
-        </div>
-
-        <!-- Таблица мультибонусов -->
+                </div>
+                
+                <!-- Таблица мультибонусов -->
         <div v-else class="overflow-x-auto">
           <div class="inline-block min-w-full align-middle">
             <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
@@ -123,15 +123,15 @@
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата получения</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
-                  </tr>
-                </thead>
+                      </tr>
+                    </thead>
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                   <tr v-for="bonus in multibonuses" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
                       <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
-                        {{ bonus.personal_number || 'Загрузка...' }}
-                      </router-link>
-                    </td>
+                            {{ bonus.personal_number || 'Загрузка...' }}
+                          </router-link>
+                        </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.reward }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
@@ -139,91 +139,91 @@
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.received_at) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm">
                       <span :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ' + getStatusBadgeClass(bonus.status)">
-                        {{ getStatusText(bonus.status) }}
-                      </span>
-                    </td>
+                            {{ getStatusText(bonus.status) }}
+                          </span>
+                        </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.created_at) }}</td>
-                  </tr>
-                </tbody>
-              </table>
+                      </tr>
+                    </tbody>
+                  </table>
             </div>
           </div>
-        </div>
-
-        <!-- Пагинация -->
+                </div>
+                
+                <!-- Пагинация -->
         <div v-if="multibonusPagination" class="mt-3 flex items-center justify-between">
           <div class="text-sm text-gray-700 dark:text-white">
-            <span>Страница {{ multibonusPagination.current_page }} из {{ multibonusPagination.total_pages }}</span>
+                    <span>Страница {{ multibonusPagination.current_page }} из {{ multibonusPagination.total_pages }}</span>
             <span class="ml-3">Всего: {{ multibonusPagination.total_count }}</span>
-          </div>
+                  </div>
           <div class="flex gap-2">
-            <button 
-              @click="changeMultibonusPage(multibonusPagination.current_page - 1)" 
-              :disabled="multibonusPagination.current_page <= 1"
+                    <button 
+                      @click="changeMultibonusPage(multibonusPagination.current_page - 1)" 
+                      :disabled="multibonusPagination.current_page <= 1"
               class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
-            >
-              Предыдущая
-            </button>
-            <button 
-              @click="changeMultibonusPage(multibonusPagination.current_page + 1)" 
-              :disabled="multibonusPagination.current_page >= multibonusPagination.total_pages"
+                    >
+                      Предыдущая
+                    </button>
+                    <button 
+                      @click="changeMultibonusPage(multibonusPagination.current_page + 1)" 
+                      :disabled="multibonusPagination.current_page >= multibonusPagination.total_pages"
               class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
-            >
-              Следующая
-            </button>
+                    >
+                      Следующая
+                    </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Структурный бонус -->
+          
+          <!-- Структурный бонус -->
     <div v-show="activeTab === 'structural'" class="mt-6 bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700">
       <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
         <h5 class="m-0 dark:text-white">Структурный бонус</h5>
-      </div>
+              </div>
       <div class="p-4">
         <div class="grid md:grid-cols-12 gap-3 mb-3">
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
             <select v-model="structuralFilters.page_size" @change="loadStructuralBonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="50">50</option>
-            </select>
-          </div>
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="30">30</option>
+                      <option value="50">50</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сортировка:</label>
             <select v-model="structuralFilters.order_by" @change="loadStructuralBonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="created_at">Дата создания</option>
-              <option value="received_at">Дата получения</option>
-              <option value="amount">Сумма</option>
-              <option value="cycle_number">Номер цикла</option>
-              <option value="stage_number">Номер этапа</option>
-            </select>
-          </div>
+                      <option value="created_at">Дата создания</option>
+                      <option value="received_at">Дата получения</option>
+                      <option value="amount">Сумма</option>
+                      <option value="cycle_number">Номер цикла</option>
+                      <option value="stage_number">Номер этапа</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Направление:</label>
             <select v-model="structuralFilters.order_dir" @change="loadStructuralBonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="desc">По убыванию</option>
-              <option value="asc">По возрастанию</option>
-            </select>
-          </div>
+                      <option value="desc">По убыванию</option>
+                      <option value="asc">По возрастанию</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3 flex items-end">
             <button @click="loadStructuralBonuses"
               class="inline-flex w-full items-center justify-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">
               Обновить
             </button>
-          </div>
-        </div>
-
+                  </div>
+                </div>
+                
         <div v-if="structuralLoading" class="py-6 text-center">
           <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
-        </div>
-
+                </div>
+                
         <div v-else class="overflow-x-auto">
           <div class="inline-block min-w-full align-middle">
             <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
@@ -238,15 +238,15 @@
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата получения</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
-                  </tr>
-                </thead>
+                      </tr>
+                    </thead>
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                   <tr v-for="bonus in structuralBonuses" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
                       <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
-                        {{ bonus.personal_number || 'Загрузка...' }}
-                      </router-link>
-                    </td>
+                            {{ bonus.personal_number || 'Загрузка...' }}
+                          </router-link>
+                        </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
@@ -254,90 +254,90 @@
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.received_at) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm">
                       <span :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ' + getStatusBadgeClass(bonus.status)">
-                        {{ getStatusText(bonus.status) }}
-                      </span>
-                    </td>
+                            {{ getStatusText(bonus.status) }}
+                          </span>
+                        </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.created_at) }}</td>
-                  </tr>
-                </tbody>
-              </table>
+                      </tr>
+                    </tbody>
+                  </table>
             </div>
           </div>
-        </div>
-
+                </div>
+                
         <div v-if="structuralPagination" class="mt-3 flex items-center justify-between">
           <div class="text-sm text-gray-700 dark:text-white">
-            <span>Страница {{ structuralPagination.current_page }} из {{ structuralPagination.total_pages }}</span>
+                    <span>Страница {{ structuralPagination.current_page }} из {{ structuralPagination.total_pages }}</span>
             <span class="ml-3">Всего: {{ structuralPagination.total_count }}</span>
-          </div>
+                  </div>
           <div class="flex gap-2">
-            <button 
-              @click="changeStructuralPage(structuralPagination.current_page - 1)" 
-              :disabled="structuralPagination.current_page <= 1"
+                    <button 
+                      @click="changeStructuralPage(structuralPagination.current_page - 1)" 
+                      :disabled="structuralPagination.current_page <= 1"
               class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
-            >
-              Предыдущая
-            </button>
-            <button 
-              @click="changeStructuralPage(structuralPagination.current_page + 1)" 
-              :disabled="structuralPagination.current_page >= structuralPagination.total_pages"
+                    >
+                      Предыдущая
+                    </button>
+                    <button 
+                      @click="changeStructuralPage(structuralPagination.current_page + 1)" 
+                      :disabled="structuralPagination.current_page >= structuralPagination.total_pages"
               class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
-            >
-              Следующая
-            </button>
+                    >
+                      Следующая
+                    </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Спонсорский бонус -->
+          
+          <!-- Спонсорский бонус -->
     <div v-show="activeTab === 'sponsor'" class="mt-6 bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700">
       <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
         <h5 class="m-0 dark:text-white">Спонсорский бонус</h5>
-      </div>
+              </div>
       <div class="p-4">
         <div class="grid md:grid-cols-12 gap-3 mb-3">
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
             <select v-model="sponsorFilters.page_size" @change="loadSponsorBonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="10">10</option>
-              <option value="20">20</option>
-              <option value="30">30</option>
-              <option value="50">50</option>
-            </select>
-          </div>
+                      <option value="10">10</option>
+                      <option value="20">20</option>
+                      <option value="30">30</option>
+                      <option value="50">50</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сортировка:</label>
             <select v-model="sponsorFilters.order_by" @change="loadSponsorBonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="created_at">Дата создания</option>
-              <option value="received_at">Дата получения</option>
-              <option value="amount">Сумма</option>
-              <option value="cycle_number">Номер цикла</option>
-              <option value="stage_number">Номер этапа</option>
-            </select>
-          </div>
+                      <option value="created_at">Дата создания</option>
+                      <option value="received_at">Дата получения</option>
+                      <option value="amount">Сумма</option>
+                      <option value="cycle_number">Номер цикла</option>
+                      <option value="stage_number">Номер этапа</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Направление:</label>
             <select v-model="sponsorFilters.order_dir" @change="loadSponsorBonuses"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
-              <option value="desc">По убыванию</option>
-              <option value="asc">По возрастанию</option>
-            </select>
-          </div>
+                      <option value="desc">По убыванию</option>
+                      <option value="asc">По возрастанию</option>
+                    </select>
+                  </div>
           <div class="md:col-span-3 flex items-end">
             <button @click="loadSponsorBonuses"
               class="inline-flex w-full items-center justify-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">
               Обновить
             </button>
-          </div>
-        </div>
-
+                  </div>
+                </div>
+                
         <div v-if="sponsorLoading" class="py-6 text-center">
           <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
-        </div>
-
+                </div>
+                
         <div v-else class="overflow-x-auto">
           <div class="inline-block min-w-full align-middle">
             <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
@@ -353,20 +353,20 @@
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата получения</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
-                  </tr>
-                </thead>
+                      </tr>
+                    </thead>
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                   <tr v-for="bonus in sponsorBonuses" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
                       <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
-                        {{ bonus.participant_personal_number || 'Загрузка...' }}
-                      </router-link>
-                    </td>
+                            {{ bonus.participant_personal_number || 'Загрузка...' }}
+                          </router-link>
+                        </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
                       <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
-                        {{ bonus.from_participant_personal_number || 'Загрузка...' }}
-                      </router-link>
-                    </td>
+                            {{ bonus.from_participant_personal_number || 'Загрузка...' }}
+                          </router-link>
+                        </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
@@ -374,37 +374,37 @@
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.received_at) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm">
                       <span :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ' + getStatusBadgeClass(bonus.status)">
-                        {{ getStatusText(bonus.status) }}
-                      </span>
-                    </td>
+                            {{ getStatusText(bonus.status) }}
+                          </span>
+                        </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.created_at) }}</td>
-                  </tr>
-                </tbody>
-              </table>
+                      </tr>
+                    </tbody>
+                  </table>
             </div>
           </div>
-        </div>
-
+                </div>
+                
         <div v-if="sponsorPagination" class="mt-3 flex items-center justify-between">
           <div class="text-sm text-gray-700 dark:text-white">
-            <span>Страница {{ sponsorPagination.current_page }} из {{ sponsorPagination.total_pages }}</span>
+                    <span>Страница {{ sponsorPagination.current_page }} из {{ sponsorPagination.total_pages }}</span>
             <span class="ml-3">Всего: {{ sponsorPagination.total_count }}</span>
-          </div>
+                  </div>
           <div class="flex gap-2">
-            <button 
-              @click="changeSponsorPage(sponsorPagination.current_page - 1)" 
-              :disabled="sponsorPagination.current_page <= 1"
+                    <button 
+                      @click="changeSponsorPage(sponsorPagination.current_page - 1)" 
+                      :disabled="sponsorPagination.current_page <= 1"
               class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
-            >
-              Предыдущая
-            </button>
-            <button 
-              @click="changeSponsorPage(sponsorPagination.current_page + 1)" 
-              :disabled="sponsorPagination.current_page >= sponsorPagination.total_pages"
+                    >
+                      Предыдущая
+                    </button>
+                    <button 
+                      @click="changeSponsorPage(sponsorPagination.current_page + 1)" 
+                      :disabled="sponsorPagination.current_page >= sponsorPagination.total_pages"
               class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
-            >
-              Следующая
-            </button>
+                    >
+                      Следующая
+                    </button>
           </div>
         </div>
       </div>
@@ -422,7 +422,7 @@ const router = useRouter()
 const route = useRoute()
 
 // Реактивные данные
-const activeTab = ref('multibonus')
+const activeTab = ref('structural')
 
 // Animated indicator for tabs
 const tabsContainer = ref(null)
