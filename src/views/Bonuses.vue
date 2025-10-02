@@ -344,8 +344,10 @@
               <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-[#3f3f47]">
                   <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Участник</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">От участника</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Номер </th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ФИО</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">От Номер</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">От ФИО</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цикл</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Этап</th>
@@ -359,14 +361,24 @@
                   <tr v-for="bonus in sponsorBonuses" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
                       <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
-                            {{ bonus.participant_personal_number || 'Загрузка...' }}
-                          </router-link>
-                        </td>
+                        {{ bonus.participant_personal_number || '-' }}
+                      </router-link>
+                    </td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                        {{ bonus.participant_fio || '-' }}
+                      </router-link>
+                    </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
                       <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
-                            {{ bonus.from_participant_personal_number || 'Загрузка...' }}
-                          </router-link>
-                        </td>
+                        {{ bonus.from_participant_personal_number || '-' }}
+                      </router-link>
+                    </td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                        {{ bonus.from_participant_fio || '-' }}
+                      </router-link>
+                    </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
@@ -619,25 +631,8 @@ const loadSponsorBonuses = async () => {
       }
     })
     const bonuses = response.data.results || response.data
-    const bonusesWithPersonalNumbers = await Promise.all(
-      bonuses.map(async (bonus) => {
-        try {
-          const [participantResponse, fromParticipantResponse] = await Promise.all([
-            api.get(`participants/${bonus.participant_id}`),
-            api.get(`participants/${bonus.from_participant_id}`)
-          ])
-          return {
-            ...bonus,
-            participant_personal_number: participantResponse.data.personal_number,
-            from_participant_personal_number: fromParticipantResponse.data.personal_number
-          }
-        } catch (error) {
-          console.error(`Ошибка загрузки участников для бонуса ${bonus.id}:`, error)
-          return bonus
-        }
-      })
-    )
-    sponsorBonuses.value = bonusesWithPersonalNumbers
+    // Бэкенд уже отдает FIO и персональные номера, дополнительные запросы не нужны
+    sponsorBonuses.value = bonuses
     sponsorPagination.value = {
       current_page: response.data.current_page || 1,
       total_pages: response.data.total_pages || 1,
