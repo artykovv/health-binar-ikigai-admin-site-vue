@@ -41,34 +41,114 @@
           <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
         </div>
         <div v-else-if="error" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 my-3 dark:bg-[#3f3f47] dark:border-gray-700 dark:text-white">{{ error }}</div>
-        <div v-else>
+        <div class="flex justify-center" v-else>
           <div class="tree mt-5 mb-5">
-            <div v-if="structure" class="node">
+              <div v-if="structure" class="node">
               <div @click="goTo(structure.participant_id)" class="node-content" :style="nodeStyle(structure)">
-                <h6>{{ structure.participant_lastname }} {{ structure.participant_name }} {{ structure.participant_patronymic }}</h6>
-                <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.participant_personal_number }}</button>
+                <div class="text-center">
+                  <h6>{{ structure.participant_lastname }} {{ structure.participant_name }} {{ structure.participant_patronymic }}</h6>
+                  <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.participant_personal_number }}</button>
+                </div>
+                <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
+                  <div>
+                    <div class="text-[10px] opacity-70">Общий слева</div>
+                    <div class="font-semibold">{{ getBD(structure.participant_id)?.total_left ?? '-' }}</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] opacity-70">Общий справа</div>
+                    <div class="font-semibold">{{ getBD(structure.participant_id)?.total_right ?? '-' }}</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] opacity-70">Текущий слева</div>
+                    <div class="font-semibold">{{ currentLeft(structure.participant_id) }}</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] opacity-70">Текущий справа</div>
+                    <div class="font-semibold">{{ currentRight(structure.participant_id) }}</div>
+                  </div>
+                </div>
               </div>
               <div class="branch" v-if="hasAnyChild(structure)">
                 <!-- Left subtree level 2 -->
                 <div class="node">
                   <div v-if="structure.left_child" @click="goTo(structure.left_child.participant_id)" class="node-content" :style="nodeStyle(structure.left_child)">
-                    <h6>{{ structure.left_child.participant_lastname }} {{ structure.left_child.participant_name }} {{ structure.left_child.participant_patronymic }}</h6>
-                    <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.participant_personal_number }}</button>
+                    <div class="text-center">
+                      <h6>{{ structure.left_child.participant_lastname }} {{ structure.left_child.participant_name }} {{ structure.left_child.participant_patronymic }}</h6>
+                      <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.participant_personal_number }}</button>
+                    </div>
+                    <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
+                      <div>
+                        <div class="text-[10px] opacity-70">Общий слева</div>
+                        <div class="font-semibold">{{ getBD(structure.left_child.participant_id)?.total_left ?? '-' }}</div>
+                      </div>
+                      <div>
+                        <div class="text-[10px] opacity-70">Общий справа</div>
+                        <div class="font-semibold">{{ getBD(structure.left_child.participant_id)?.total_right ?? '-' }}</div>
+                      </div>
+                      <div>
+                        <div class="text-[10px] opacity-70">Текущий слева</div>
+                        <div class="font-semibold">{{ currentLeft(structure.left_child.participant_id) }}</div>
+                      </div>
+                      <div>
+                        <div class="text-[10px] opacity-70">Текущий справа</div>
+                        <div class="font-semibold">{{ currentRight(structure.left_child.participant_id) }}</div>
+                      </div>
+                    </div>
                   </div>
                   <div v-else class="node invisible"></div>
                   <!-- grandchildren for left child (level 3) -->
                   <div class="branch" v-if="structure.left_child && hasAnyChild(structure.left_child)">
                     <div class="node">
                       <div v-if="structure.left_child.left_child" @click="goTo(structure.left_child.left_child.participant_id)" class="node-content" :style="nodeStyle(structure.left_child.left_child)">
-                        <h6>{{ structure.left_child.left_child.participant_lastname }} {{ structure.left_child.left_child.participant_name }} {{ structure.left_child.left_child.participant_patronymic }}</h6>
-                        <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.left_child.participant_personal_number }}</button>
+                        <div class="text-center">
+                          <h6>{{ structure.left_child.left_child.participant_lastname }} {{ structure.left_child.left_child.participant_name }} {{ structure.left_child.left_child.participant_patronymic }}</h6>
+                          <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.left_child.participant_personal_number }}</button>
+                        </div>
+                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
+                          <div>
+                            <div class="text-[10px] opacity-70">Общий слева</div>
+                            <div class="font-semibold">{{ getBD(structure.left_child.left_child.participant_id)?.total_left ?? '-' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Общий справа</div>
+                            <div class="font-semibold">{{ getBD(structure.left_child.left_child.participant_id)?.total_right ?? '-' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Текущий слева</div>
+                            <div class="font-semibold">{{ currentLeft(structure.left_child.left_child.participant_id) }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Текущий справа</div>
+                            <div class="font-semibold">{{ currentRight(structure.left_child.left_child.participant_id) }}</div>
+                          </div>
+                        </div>
                       </div>
                       <div v-else class="node invisible"></div>
                     </div>
                     <div class="node">
                       <div v-if="structure.left_child.right_child" @click="goTo(structure.left_child.right_child.participant_id)" class="node-content" :style="nodeStyle(structure.left_child.right_child)">
-                        <h6>{{ structure.left_child.right_child.participant_lastname }} {{ structure.left_child.right_child.participant_name }} {{ structure.left_child.right_child.participant_patronymic }}</h6>
-                        <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.right_child.participant_personal_number }}</button>
+                        <div class="text-center">
+                          <h6>{{ structure.left_child.right_child.participant_lastname }} {{ structure.left_child.right_child.participant_name }} {{ structure.left_child.right_child.participant_patronymic }}</h6>
+                          <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.right_child.participant_personal_number }}</button>
+                        </div>
+                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
+                          <div>
+                            <div class="text-[10px] opacity-70">Общий слева</div>
+                            <div class="font-semibold">{{ getBD(structure.left_child.right_child.participant_id)?.total_left ?? '-' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Общий справа</div>
+                            <div class="font-semibold">{{ getBD(structure.left_child.right_child.participant_id)?.total_right ?? '-' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Текущий слева</div>
+                            <div class="font-semibold">{{ currentLeft(structure.left_child.right_child.participant_id) }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Текущий справа</div>
+                            <div class="font-semibold">{{ currentRight(structure.left_child.right_child.participant_id) }}</div>
+                          </div>
+                        </div>
                       </div>
                       <div v-else class="node invisible"></div>
                     </div>
@@ -78,23 +158,83 @@
                 <!-- Right subtree level 2 -->
                 <div class="node">
                   <div v-if="structure.right_child" @click="goTo(structure.right_child.participant_id)" class="node-content" :style="nodeStyle(structure.right_child)">
-                    <h6>{{ structure.right_child.participant_lastname }} {{ structure.right_child.participant_name }} {{ structure.right_child.participant_patronymic }}</h6>
-                    <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.participant_personal_number }}</button>
+                    <div class="text-center">
+                      <h6>{{ structure.right_child.participant_lastname }} {{ structure.right_child.participant_name }} {{ structure.right_child.participant_patronymic }}</h6>
+                      <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.participant_personal_number }}</button>
+                    </div>
+                    <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
+                      <div>
+                        <div class="text-[10px] opacity-70">Общий слева</div>
+                        <div class="font-semibold">{{ getBD(structure.right_child.participant_id)?.total_left ?? '-' }}</div>
+                      </div>
+                      <div>
+                        <div class="text-[10px] opacity-70">Общий справа</div>
+                        <div class="font-semibold">{{ getBD(structure.right_child.participant_id)?.total_right ?? '-' }}</div>
+                      </div>
+                      <div>
+                        <div class="text-[10px] opacity-70">Текущий слева</div>
+                        <div class="font-semibold">{{ currentLeft(structure.right_child.participant_id) }}</div>
+                      </div>
+                      <div>
+                        <div class="text-[10px] opacity-70">Текущий справа</div>
+                        <div class="font-semibold">{{ currentRight(structure.right_child.participant_id) }}</div>
+                      </div>
+                    </div>
                   </div>
                   <div v-else class="node invisible"></div>
                   <!-- grandchildren for right child (level 3) -->
                   <div class="branch" v-if="structure.right_child && hasAnyChild(structure.right_child)">
                     <div class="node">
                       <div v-if="structure.right_child.left_child" @click="goTo(structure.right_child.left_child.participant_id)" class="node-content" :style="nodeStyle(structure.right_child.left_child)">
-                        <h6>{{ structure.right_child.left_child.participant_lastname }} {{ structure.right_child.left_child.participant_name }} {{ structure.right_child.left_child.participant_patronymic }}</h6>
-                        <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.left_child.participant_personal_number }}</button>
+                        <div class="text-center">
+                          <h6>{{ structure.right_child.left_child.participant_lastname }} {{ structure.right_child.left_child.participant_name }} {{ structure.right_child.left_child.participant_patronymic }}</h6>
+                          <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.left_child.participant_personal_number }}</button>
+                        </div>
+                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
+                          <div>
+                            <div class="text-[10px] opacity-70">Общий слева</div>
+                            <div class="font-semibold">{{ getBD(structure.right_child.left_child.participant_id)?.total_left ?? '-' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Общий справа</div>
+                            <div class="font-semibold">{{ getBD(structure.right_child.left_child.participant_id)?.total_right ?? '-' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Текущий слева</div>
+                            <div class="font-semibold">{{ currentLeft(structure.right_child.left_child.participant_id) }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Текущий справа</div>
+                            <div class="font-semibold">{{ currentRight(structure.right_child.left_child.participant_id) }}</div>
+                          </div>
+                        </div>
                       </div>
                       <div v-else class="node invisible"></div>
                     </div>
                     <div class="node">
                       <div v-if="structure.right_child.right_child" @click="goTo(structure.right_child.right_child.participant_id)" class="node-content" :style="nodeStyle(structure.right_child.right_child)">
-                        <h6>{{ structure.right_child.right_child.participant_lastname }} {{ structure.right_child.right_child.participant_name }} {{ structure.right_child.right_child.participant_patronymic }}</h6>
-                        <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.right_child.participant_personal_number }}</button>
+                        <div class="text-center">
+                          <h6>{{ structure.right_child.right_child.participant_lastname }} {{ structure.right_child.right_child.participant_name }} {{ structure.right_child.right_child.participant_patronymic }}</h6>
+                          <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.right_child.participant_personal_number }}</button>
+                        </div>
+                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
+                          <div>
+                            <div class="text-[10px] opacity-70">Общий слева</div>
+                            <div class="font-semibold">{{ getBD(structure.right_child.right_child.participant_id)?.total_left ?? '-' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Общий справа</div>
+                            <div class="font-semibold">{{ getBD(structure.right_child.right_child.participant_id)?.total_right ?? '-' }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Текущий слева</div>
+                            <div class="font-semibold">{{ currentLeft(structure.right_child.right_child.participant_id) }}</div>
+                          </div>
+                          <div>
+                            <div class="text-[10px] opacity-70">Текущий справа</div>
+                            <div class="font-semibold">{{ currentRight(structure.right_child.right_child.participant_id) }}</div>
+                          </div>
+                        </div>
                       </div>
                       <div v-else class="node invisible"></div>
                     </div>
@@ -123,6 +263,8 @@ const router = useRouter()
 const structure = ref(null)
 const loading = ref(false)
 const error = ref('')
+// Кэш бонус-данных по участнику
+const bonusByParticipant = ref({})
 
 const participantId = ref(route.params.id || '')
 
@@ -136,6 +278,9 @@ const fetchStructure = async (id) => {
   try {
     const { data } = await api.get(`structure/${id}`)
     structure.value = data
+    // после загрузки структуры подгружаем бонус-данные для всех присутствующих узлов
+    const ids = collectParticipantIds(structure.value)
+    await fetchBonusBatch(ids)
   } catch (e) {
     console.error(e)
     error.value = 'Ошибка загрузки структуры'
@@ -150,8 +295,6 @@ const nodeStyle = (node) => {
   const style = {}
   if (node && node.color) {
     style.background = `linear-gradient(${node.color})`
-    style.padding = '40px'
-    style.width = '200px'
     style.borderRadius = '30px'
   }
   return style
@@ -218,6 +361,57 @@ const selectParticipant = (p) => {
   showResults.value = false
   searchResults.value = []
   router.push(`/structure/${p.id}`)
+}
+
+// Сбор всех participant_id из дерева
+function collectParticipantIds(root) {
+  const result = new Set()
+  function walk(node) {
+    if (!node) return
+    if (node.participant_id) result.add(node.participant_id)
+    walk(node.left_child)
+    walk(node.right_child)
+  }
+  walk(root)
+  return Array.from(result)
+}
+
+// Загрузка бонус-данных для набора ID с кешированием
+async function fetchBonusBatch(ids) {
+  const toLoad = ids.filter((id) => !bonusByParticipant.value[id])
+  await Promise.all(
+    toLoad.map(async (id) => {
+      try {
+        const { data } = await api.get(`data/participant_bonus_data/${id}`)
+        bonusByParticipant.value[id] = data
+      } catch (e) {
+        console.error('Ошибка загрузки бонус-данных участника', id, e)
+        bonusByParticipant.value[id] = null
+      }
+    })
+  )
+}
+
+// Доступ к бонус-данным одного участника
+function getBD(id) {
+  return bonusByParticipant.value[id] || null
+}
+
+// Текущие значения: слева = total_left - base_right, справа = total_right - base_left
+function currentLeft(id) {
+  const bd = getBD(id)
+  if (!bd) return '-'
+  const totalLeft = Number(bd.total_left || 0)
+  const baseLeft = Number(bd.base_left || 0)
+  return Math.max(totalLeft - baseLeft, 0)
+}
+
+function currentRight(id) {
+  const bd = getBD(id)
+  if (!bd) return '-'
+  const totalRight = Number(bd.total_right || 0)
+  const baseRight = Number(bd.base_right || 0)
+  return Math.max(totalRight - baseRight, 0)
 }
 </script>
 
@@ -292,12 +486,15 @@ const selectParticipant = (p) => {
 		color: #000000;
 		font-family: arial, verdana, tahoma;
 		font-size: 11px;
-		display: inline-block;
+		display: inline-grid;
+		place-items: center;
 		border-radius: 5px;
 		transition: all 0.5s;
 		cursor: pointer;
 		border: 1px solid #000000;
 		background-color: #ffffff;
+		width: 200px;
+		height: 200px;
 	}
 
 	.tree .node-content:hover {

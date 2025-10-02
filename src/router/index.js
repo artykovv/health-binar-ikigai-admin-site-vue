@@ -18,96 +18,123 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: { title: 'Главная' }
   },
   {
     path: '/participants',
     name: 'Participants',
-    component: Participants
+    component: Participants,
+    meta: { title: 'Участники' }
   },
   {
     path: '/registration',
     name: 'Registration',
-    component: Registration
+    component: Registration,
+    meta: { title: 'Регистрация' }
   },
   {
     path: '/branches',
     name: 'Branches',
-    component: Branches
+    component: Branches,
+    meta: { title: 'Филиалы' }
   },
   {
     path: '/bonuses',
     name: 'Bonuses',
-    component: Bonuses
+    component: Bonuses,
+    meta: { title: 'Бонусы' }
   },
   {
     path: '/bonuses/multibonus',
     name: 'Multibonus',
     component: Bonuses,
-    props: { defaultTab: 'multibonus' }
+    props: { defaultTab: 'multibonus' },
+    meta: { title: 'Бонусы — Мультибонус' }
   },
   {
     path: '/bonuses/structural',
     name: 'StructuralBonus',
     component: Bonuses,
-    props: { defaultTab: 'structural' }
+    props: { defaultTab: 'structural' },
+    meta: { title: 'Бонусы — Структурный' }
   },
   {
     path: '/bonuses/sponsor',
     name: 'SponsorBonus',
     component: Bonuses,
-    props: { defaultTab: 'sponsor' }
+    props: { defaultTab: 'sponsor' },
+    meta: { title: 'Бонусы — Спонсорский' }
   },
   {
     path: '/settings',
     name: 'Settings',
-    component: Settings
+    component: Settings,
+    meta: { title: 'Настройки' }
   },
   {
     path: '/report',
     name: 'Report',
-    component: Report
+    component: Report,
+    meta: { title: 'Отчёты' }
   },
   {
     path: '/participants/:id',
     name: 'ParticipantView',
-    component: ParticipantView
+    component: ParticipantView,
+    meta: { title: 'Участник' }
   },
   {
     path: '/purchase',
     name: 'Purchases',
-    component: Purchases
+    component: Purchases,
+    meta: { title: 'Покупки' }
   },
   {
     path: '/purchase/:id',
     name: 'Purchase',
-    component: Purchase
+    component: Purchase,
+    meta: { title: 'Покупка' }
   },
   {
     path: '/registration/new',
     name: 'UserRegistration',
-    component: UserRegistration
+    component: UserRegistration,
+    meta: { title: 'Новая регистрация' }
   },
   {
     path: '/registration/edit/:id',
     name: 'UserEdit',
-    component: UserEdit
+    component: UserEdit,
+    meta: { title: 'Изменение участника' }
   },
   {
     path: '/structure/:id?',
     name: 'Structure',
-    component: Structure
+    component: Structure,
+    meta: { title: 'Структура' }
   },
   {
     path: '/registration/add-to-structure/:id',
     name: 'AddToStructure',
-    component: AddToStructure
+    component: AddToStructure,
+    meta: { title: 'Добавить в структуру' }
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+// Установка заголовка страницы из meta.title
+router.afterEach((to) => {
+  const defaultTitle = 'Ikigai'
+  if (to && to.meta && to.meta.title) {
+    document.title = to.meta.title
+  } else {
+    document.title = defaultTitle
+  }
 })
 
 export default router
