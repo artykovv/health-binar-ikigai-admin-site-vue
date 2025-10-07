@@ -198,8 +198,8 @@
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(stage.closed_at) }}</td>
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(stage.start_at) }}</td>
                             <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDuration(stage.start_at, stage.closed_at) }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.participants_left }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.participants_right }}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.effective_left}}</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.effective_right }}</td>
                           </tr>
                         </tbody>
                       </table>
