@@ -65,8 +65,29 @@ const indicator = reactive({
   visible: false
 })
 
+// External active key override for detail pages (e.g., participants/:id)
+const externalActiveKey = ref(null)
+
+function readExternalActiveKey() {
+  if (typeof window === 'undefined') return null
+  const k = window.__navActiveKey
+  if (k === 'participants' || k === 'registration') return k
+  return null
+}
+
 function getActiveKey() {
   const currentPath = route.path
+  // Map related detail pages to their logical parent menu item
+  if (currentPath.startsWith('/sponsored')) {
+    return 'participants'
+  }
+  // On participant detail, allow external override (set by the page after data load)
+  if (currentPath.startsWith('/participants/')) {
+    const ext = externalActiveKey.value || readExternalActiveKey()
+    if (ext) return ext
+    // If not yet known, avoid showing a wrong active tab (no highlight until decided)
+    return null
+  }
   let match = items.find(i => currentPath === i.to)
   if (!match) {
     match = items.find(i => i.to !== '/' && (currentPath === i.to || currentPath.startsWith(i.to + '/')))
@@ -95,6 +116,10 @@ function updateIndicator() {
   updateWidths()
 
   const activeKey = getActiveKey()
+  if (!activeKey) {
+    indicator.visible = false
+    return
+  }
   const linkEl = linkRefs.get(activeKey)
   if (!linkEl) return
 
@@ -152,8 +177,34 @@ watch(
   async () => {
     await nextTick()
     updateIndicator()
+    // Clear external override when leaving participant detail page
+    const currentPath = route.path
+    if (!currentPath.startsWith('/participants/')) {
+      externalActiveKey.value = null
+      if (typeof window !== 'undefined' && window.__navActiveKey) {
+        try { delete window.__navActiveKey } catch {}
+      }
+    }
   }
 )
+
+// Listen for external active key change events to update immediately
+function onExternalKeyChanged() {
+  externalActiveKey.value = readExternalActiveKey()
+  nextTick().then(() => updateIndicator())
+}
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    window.addEventListener('nav-active-key-changed', onExternalKeyChanged)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('nav-active-key-changed', onExternalKeyChanged)
+  }
+})
 
 watch(linkWidth, async () => {
   await nextTick()

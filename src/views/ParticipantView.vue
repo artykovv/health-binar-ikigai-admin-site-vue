@@ -222,6 +222,7 @@
                 <div class="grid gap-2">
                   <router-link :to="`/purchase/${participant.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-sm hover:bg-gray-900">Покупки</router-link>
                   <router-link :to="`/structure/${participant.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900 ">Структура</router-link>
+                  <router-link :to="`/sponsored/${participant.id}`" class="inline-flex items-center rounded-md bg-slate-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Личники</router-link>
                 </div>
               </div>
             </div>
@@ -258,7 +259,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from '@/api'
 
@@ -282,6 +283,10 @@ const loadParticipant = async () => {
   try {
     const response = await api.get(`participants/${participantId}`)
     participant.value = response.data
+    if (typeof window !== 'undefined') {
+      window.__navActiveKey = response.data?.registered ? 'participants' : 'registration'
+      try { window.dispatchEvent(new Event('nav-active-key-changed')) } catch {}
+    }
   } catch (error) {
     console.error('Ошибка загрузки участника:', error)
     participant.value = null
@@ -373,6 +378,13 @@ onMounted(async () => {
     loadStructureData(),
     loadStageHistory()
   ])
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined' && window.__navActiveKey) {
+    try { delete window.__navActiveKey } catch {}
+    try { window.dispatchEvent(new Event('nav-active-key-changed')) } catch {}
+  }
 })
 </script>
 

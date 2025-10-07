@@ -9,6 +9,7 @@ import ParticipantView from '../views/ParticipantView.vue'
 import Purchase from '../views/Purchase.vue'
 import Purchases from '../views/Purchases.vue'
 import Report from '../views/Report.vue'
+import Sponsored from '../views/Sponsored.vue'
 import UserRegistration from '../views/UserRegistration.vue'
 import UserEdit from '../views/UserEdit.vue'
 import Structure from '../views/Structure.vue'
@@ -83,6 +84,12 @@ const routes = [
     name: 'ParticipantView',
     component: ParticipantView,
     meta: { title: 'Участник' }
+  },
+  {
+    path: '/sponsored/:id',
+    name: 'Sponsored',
+    component: Sponsored,
+    meta: { title: 'Личники' }
   },
   {
     path: '/purchase',
