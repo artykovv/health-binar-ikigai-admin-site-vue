@@ -53,6 +53,7 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ФИО</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Структурный бонус</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Спонсорский бонус</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
@@ -64,26 +65,37 @@
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ row.full_name }}</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ row.structure_bonus }}</strong></td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ row.sponsor_bonus }}</strong></td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                  <button 
+                    v-if="(row.status === 'pending' || !row.status) && !isCurrentWeek" 
+                    @click="openPayModal(row)" 
+                    type="button"
+                    :class="getStatusBadgeClass(row.status)" 
+                    class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium cursor-pointer hover:opacity-80">
+                    {{ getStatusText(row.status) }}
+                  </button>
+                  <span v-else :class="getStatusBadgeClass(row.status)" class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium">
+                    {{ getStatusText(row.status) }}
+                  </span>
+                </td>
               </tr>
             </tbody>
             <tfoot class="bg-gray-50 dark:bg-[#3f3f47]">
               <tr>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white" colspan="3">Итого</th>
                 <th class="px-4 py-2 text-left text-sm text-gray-900 dark:text-white">{{ totalStructure }}</th>
-                <th class="px-4 py-2 text-left text-sm text-gray-900 dark:text-white">
-                  <div class="flex items-center justify-between gap-3">
-                    <span>{{ totalSponsor }}</span>
-                    <div class="flex items-center gap-2">
-                      <button @click="downloadSummary" type="button" :disabled="downloading"
-                        class="inline-flex items-center rounded-md bg-green-600 px-3 py-1.5 text-white text-xs hover:bg-green-700 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">
-                        <span v-if="downloading" class="mr-2 inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/50 border-t-white"></span>
-                        Скачать xlsx
-                      </button>
-                      <button @click="copyPlainText" type="button"
-                        class="inline-flex items-center rounded-md bg-black px-3 py-1.5 text-white text-xs hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">
-                        Копировать
-                      </button>
-                    </div>
+                <th class="px-4 py-2 text-left text-sm text-gray-900 dark:text-white">{{ totalSponsor }}</th>
+                <th class="px-4 py-2">
+                  <div class="flex items-center justify-end gap-2">
+                    <button @click="downloadSummary" type="button" :disabled="downloading"
+                      class="inline-flex items-center rounded-md bg-green-600 px-3 py-1.5 text-white text-xs hover:bg-green-700 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">
+                      <span v-if="downloading" class="mr-2 inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/50 border-t-white"></span>
+                      Скачать xlsx
+                    </button>
+                    <button @click="copyPlainText" type="button"
+                      class="inline-flex items-center rounded-md bg-black px-3 py-1.5 text-white text-xs hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">
+                      Копировать
+                    </button>
                   </div>
                 </th>
               </tr>
@@ -95,6 +107,46 @@
 
     <div v-else class="bg-white rounded-lg ring-1 ring-gray-200 p-6 text-gray-700 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
       Данные не найдены. Уточните фильтры и попробуйте снова.
+    </div>
+
+    <!-- Уведомление о текущей неделе -->
+    <div v-if="isCurrentWeek && summary.length > 0" class="mt-3 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300">
+      <strong>Внимание:</strong> Вы просматриваете текущую неделю. Выдача бонусов доступна только для завершенных недель.
+    </div>
+
+    <!-- Модальное окно выдачи бонуса -->
+    <div v-if="showPayModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="closePayModal">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 dark:bg-[#3f3f47]">
+        <h3 class="text-lg font-semibold mb-4 dark:text-white">Выдать бонус</h3>
+        <p class="text-sm text-gray-700 mb-4 dark:text-white">
+          Вы уверены, что хотите выдать бонус участнику <strong>{{ selectedParticipant?.full_name }}</strong>?
+        </p>
+        <div class="mb-4 space-y-2">
+          <div class="flex justify-between text-sm dark:text-white">
+            <span class="text-gray-600 dark:text-gray-300">Структурный бонус:</span>
+            <strong>{{ selectedParticipant?.structure_bonus || 0 }}</strong>
+          </div>
+          <div class="flex justify-between text-sm dark:text-white">
+            <span class="text-gray-600 dark:text-gray-300">Спонсорский бонус:</span>
+            <strong>{{ selectedParticipant?.sponsor_bonus || 0 }}</strong>
+          </div>
+          <div class="flex justify-between text-sm pt-2 border-t dark:border-gray-600 dark:text-white">
+            <span class="text-gray-600 dark:text-gray-300">Всего:</span>
+            <strong class="text-lg">{{ (selectedParticipant?.structure_bonus || 0) + (selectedParticipant?.sponsor_bonus || 0) }}</strong>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button @click="closePayModal" type="button"
+            class="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:bg-[#252529] dark:text-white dark:border-gray-700 dark:hover:bg-[#3f3f47]">
+            Отмена
+          </button>
+          <button @click="confirmPay" type="button" :disabled="paying"
+            class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-white text-sm hover:bg-blue-700 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">
+            <span v-if="paying" class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/50 border-t-white"></span>
+            Выдать
+          </button>
+        </div>
+      </div>
     </div>
   </div>
   
@@ -121,6 +173,15 @@ const selectedWeekIndex = ref(0)
 
 const totalStructure = computed(() => summary.value.reduce((s, r) => s + (Number(r.structure_bonus) || 0), 0))
 const totalSponsor = computed(() => summary.value.reduce((s, r) => s + (Number(r.sponsor_bonus) || 0), 0))
+
+// Проверка, является ли выбранная неделя текущей (незавершенной)
+const isCurrentWeek = computed(() => {
+  if (!filters.value.end_date) return false
+  const endDate = new Date(filters.value.end_date)
+  const today = new Date()
+  const midnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  return endDate > midnight
+})
 
 const formatDate = (d) => {
   const pad = (n) => String(n).padStart(2, '0')
@@ -168,7 +229,7 @@ const resetFilters = () => {
   fetchSummary()
 }
 
-// Построение недель с 23.09.2025 по последнюю завершенную неделю
+// Построение недель с 23.09.2025 включая текущую неделю
 function buildWeeks() {
   weeks.value = []
   const today = new Date()
@@ -179,8 +240,8 @@ function buildWeeks() {
   let end = new Date(start)
   end.setDate(start.getDate() + 7)
   const result = []
-  // Добавляем недели, пока конец недели меньше или равен сегодняшней полуночи (полностью завершенная неделя)
-  while (end <= midnight) {
+  // Добавляем недели, пока начало недели меньше сегодняшней даты
+  while (start <= midnight) {
     const label = `${formatDate(start)} — ${formatDate(end)}`
     result.push({ start: formatDate(start), end: formatDate(end), label })
     // Следующая неделя
@@ -196,6 +257,7 @@ function onWeekChange() {
   if (!w) return
   filters.value.start_date = w.start
   filters.value.end_date = w.end
+  fetchSummary()
 }
 
 // Копирование всех строк как обычный текст
@@ -238,6 +300,57 @@ async function downloadSummary() {
     console.error('Ошибка скачивания отчёта:', e)
   } finally {
     downloading.value = false
+  }
+}
+
+// Функции для статуса
+function getStatusText(status) {
+  if (status === 'paid') return 'Выдано'
+  return 'Не выдано'
+}
+
+function getStatusBadgeClass(status) {
+  if (status === 'paid') {
+    return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+  }
+  return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+}
+
+// Модальное окно выдачи бонуса
+const showPayModal = ref(false)
+const selectedParticipant = ref(null)
+const paying = ref(false)
+
+function openPayModal(participant) {
+  selectedParticipant.value = participant
+  showPayModal.value = true
+}
+
+function closePayModal() {
+  showPayModal.value = false
+  selectedParticipant.value = null
+}
+
+async function confirmPay() {
+  if (!selectedParticipant.value) return
+  paying.value = true
+  try {
+    await api.post(`bonuses/pay/by-participant`, {
+      start_date: filters.value.start_date,
+      end_date: filters.value.end_date,
+      participant_id: selectedParticipant.value.participant_id
+    })
+    // Обновить статус в списке
+    const item = summary.value.find(r => r.participant_id === selectedParticipant.value.participant_id)
+    if (item) {
+      item.status = 'paid'
+    }
+    closePayModal()
+  } catch (error) {
+    console.error('Ошибка выдачи бонуса:', error)
+    alert('Не удалось выдать бонус')
+  } finally {
+    paying.value = false
   }
 }
 

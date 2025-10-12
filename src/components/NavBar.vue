@@ -9,9 +9,9 @@ const items = [
   { to: '/registration', label: 'Регистрации', key: 'registration' },
   { to: '/branches', label: 'Филиалы', key: 'branches' },
   { to: '/bonuses', label: 'Бонусы', key: 'bonuses' },
-  { to: '/purchase', label: 'Покупки', key: 'purchases' },
+  // { to: '/purchase', label: 'Покупки', key: 'purchases' },
   { to: '/report', label: 'Отчет', key: 'report' },
-  { to: '/settings', label: 'Настройки', key: 'settings' }
+  // { to: '/settings', label: 'Настройки', key: 'settings' }
 ]
 
 const route = useRoute()
@@ -139,14 +139,27 @@ function onResize() {
 
 let resizeObserver
 
+// Listen for external active key change events to update immediately
+function onExternalKeyChanged() {
+  externalActiveKey.value = readExternalActiveKey()
+  nextTick().then(() => updateIndicator())
+}
+
 onMounted(() => {
   // Load persisted theme
   loadTheme()
+  
   nextTick(() => {
     updateIndicator()
   })
+  
   window.addEventListener('resize', onResize)
   window.addEventListener('load', onResize)
+  
+  // External key change listener
+  if (typeof window !== 'undefined') {
+    window.addEventListener('nav-active-key-changed', onExternalKeyChanged)
+  }
 
   if (typeof ResizeObserver !== 'undefined') {
     resizeObserver = new ResizeObserver(() => {
@@ -167,6 +180,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
   window.removeEventListener('load', onResize)
+  
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('nav-active-key-changed', onExternalKeyChanged)
+  }
+  
   if (resizeObserver && containerRef.value) {
     try { resizeObserver.unobserve(containerRef.value) } catch {}
   }
@@ -188,24 +206,6 @@ watch(
   }
 )
 
-// Listen for external active key change events to update immediately
-function onExternalKeyChanged() {
-  externalActiveKey.value = readExternalActiveKey()
-  nextTick().then(() => updateIndicator())
-}
-
-onMounted(() => {
-  if (typeof window !== 'undefined') {
-    window.addEventListener('nav-active-key-changed', onExternalKeyChanged)
-  }
-})
-
-onBeforeUnmount(() => {
-  if (typeof window !== 'undefined') {
-    window.removeEventListener('nav-active-key-changed', onExternalKeyChanged)
-  }
-})
-
 watch(linkWidth, async () => {
   await nextTick()
   updateIndicator()
@@ -213,7 +213,7 @@ watch(linkWidth, async () => {
 </script>
 
 <template>
-  <nav class="nav">
+  <nav class="nav" aria-label="Основная навигация">
     <ul class="nav-list card" ref="containerRef">
       <li v-for="item in items" :key="item.key" class="nav-item">
         <RouterLink :to="item.to" custom v-slot="{ isActive, href, navigate }">
@@ -223,6 +223,7 @@ watch(linkWidth, async () => {
             :ref="el => setLinkRef(item.key, el)"
             :class="['nav-link', { 'is-active': isActive }]"
             :style="{ width: linkWidth ? linkWidth + 'px' : undefined }"
+            :aria-label="item.label"
           >
             {{ item.label }}
           </a>
@@ -239,10 +240,16 @@ watch(linkWidth, async () => {
       />
     </ul>
     <div class="nav-toggle-card card">
-      <button class="theme-toggle" type="button" @click="toggleTheme" :aria-pressed="isDark">
-        <span v-if="!isDark" aria-hidden="true" class="icon">☀️</span>
-        <span v-else aria-hidden="true" class="icon">🌙</span>
-        <span class="sr-only">Toggle theme</span>
+      <button 
+        class="theme-toggle" 
+        type="button" 
+        @click="toggleTheme" 
+        :aria-pressed="isDark"
+        :aria-label="isDark ? 'Переключить на светлую тему' : 'Переключить на темную тему'"
+        :title="isDark ? 'Светлая тема' : 'Темная тема'"
+      >
+        <span v-if="!isDark" aria-hidden="true" class="icon theme-icon">☀️</span>
+        <span v-else aria-hidden="true" class="icon theme-icon">🌙</span>
       </button>
     </div>
   </nav>
@@ -277,7 +284,7 @@ watch(linkWidth, async () => {
   text-decoration: none;
   text-align: center;
   border-radius: 10px;
-  transition: color 600ms ease, background-color 600ms ease;
+  transition: color 300ms ease, background-color 300ms ease;
 }
 .nav-link:hover {
   color: #000000;
@@ -290,7 +297,7 @@ watch(linkWidth, async () => {
   height: 2px;
   background-color: #000000;
   border-radius: 2px;
-  transition: transform 450ms ease, width 250ms ease, opacity 150ms ease;
+  transition: transform 450ms ease, width 250ms ease, opacity 150ms ease, background-color 300ms ease;
   will-change: transform, width;
 }
 
@@ -307,19 +314,52 @@ watch(linkWidth, async () => {
   cursor: pointer;
   background-color: #f3f4f6;
   color: #111827;
-  transition: background-color 300ms ease, color 300ms ease;
+  transition: background-color 300ms ease, color 300ms ease, transform 200ms ease;
 }
 .theme-toggle:hover {
   background-color: #e5e7eb;
+  transform: scale(1.05);
+}
+.theme-toggle:active {
+  transform: scale(0.95);
 }
 .icon {
   font-size: 18px;
   line-height: 1;
 }
+.theme-icon {
+  display: inline-block;
+  animation: fadeIn 300ms ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: rotate(-20deg) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Screen reader only text */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
 
 /* Dark theme overrides for navbar */
 :root.dark .nav-link {
   color: #ffffff;
+  transition: color 300ms ease, background-color 300ms ease;
 }
 :root.dark .nav-link:hover {
   color: #ffffff;
@@ -327,6 +367,7 @@ watch(linkWidth, async () => {
 }
 :root.dark .nav-indicator {
   background-color: #ffffff;
+  transition: transform 450ms ease, width 250ms ease, opacity 150ms ease, background-color 300ms ease;
 }
 :root.dark .theme-toggle {
   background-color: #3f3f47;
@@ -337,6 +378,9 @@ watch(linkWidth, async () => {
 }
 
 /* In dark mode keep navbar container dark instead of white cards */
+.nav-list {
+  transition: background-color 300ms ease;
+}
 :root.dark .nav-list {
   background-color: #252529 !important;
 }
@@ -348,6 +392,7 @@ watch(linkWidth, async () => {
   margin-left: 12px;
   padding: 6px 10px;
   border-radius: 20px;
+  transition: background-color 300ms ease;
 }
 :root.dark .nav-toggle-card {
   background-color: #252529 !important;

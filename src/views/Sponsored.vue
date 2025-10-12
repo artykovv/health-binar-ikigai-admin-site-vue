@@ -22,6 +22,7 @@
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Персональный номер</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ФИО</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">В структуре</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Этап до</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
                   </tr>
@@ -36,6 +37,7 @@
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ participant.lastname }} {{ participant.name }} {{ participant.patronymic }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ participant.registered ? 'Да' : 'Нет' }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ calculateTimeRemaining(participant.bonus_data?.stage_start_date) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(participant.register_at) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       <router-link :to="`/participants/${participant.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
@@ -149,6 +151,31 @@ const formatDate = (dateString) => {
     })
   } catch (error) {
     return dateString
+  }
+}
+
+// Рассчитать время до окончания этапа (56 дней от stage_start_date)
+const calculateTimeRemaining = (stageStartDate) => {
+  if (!stageStartDate) return '—'
+  
+  try {
+    const startDate = new Date(stageStartDate)
+    const endDate = new Date(startDate)
+    endDate.setDate(startDate.getDate() + 56) // 56 дней
+    
+    const now = new Date()
+    const diffMs = endDate - now
+    
+    if (diffMs <= 0) return 'Завершено'
+    
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+    
+    return `${days} д ${hours} ч ${minutes} м`
+  } catch (error) {
+    console.error('Ошибка расчёта времени:', error)
+    return '—'
   }
 }
 

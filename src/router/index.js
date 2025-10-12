@@ -68,6 +68,20 @@ const routes = [
     meta: { title: 'Бонусы — Спонсорский' }
   },
   {
+    path: '/bonuses/gifts',
+    name: 'Gifts',
+    component: Bonuses,
+    props: { defaultTab: 'gifts' },
+    meta: { title: 'Бонусы — Подарки' }
+  },
+  {
+    path: '/bonuses/health_day',
+    name: 'HealthDay',
+    component: Bonuses,
+    props: { defaultTab: 'health_day' },
+    meta: { title: 'Бонусы — Health Day' }
+  },
+  {
     path: '/settings',
     name: 'Settings',
     component: Settings,

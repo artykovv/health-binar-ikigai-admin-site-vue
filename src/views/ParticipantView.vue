@@ -7,6 +7,67 @@
           <button @click="$router.go(-1)" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Назад</button>
         </div>
         
+        <!-- Tailwind Notification -->
+        <div v-if="notice.visible" class="fixed top-4 right-4 z-50">
+          <div :class="['rounded-md px-4 py-2 text-sm shadow',
+            notice.type === 'success' ? 'bg-green-100 text-green-800' :
+            notice.type === 'error' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800',
+            'dark:bg-[#3f3f47] dark:text-white']">
+            {{ notice.message }}
+          </div>
+        </div>
+        
+        <!-- Pay Bonus Modal -->
+        <div v-if="payModal.visible" class="fixed inset-0 z-50 flex items-center justify-center">
+          <div class="absolute inset-0 bg-black/40" @click="closePayModal"></div>
+          <div class="relative z-10 w-full max-w-md mx-4 overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700">
+            <div class="px-4 py-3 border-b dark:border-gray-700">
+              <h5 class="m-0 dark:text-white">Выдать бонус</h5>
+            </div>
+            <div class="p-4">
+              <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Тип бонуса:</label>
+                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ payModal.typeLabel }}</p>
+              </div>
+                    <div class="mb-3">
+                <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сумма:</label>
+                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ payModal.amount }}</p>
+                    </div>
+              <p class="text-sm text-gray-700 dark:text-white">Подтвердите выдачу бонуса участнику.</p>
+                    </div>
+            <div class="flex items-center justify-end gap-2 px-4 py-3 border-t dark:border-gray-700">
+              <button @click="closePayModal" class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">Отмена</button>
+              <button @click="confirmPay" :disabled="paying"
+                class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-white text-sm hover:bg-green-700 disabled:opacity-40">
+                <span v-if="paying" class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white dark:border-gray-600 dark:border-t-white"></span>
+                Выдать
+              </button>
+                    </div>
+                    </div>
+                  </div>
+
+        <!-- Confirm Delete Modal -->
+        <div v-if="confirm.visible" class="fixed inset-0 z-50 flex items-center justify-center">
+          <div class="absolute inset-0 bg-black/40" @click="closeConfirm"></div>
+          <div class="relative z-10 w-full max-w-md mx-4 overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700">
+            <div class="px-4 py-3 border-b dark:border-gray-700">
+              <h5 class="m-0 dark:text-white">Подтверждение</h5>
+                    </div>
+            <div class="p-4 text-sm text-gray-700 dark:text-white">
+              <p class="mb-2">Удалить участника? Это действие необратимо.</p>
+              <p>Подтвердите действие.</p>
+                    </div>
+            <div class="flex items-center justify-end gap-2 px-4 py-3 border-t dark:border-gray-700">
+              <button @click="closeConfirm" class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">Отмена</button>
+              <button @click="confirmDelete" :disabled="deleting"
+                class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-white text-sm hover:bg-red-700 disabled:opacity-40 dark:hover:bg-[#4a4a52]">
+                <span v-if="deleting" class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white dark:border-gray-600 dark:border-t-white"></span>
+                Удалить
+              </button>
+                    </div>
+                  </div>
+                </div>
+                
         <!-- Загрузка -->
         <div v-if="loading" class="py-6 text-center">
           <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
@@ -15,199 +76,472 @@
         <!-- Данные участника -->
         <div v-else-if="participant" class="grid md:grid-cols-12 gap-4">
           <div class="md:col-span-8">
-            <div class="mb-3 bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
-              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
-                <h5 class="m-0 dark:text-white">Информация об участнике</h5>
+            <!-- Информация об участнике и Данные структуры рядом -->
+            <div class="mb-3 grid md:grid-cols-2 gap-4">
+              <!-- Информация об участнике -->
+              <div class="bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
+                <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
+                  <h5 class="m-0 dark:text-white">Информация об участнике</h5>
               </div>
-              <div class="p-4">
-                <div class="grid md:grid-cols-12 gap-4">
-                  <div class="md:col-span-6">
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">ID:</label>
-                      <p class="text-sm text-gray-900">{{ participant.id }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Персональный номер:</label>
-                      <p class="text-sm text-gray-900">{{ participant.personal_number }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Имя:</label>
-                      <p class="text-sm text-gray-900">{{ participant.name }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Фамилия:</label>
-                      <p class="text-sm text-gray-900">{{ participant.lastname }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Отчество:</label>
-                      <p class="text-sm text-gray-900">{{ participant.patronymic }}</p>
+                <div class="p-4">
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                      <tbody>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Персональный номер:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.personal_number }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">ФИО:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.lastname }} {{ participant.name }} {{ participant.patronymic }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Email:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.email }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Код:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.code }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Филиал:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.branch?.name || 'Неизвестно' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Статус регистрации:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.registered ? 'Зарегистрирован' : 'Ожидает' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Активен:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.is_active ? 'Да' : 'Нет' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Дата создания:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ formatDate(participant.created_at) }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Дата регистрации:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ formatDate(participant.register_at) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                     </div>
                   </div>
-                  <div class="md:col-span-6">
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
-                      <p class="text-sm text-gray-900">{{ participant.email }}</p>
+
+              <!-- Данные структуры -->
+              <div class="bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
+                <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
+                  <h5 class="m-0 dark:text-white">Данные структуры</h5>
                     </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Код:</label>
-                      <p class="text-sm text-gray-900">{{ participant.code }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Филиал:</label>
-                      <p class="text-sm text-gray-900">{{ participant.branch?.name || 'Неизвестно' }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Статус регистрации:</label>
-                      <p class="text-sm text-gray-900">{{ participant.registered ? 'Зарегистрирован' : 'Ожидает' }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Активен:</label>
-                      <p class="text-sm text-gray-900">{{ participant.is_active ? 'Да' : 'Нет' }}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="grid md:grid-cols-12 gap-4">
-                  <div class="md:col-span-6">
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Дата создания:</label>
-                      <p class="text-sm text-gray-900">{{ formatDate(participant.created_at) }}</p>
-                    </div>
-                  </div>
-                  <div class="md:col-span-6">
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Дата регистрации:</label>
-                      <p class="text-sm text-gray-900">{{ formatDate(participant.register_at) }}</p>
-                    </div>
+                <div class="p-4">
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                      <tbody>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Цикл:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ structureData?.cycle_number || 'Не указано' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Этап:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ structureData?.stage_number || 'Не указано' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Дата начала этапа:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ formatDate(structureData?.stage_start_date) }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Общее количество:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ structureData?.total_count || 0 }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Лево:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ (structureData?.total_left || 0) - (structureData?.base_left || 0) }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Право:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ (structureData?.total_right || 0) - (structureData?.base_right || 0) }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Общий структурный:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ bonusData?.total_structure || 0 }}</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Общий спонсорский:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ bonusData?.total_sponsor || 0 }}</td>
+                        </tr>
+                        <tr v-if="bonusData?.last_updated">
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Последнее обновление:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ formatDate(bonusData.last_updated) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Бонусы участника -->
-            <div class="mb-3 bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
-              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
-                <h5 class="m-0 dark:text-white">Бонусы участника</h5>
-              </div>
-              <div class="p-4">
-                <div class="grid md:grid-cols-12 gap-3">
-                  <div class="md:col-span-4">
-                    <div class="text-center p-3 rounded border">
-                      <h6 class="text-gray-500">Структурный бонус</h6>
-                      <h4 class="text-black">{{ bonusData?.total_structure || 0 }}</h4>
-                    </div>
-                  </div>
-                  <div class="md:col-span-4">
-                    <div class="text-center p-3 rounded border">
-                      <h6 class="text-gray-500">Спонсорский бонус</h6>
-                      <h4 class="text-black">{{ bonusData?.total_sponsor || 0 }}</h4>
-                    </div>
-                  </div>
-                  <div class="md:col-span-4">
-                    <div class="text-center p-3 rounded border">
-                      <h6 class="text-gray-500">Мультибонус</h6>
-                      <h4 class="text-black">{{ bonusData?.total_multi || 0 }}</h4>
-                    </div>
-                  </div>
-                </div>
-                <div v-if="bonusData?.last_updated" class="mt-3 text-center">
-                  <small class="text-gray-500">Последнее обновление: {{ formatDate(bonusData.last_updated) }}</small>
-                </div>
-              </div>
-            </div>
-
-            <!-- Данные структуры -->
-            <div class="mb-3 bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
-              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
-                <h5 class="m-0 dark:text-white">Данные структуры</h5>
-              </div>
-              <div class="p-4">
-                <div class="grid md:grid-cols-12 gap-4">
-                  <div class="md:col-span-6">
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Цикл:</label>
-                      <p class="text-sm text-gray-900">{{ structureData?.cycle_number || 'Не указано' }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Этап:</label>
-                      <p class="text-sm text-gray-900">{{ structureData?.stage_number || 'Не указано' }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Дата начала этапа:</label>
-                      <p class="text-sm text-gray-900">{{ formatDate(structureData?.stage_start_date) }}</p>
-                    </div>
-                  </div>
-                  <div class="md:col-span-6">
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Базовая левая:</label>
-                      <p class="text-sm text-gray-900">{{ structureData?.base_left || 0 }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Базовая правая:</label>
-                      <p class="text-sm text-gray-900">{{ structureData?.base_right || 0 }}</p>
-                    </div>
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Общее количество:</label>
-                      <p class="text-sm text-gray-900">{{ structureData?.total_count || 0 }}</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="grid md:grid-cols-12 gap-4">
-                  <div class="md:col-span-6">
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Всего слева:</label>
-                      <p class="text-sm text-gray-900">{{ structureData?.total_left || 0 }}</p>
-                    </div>
-                  </div>
-                  <div class="md:col-span-6">
-                    <div class="mb-3">
-                      <label class="block text-sm font-medium text-gray-700 mb-1">Всего справа:</label>
-                      <p class="text-sm text-gray-900">{{ structureData?.total_right || 0 }}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- История закрытия этапов (Tailwind) -->
+            <!-- Бонусы участника и История -->
             <div class="bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
-              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
-                <h5 class="m-0 dark:text-white">История закрытия этапов</h5>
-              </div>
-              <div class="p-4">
-                <div v-if="stageHistory.length > 0" class="overflow-x-auto">
-                  <div class="inline-block min-w-full align-middle">
-                    <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
-                      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-[#3f3f47]">
-                          <tr>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цикл</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Этап</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата закрытия</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата открытия</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Время ушло</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Левая</th>
-                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Правая</th>
-                          </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
-                          <tr v-for="stage in stageHistory" :key="stage.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.cycle_number }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.stage_number }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(stage.closed_at) }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(stage.start_at) }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDuration(stage.start_at, stage.closed_at) }}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.effective_left}}</td>
-                            <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.effective_right }}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+              <div class="px-4 py-3 bg-gray-50 border-b dark:bg-[#3f3f47] dark:border-gray-700">
+                <div class="border-b border-gray-200 dark:border-gray-700">
+                  <div class="flex gap-2 relative" ref="bonusTabsContainer">
+                    <button 
+                      type="button"
+                      :class="[
+                        'px-3 py-2 -mb-px text-sm transition border-b-2',
+                        activeBonusTab === 'history'
+                          ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
+                          : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
+                      ]"
+                      @click="setActiveBonusTab('history')"
+                      :ref="el => setBonusTabRef('history', el)"
+                    >
+                      История закрытия этапов
+                    </button>
+                    <button 
+                      type="button"
+                      :class="[
+                        'px-3 py-2 -mb-px text-sm transition border-b-2',
+                        activeBonusTab === 'structural'
+                          ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
+                          : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
+                      ]"
+                      @click="setActiveBonusTab('structural')"
+                      :ref="el => setBonusTabRef('structural', el)"
+                    >
+                      Структурный
+                    </button>
+                    <button 
+                      type="button"
+                      :class="[
+                        'px-3 py-2 -mb-px text-sm transition border-b-2',
+                        activeBonusTab === 'sponsor'
+                          ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
+                          : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
+                      ]"
+                      @click="setActiveBonusTab('sponsor')"
+                      :ref="el => setBonusTabRef('sponsor', el)"
+                    >
+                      Спонсорский
+                    </button>
+                    <button 
+                      type="button"
+                      :class="[
+                        'px-3 py-2 -mb-px text-sm transition border-b-2',
+                        activeBonusTab === 'gifts'
+                          ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
+                          : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
+                      ]"
+                      @click="setActiveBonusTab('gifts')"
+                      :ref="el => setBonusTabRef('gifts', el)"
+                    >
+                      Подарки
+                    </button>
+                    <button 
+                      type="button"
+                      :class="[
+                        'px-3 py-2 -mb-px text-sm transition border-b-2',
+                        activeBonusTab === 'health_day'
+                          ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
+                          : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
+                      ]"
+                      @click="setActiveBonusTab('health_day')"
+                      :ref="el => setBonusTabRef('health_day', el)"
+                    >
+                      Health Day
+                    </button>
+                    <button 
+                      type="button"
+                      :class="[
+                        'px-3 py-2 -mb-px text-sm transition border-b-2',
+                        activeBonusTab === 'multibonus'
+                          ? 'font-semibold text-gray-900 border-gray-900 dark:text-white dark:border-white'
+                          : 'text-gray-500 hover:text-gray-900 border-transparent dark:text-white/70 dark:hover:text-white'
+                      ]"
+                      @click="setActiveBonusTab('multibonus')"
+                      :ref="el => setBonusTabRef('multibonus', el)"
+                    >
+                      Мультибонус
+                    </button>
                   </div>
                 </div>
-                <div v-else class="text-center text-gray-500">
-                  <p>История закрытия этапов отсутствует</p>
+                    </div>
+              
+              <div class="p-4">
+                <!-- История закрытия этапов -->
+                <div v-show="activeBonusTab === 'history'">
+                  <div v-if="stageHistory.length > 0" class="overflow-x-auto">
+                    <div class="inline-block min-w-full align-middle">
+                      <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                          <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цикл</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Этап</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата закрытия</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата открытия</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Время ушло</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Левая</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Правая</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                            <tr v-for="stage in stageHistory" :key="stage.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.cycle_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.stage_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(stage.closed_at) }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(stage.start_at) }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDuration(stage.start_at, stage.closed_at) }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.effective_left}}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ stage.effective_right }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                  </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center text-gray-500 dark:text-white">
+                    <p>История закрытия этапов отсутствует</p>
+              </div>
+            </div>
+
+                <!-- Структурный бонус -->
+                <div v-show="activeBonusTab === 'structural'">
+                  <div v-if="structuralBonusesLoading" class="py-6 text-center">
+                    <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+              </div>
+                  <div v-else-if="structuralBonusesList.length > 0" class="overflow-x-auto">
+                    <div class="inline-block min-w-full align-middle">
+                      <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                          <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цикл</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Этап</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата получения</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата выдачи</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                            <tr v-for="bonus in structuralBonusesList" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.received_at) }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                <span :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ' + getStatusBadgeClass(bonus.status)">
+                                  {{ getStatusText(bonus.status) }}
+                                </span>
+                              </td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.paid_datetime) }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center text-gray-500 dark:text-white">
+                    <p>Структурные бонусы отсутствуют</p>
+                  </div>
+                </div>
+
+                <!-- Спонсорский бонус -->
+                <div v-show="activeBonusTab === 'sponsor'">
+                  <div v-if="sponsorBonusesLoading" class="py-6 text-center">
+                    <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+                    </div>
+                  <div v-else-if="sponsorBonusesList.length > 0" class="overflow-x-auto">
+                    <div class="inline-block min-w-full align-middle">
+                      <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                          <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">От</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цикл</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Этап</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата получения</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата выдачи</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                            <tr v-for="bonus in sponsorBonusesList" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
+                                <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                                  {{ bonus.from_participant_fio || '-' }}
+                                </router-link>
+                              </td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.received_at) }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                <span :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ' + getStatusBadgeClass(bonus.status)">
+                                  {{ getStatusText(bonus.status) }}
+                                </span>
+                              </td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.paid_datetime) }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                    </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center text-gray-500 dark:text-white">
+                    <p>Спонсорские бонусы отсутствуют</p>
+                  </div>
+                </div>
+                
+                <!-- Подарки -->
+                <div v-show="activeBonusTab === 'gifts'">
+                  <div v-if="giftsLoading" class="py-6 text-center">
+                    <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+                  </div>
+                  <div v-else-if="giftsList.length > 0" class="overflow-x-auto">
+                    <div class="inline-block min-w-full align-middle">
+                      <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                          <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Подарок</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цикл</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Этап</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата получения</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата выдачи</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                            <tr v-for="gift in giftsList" :key="gift.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ gift.reward }}</strong></td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ gift.cycle_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ gift.stage_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(gift.received_at) }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                <button 
+                                  v-if="!gift.status || gift.status === 'pending'"
+                                  @click="openPayModal(gift, 'gifts')"
+                                  :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer hover:opacity-80 ' + getStatusBadgeClass(gift.status)">
+                                  {{ getStatusText(gift.status) }}
+                                </button>
+                                <span v-else :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ' + getStatusBadgeClass(gift.status)">
+                                  {{ getStatusText(gift.status) }}
+                                </span>
+                              </td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(gift.paid_datetime) }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center text-gray-500 dark:text-white">
+                    <p>Подарки отсутствуют</p>
+                  </div>
+                </div>
+
+                <!-- Health Day -->
+                <div v-show="activeBonusTab === 'health_day'">
+                  <div v-if="healthDayLoading" class="py-6 text-center">
+                    <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+                  </div>
+                  <div v-else-if="healthDayList.length > 0" class="overflow-x-auto">
+                    <div class="inline-block min-w-full align-middle">
+                      <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                          <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">От</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Глубина</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата получения</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата выдачи</th>
+                            </tr>
+                          </thead>
+                          <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                            <tr v-for="bonus in healthDayList" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
+                                <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                                  {{ bonus.from_participant_fio || '-' }}
+                                </router-link>
+                              </td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.depth }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.received_at) }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                <button 
+                                  v-if="!bonus.status || bonus.status === 'pending'"
+                                  @click="openPayModal(bonus, 'health_day')"
+                                  :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer hover:opacity-80 ' + getStatusBadgeClass(bonus.status)">
+                                  {{ getStatusText(bonus.status) }}
+                                </button>
+                                <span v-else :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ' + getStatusBadgeClass(bonus.status)">
+                                  {{ getStatusText(bonus.status) }}
+                                </span>
+                              </td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.paid_datetime) }}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center text-gray-500 dark:text-white">
+                    <p>Health Day бонусы отсутствуют</p>
+              </div>
+            </div>
+
+                <!-- Мультибонус -->
+                <div v-show="activeBonusTab === 'multibonus'">
+                  <div v-if="multibonusesLoading" class="py-6 text-center">
+                    <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+              </div>
+                  <div v-else-if="multibonusesList.length > 0" class="overflow-x-auto">
+                    <div class="inline-block min-w-full align-middle">
+                      <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                          <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                            <tr>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цикл</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Этап</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата получения</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата выдачи</th>
+                      </tr>
+                    </thead>
+                          <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                            <tr v-for="bonus in multibonusesList" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.reward }}</strong></td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.received_at) }}</td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                <button 
+                                  v-if="!bonus.status || bonus.status === 'pending'"
+                                  @click="openPayModal(bonus, 'multibonus')"
+                                  :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium cursor-pointer hover:opacity-80 ' + getStatusBadgeClass(bonus.status)">
+                                  {{ getStatusText(bonus.status) }}
+                                </button>
+                                <span v-else :class="'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ' + getStatusBadgeClass(bonus.status)">
+                                  {{ getStatusText(bonus.status) }}
+                                </span>
+                              </td>
+                              <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.paid_datetime) }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                    </div>
+                  </div>
+                  <div v-else class="text-center text-gray-500 dark:text-white">
+                    <p>Мультибонусы отсутствуют</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -220,9 +554,12 @@
               </div>
               <div class="p-4">
                 <div class="grid gap-2">
-                  <router-link :to="`/purchase/${participant.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-sm hover:bg-gray-900">Покупки</router-link>
-                  <router-link :to="`/structure/${participant.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900 ">Структура</router-link>
-                  <router-link :to="`/sponsored/${participant.id}`" class="inline-flex items-center rounded-md bg-slate-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Личники</router-link>
+                  <router-link :to="`/purchase/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-white text-sm hover:bg-gray-900">Покупки</router-link>
+                  <router-link v-if="participant.registered" :to="`/structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">Структура</router-link>
+                  <router-link v-if="participant.registered" :to="`/sponsored/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-slate-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Личники</router-link>
+                  <router-link v-if="!participant.registered" :to="`/registration/add-to-structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">+ Cтруктуру</router-link>
+                  <router-link :to="`/registration/edit/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-orange-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Изменить</router-link>
+                  <button v-if="!participant.registered" @click="openConfirm(participant.id)" class="inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-2 text-white text-sm hover:bg-red-700">Удалить</button>
                 </div>
               </div>
             </div>
@@ -238,7 +575,7 @@
             </div>
             <div class="bg-white rounded-lg ring-1 ring-gray-200 mt-3 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
               <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
-                <h5 class="m-0 dark:text-white">Ментор</h5>
+                <h5 class="m-0 dark:text-white">Наставник</h5>
               </div>
               <div class="p-4">
                 <p class="text-sm text-gray-900 dark:text-white">{{ participant.mentor?.lastname }} {{ participant.mentor?.name }} {{ participant.mentor?.patronymic }}</p>
@@ -259,9 +596,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/api'
+
+const router = useRouter()
 
 // Реактивные данные
 const participant = ref(null)
@@ -269,6 +608,124 @@ const loading = ref(false)
 const bonusData = ref(null)
 const structureData = ref(null)
 const stageHistory = ref([])
+
+// Уведомления
+const notice = ref({ visible: false, type: 'info', message: '' })
+const showNotice = (message, type = 'info') => {
+  notice.value = { visible: true, type, message }
+  setTimeout(() => { notice.value.visible = false }, 2500)
+}
+
+// Подтверждение удаления
+const confirm = ref({ visible: false, id: null })
+const deleting = ref(false)
+const openConfirm = (id) => { confirm.value = { visible: true, id } }
+const closeConfirm = () => { confirm.value = { visible: false, id: null } }
+const confirmDelete = async () => {
+  if (!confirm.value.id) return
+  deleting.value = true
+  await deleteParticipant(confirm.value.id)
+  deleting.value = false
+  closeConfirm()
+}
+
+// Модальное окно выдачи бонуса
+const payModal = ref({ 
+  visible: false, 
+  bonusId: null, 
+  bonusType: '', 
+  typeLabel: '',
+  amount: 0
+})
+const paying = ref(false)
+
+const openPayModal = (bonus, type) => {
+  const typeLabels = {
+    'structural': 'Структурный бонус',
+    'sponsor': 'Спонсорский бонус',
+    'gifts': 'Подарок',
+    'health_day': 'Health Day',
+    'multibonus': 'Мультибонус'
+  }
+  
+  payModal.value = {
+    visible: true,
+    bonusId: bonus.id,
+    bonusType: type,
+    typeLabel: typeLabels[type] || type,
+    amount: bonus.amount || bonus.reward || 0
+  }
+}
+
+const closePayModal = () => {
+  payModal.value = { visible: false, bonusId: null, bonusType: '', typeLabel: '', amount: 0 }
+}
+
+const confirmPay = async () => {
+  if (!payModal.value.bonusId || !payModal.value.bonusType) return
+  paying.value = true
+  
+  try {
+    const typeMap = {
+      'structural': 'structure',
+      'sponsor': 'sponsor',
+      'gifts': 'gift',
+      'health_day': 'health',
+      'multibonus': 'multi'
+    }
+    const apiType = typeMap[payModal.value.bonusType]
+    
+    await api.put(`bonuses/pay/batch`, {
+      bonuses: [
+        {
+          bonus_type: apiType,
+          bonus_id: payModal.value.bonusId
+        }
+      ]
+    })
+    
+    showNotice('Бонус успешно выдан', 'success')
+    closePayModal()
+    
+    // Перезагружаем данные для текущей вкладки
+    if (activeBonusTab.value === 'structural') {
+      await loadStructuralBonuses()
+    } else if (activeBonusTab.value === 'sponsor') {
+      await loadSponsorBonuses()
+    } else if (activeBonusTab.value === 'gifts') {
+      await loadGifts()
+    } else if (activeBonusTab.value === 'health_day') {
+      await loadHealthDay()
+    } else if (activeBonusTab.value === 'multibonus') {
+      await loadMultibonuses()
+    }
+  } catch (error) {
+    console.error('Ошибка выдачи бонуса:', error)
+    showNotice('Не удалось выдать бонус: ' + (error.response?.data?.detail || error.message), 'error')
+  } finally {
+    paying.value = false
+  }
+}
+
+// Табы бонусов
+const activeBonusTab = ref('history')
+const bonusTabsContainer = ref(null)
+const bonusTabRefs = new Map()
+function setBonusTabRef(key, el) {
+  if (el) bonusTabRefs.set(key, el)
+}
+
+// Данные бонусов
+const structuralBonusesList = ref([])
+const structuralBonusesLoading = ref(false)
+const sponsorBonusesList = ref([])
+const sponsorBonusesLoading = ref(false)
+const multibonusesList = ref([])
+const multibonusesLoading = ref(false)
+const giftsList = ref([])
+const giftsLoading = ref(false)
+const healthDayList = ref([])
+const healthDayLoading = ref(false)
 
 // API базовый URL
 // centralized API client is used
@@ -367,6 +824,165 @@ const formatDuration = (start, end) => {
     return parts.join(' ')
   } catch (e) {
     return '—'
+  }
+}
+
+// Функция переключения табов бонусов
+const setActiveBonusTab = (tab) => {
+  activeBonusTab.value = tab
+  if (tab === 'structural' && structuralBonusesList.value.length === 0) {
+    loadStructuralBonuses()
+  } else if (tab === 'sponsor' && sponsorBonusesList.value.length === 0) {
+    loadSponsorBonuses()
+  } else if (tab === 'multibonus' && multibonusesList.value.length === 0) {
+    loadMultibonuses()
+  } else if (tab === 'gifts' && giftsList.value.length === 0) {
+    loadGifts()
+  } else if (tab === 'health_day' && healthDayList.value.length === 0) {
+    loadHealthDay()
+  }
+}
+
+// Загрузка структурных бонусов
+const loadStructuralBonuses = async () => {
+  structuralBonusesLoading.value = true
+  try {
+    const response = await api.get(`bonuses/structure_bonuses`, {
+      params: {
+        participant_id: participantId,
+        page_size: 100,
+        order_by: 'created_at',
+        order_dir: 'desc'
+      }
+    })
+    structuralBonusesList.value = response.data.results || response.data || []
+  } catch (error) {
+    console.error('Ошибка загрузки структурных бонусов:', error)
+    structuralBonusesList.value = []
+  } finally {
+    structuralBonusesLoading.value = false
+  }
+}
+
+// Загрузка спонсорских бонусов
+const loadSponsorBonuses = async () => {
+  sponsorBonusesLoading.value = true
+  try {
+    const response = await api.get(`bonuses/sponsor_bonuses`, {
+      params: {
+        participant_id: participantId,
+        page_size: 100,
+        order_by: 'created_at',
+        order_dir: 'desc'
+      }
+    })
+    sponsorBonusesList.value = response.data.results || response.data || []
+  } catch (error) {
+    console.error('Ошибка загрузки спонсорских бонусов:', error)
+    sponsorBonusesList.value = []
+  } finally {
+    sponsorBonusesLoading.value = false
+  }
+}
+
+// Загрузка мультибонусов
+const loadMultibonuses = async () => {
+  multibonusesLoading.value = true
+  try {
+    const response = await api.get(`bonuses/multi_bonuses`, {
+      params: {
+        participant_id: participantId,
+        page_size: 100,
+        order_by: 'created_at',
+        order_dir: 'desc'
+      }
+    })
+    multibonusesList.value = response.data.results || response.data || []
+  } catch (error) {
+    console.error('Ошибка загрузки мультибонусов:', error)
+    multibonusesList.value = []
+  } finally {
+    multibonusesLoading.value = false
+  }
+}
+
+// Загрузка подарков
+const loadGifts = async () => {
+  giftsLoading.value = true
+  try {
+    const response = await api.get(`bonuses/gifts`, {
+      params: {
+        participant_id: participantId,
+        page_size: 100,
+        order_by: 'created_at',
+        order_dir: 'desc'
+      }
+    })
+    giftsList.value = response.data.results || response.data || []
+  } catch (error) {
+    console.error('Ошибка загрузки подарков:', error)
+    giftsList.value = []
+  } finally {
+    giftsLoading.value = false
+  }
+}
+
+// Загрузка Health Day
+const loadHealthDay = async () => {
+  healthDayLoading.value = true
+  try {
+    const response = await api.get(`bonuses/health_day`, {
+      params: {
+        participant_id: participantId,
+        page_size: 100,
+        order_by: 'created_at',
+        order_dir: 'desc'
+      }
+    })
+    healthDayList.value = response.data.results || response.data || []
+  } catch (error) {
+    console.error('Ошибка загрузки Health Day:', error)
+    healthDayList.value = []
+  } finally {
+    healthDayLoading.value = false
+  }
+}
+
+// Получение текста статуса
+const getStatusText = (status) => {
+  if (!status || status === 'pending') {
+    return 'Не выдано'
+  } else if (status === 'paid') {
+    return 'Выдано'
+  }
+  return status
+}
+
+// Tailwind badge classes
+const getStatusBadgeClass = (status) => {
+  if (!status || status === 'pending') {
+    return 'bg-yellow-100 text-yellow-800'
+  } else if (status === 'paid') {
+    return 'bg-green-100 text-green-800'
+  }
+  return 'bg-gray-100 text-gray-800'
+}
+
+// Удаление участника
+const deleteParticipant = async (id) => {
+  if (!id) return
+  try {
+    await api.delete(`participants/${id}`, {
+      headers: { 'accept': 'application/json' }
+    })
+    showNotice('Участник удалён', 'success')
+    // Перенаправляем на страницу регистраций
+    setTimeout(() => {
+      router.push('/registration')
+    }, 1000)
+  } catch (error) {
+    console.error('Ошибка удаления участника:', error)
+    showNotice('Не удалось удалить участника', 'error')
   }
 }
 

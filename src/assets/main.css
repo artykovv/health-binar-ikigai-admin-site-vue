@@ -138,44 +138,48 @@ h1 {
 }
 
 /* Dark theme overrides */
-.dark body {
+:root.dark body {
   background-color: #18181b;
   color: #ffffff;
 }
 
-.dark main {
+:root.dark main {
+  background-color: #18181b;
+}
+
+:root.dark #app {
   background-color: #18181b;
 }
 
 /* Keep UI surfaces white in dark mode */
-.dark .card,
-.dark .table,
-.dark .modal-content {
+:root.dark .card,
+:root.dark .table,
+:root.dark .modal-content {
   background-color: #ffffff !important;
   color: #111827 !important;
   border-color: #e5e7eb !important;
 }
 
-.dark .table th,
-.dark .table td,
-.dark .card-header,
-.dark .card-body,
-.dark .modal-header,
-.dark .modal-footer {
+:root.dark .table th,
+:root.dark .table td,
+:root.dark .card-header,
+:root.dark .card-body,
+:root.dark .modal-header,
+:root.dark .modal-footer {
   background-color: #ffffff !important;
   color: #111827 !important;
   border-color: #e5e7eb !important;
 }
 
 /* Buttons stay white in dark mode */
-.dark .btn,
-.dark .btn-primary,
-.dark .btn-secondary,
-.dark .btn-success,
-.dark .btn-info,
-.dark .btn-warning,
-.dark .btn-danger,
-.dark button.btn {
+:root.dark .btn,
+:root.dark .btn-primary,
+:root.dark .btn-secondary,
+:root.dark .btn-success,
+:root.dark .btn-info,
+:root.dark .btn-warning,
+:root.dark .btn-danger,
+:root.dark button.btn {
   background-color: #ffffff !important;
   color: #111827 !important;
   border-color: #e5e7eb !important;
@@ -184,7 +188,7 @@ h1 {
 /* (Removed global white inputs in dark mode to allow page-level dark styles) */
 
 /* Keep table striping subtle on white */
-.dark .table-striped tbody tr:nth-of-type(odd) {
+:root.dark .table-striped tbody tr:nth-of-type(odd) {
   background-color: #f8f9fa !important;
 }
 

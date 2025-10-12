@@ -44,7 +44,7 @@
           <div class="grid md:grid-cols-12 gap-3">
             <div class="md:col-span-3">
               <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
-              <select v-model="filters.page_size" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
+              <select v-model="filters.page_size" @change="searchRegistrations" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                 <option value="10">10</option>
                 <option value="20">20</option>
                 <option value="50">50</option>
@@ -53,7 +53,7 @@
             </div>
             <div class="md:col-span-3">
               <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Филиал:</label>
-              <select v-model="filters.branch_id" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
+              <select v-model="filters.branch_id" @change="searchRegistrations" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                 <option value="">Все филиалы</option>
                     <option v-for="branch in branches" :key="branch.id" :value="branch.id">
                       {{ branch.code }} - {{ branch.name }} - {{ branch.address }}
@@ -62,7 +62,7 @@
             </div>
             <div class="md:col-span-4">
               <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Поиск:</label>
-              <input v-model="filters.search" type="text" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:placeholder-white/70 dark:focus:ring-white" placeholder="Поиск по имени, фамилии, персональному номеру...">
+              <input v-model="filters.search" @keyup.enter="searchRegistrations" type="text" class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:placeholder-white/70 dark:focus:ring-white" placeholder="Поиск по имени, фамилии, персональному номеру...">
             </div>
             <div class="md:col-span-2 flex items-end">
               <button @click="searchRegistrations" class="inline-flex w-full items-center justify-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Поиск</button>

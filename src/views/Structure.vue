@@ -48,23 +48,27 @@
                 <div class="text-center">
                   <h6>{{ structure.participant_lastname }} {{ structure.participant_name }} {{ structure.participant_patronymic }}</h6>
                   <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.participant_personal_number }}</button>
+                  <div class="mt-2 text-[11px] text-gray-800 dark:text-white grid grid-cols-2 gap-2">
+                    <div>Цикл: <span class="font-semibold">{{ getBD(structure.participant_id)?.cycle_number ?? '-' }}</span></div>
+                    <div>Этап: <span class="font-semibold">{{ getBD(structure.participant_id)?.stage_number ?? '-' }}</span></div>
+                  </div>
                 </div>
-                <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
-                  <div>
-                    <div class="text-[10px] opacity-70">Общий слева</div>
-                    <div class="font-semibold">{{ getBD(structure.participant_id)?.total_left ?? '-' }}</div>
+                <div class="mt-2 text-[11px] text-gray-800 dark:text-white">
+                  <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                    <div>Общий слева</div>
+                    <div>Общий справа</div>
                   </div>
-                  <div>
-                    <div class="text-[10px] opacity-70">Общий справа</div>
-                    <div class="font-semibold">{{ getBD(structure.participant_id)?.total_right ?? '-' }}</div>
+                  <div class="grid grid-cols-2 gap-2 font-semibold mb-2">
+                    <div>{{ getBD(structure.participant_id)?.total_left ?? '-' }}</div>
+                    <div>{{ getBD(structure.participant_id)?.total_right ?? '-' }}</div>
                   </div>
-                  <div>
-                    <div class="text-[10px] opacity-70">Текущий слева</div>
-                    <div class="font-semibold">{{ currentLeft(structure.participant_id) }}</div>
+                  <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                    <div>Текущий слева</div>
+                    <div>Текущий справа</div>
                   </div>
-                  <div>
-                    <div class="text-[10px] opacity-70">Текущий справа</div>
-                    <div class="font-semibold">{{ currentRight(structure.participant_id) }}</div>
+                  <div class="grid grid-cols-2 gap-2 font-semibold">
+                    <div>{{ currentLeft(structure.participant_id) }}</div>
+                    <div>{{ currentRight(structure.participant_id) }}</div>
                   </div>
                 </div>
               </div>
@@ -75,23 +79,27 @@
                     <div class="text-center">
                       <h6>{{ structure.left_child.participant_lastname }} {{ structure.left_child.participant_name }} {{ structure.left_child.participant_patronymic }}</h6>
                       <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.participant_personal_number }}</button>
+                      <div class="mt-2 text-[11px] text-gray-800 dark:text-white grid grid-cols-2 gap-2">
+                        <div>Цикл: <span class="font-semibold">{{ getBD(structure.left_child.participant_id)?.cycle_number ?? '-' }}</span></div>
+                        <div>Этап: <span class="font-semibold">{{ getBD(structure.left_child.participant_id)?.stage_number ?? '-' }}</span></div>
+                      </div>
                     </div>
-                    <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
-                      <div>
-                        <div class="text-[10px] opacity-70">Общий слева</div>
-                        <div class="font-semibold">{{ getBD(structure.left_child.participant_id)?.total_left ?? '-' }}</div>
+                    <div class="mt-2 text-[11px] text-gray-800 dark:text-white">
+                      <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                        <div>Общий слева</div>
+                        <div>Общий справа</div>
                       </div>
-                      <div>
-                        <div class="text-[10px] opacity-70">Общий справа</div>
-                        <div class="font-semibold">{{ getBD(structure.left_child.participant_id)?.total_right ?? '-' }}</div>
+                      <div class="grid grid-cols-2 gap-2 font-semibold mb-2">
+                        <div>{{ getBD(structure.left_child.participant_id)?.total_left ?? '-' }}</div>
+                        <div>{{ getBD(structure.left_child.participant_id)?.total_right ?? '-' }}</div>
                       </div>
-                      <div>
-                        <div class="text-[10px] opacity-70">Текущий слева</div>
-                        <div class="font-semibold">{{ currentLeft(structure.left_child.participant_id) }}</div>
+                      <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                        <div>Текущий слева</div>
+                        <div>Текущий справа</div>
                       </div>
-                      <div>
-                        <div class="text-[10px] opacity-70">Текущий справа</div>
-                        <div class="font-semibold">{{ currentRight(structure.left_child.participant_id) }}</div>
+                      <div class="grid grid-cols-2 gap-2 font-semibold">
+                        <div>{{ currentLeft(structure.left_child.participant_id) }}</div>
+                        <div>{{ currentRight(structure.left_child.participant_id) }}</div>
                       </div>
                     </div>
                   </div>
@@ -103,23 +111,27 @@
                         <div class="text-center">
                           <h6>{{ structure.left_child.left_child.participant_lastname }} {{ structure.left_child.left_child.participant_name }} {{ structure.left_child.left_child.participant_patronymic }}</h6>
                           <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.left_child.participant_personal_number }}</button>
+                          <div class="mt-2 text-[11px] text-gray-800 dark:text-white grid grid-cols-2 gap-2">
+                            <div>Цикл: <span class="font-semibold">{{ getBD(structure.left_child.left_child.participant_id)?.cycle_number ?? '-' }}</span></div>
+                            <div>Этап: <span class="font-semibold">{{ getBD(structure.left_child.left_child.participant_id)?.stage_number ?? '-' }}</span></div>
+                          </div>
                         </div>
-                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
-                          <div>
-                            <div class="text-[10px] opacity-70">Общий слева</div>
-                            <div class="font-semibold">{{ getBD(structure.left_child.left_child.participant_id)?.total_left ?? '-' }}</div>
+                        <div class="mt-2 text-[11px] text-gray-800 dark:text-white">
+                          <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                            <div>Общий слева</div>
+                            <div>Общий справа</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Общий справа</div>
-                            <div class="font-semibold">{{ getBD(structure.left_child.left_child.participant_id)?.total_right ?? '-' }}</div>
+                          <div class="grid grid-cols-2 gap-2 font-semibold mb-2">
+                            <div>{{ getBD(structure.left_child.left_child.participant_id)?.total_left ?? '-' }}</div>
+                            <div>{{ getBD(structure.left_child.left_child.participant_id)?.total_right ?? '-' }}</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Текущий слева</div>
-                            <div class="font-semibold">{{ currentLeft(structure.left_child.left_child.participant_id) }}</div>
+                          <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                            <div>Текущий слева</div>
+                            <div>Текущий справа</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Текущий справа</div>
-                            <div class="font-semibold">{{ currentRight(structure.left_child.left_child.participant_id) }}</div>
+                          <div class="grid grid-cols-2 gap-2 font-semibold">
+                            <div>{{ currentLeft(structure.left_child.left_child.participant_id) }}</div>
+                            <div>{{ currentRight(structure.left_child.left_child.participant_id) }}</div>
                           </div>
                         </div>
                       </div>
@@ -130,23 +142,27 @@
                         <div class="text-center">
                           <h6>{{ structure.left_child.right_child.participant_lastname }} {{ structure.left_child.right_child.participant_name }} {{ structure.left_child.right_child.participant_patronymic }}</h6>
                           <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.left_child.right_child.participant_personal_number }}</button>
+                          <div class="mt-2 text-[11px] text-gray-800 dark:text-white grid grid-cols-2 gap-2">
+                            <div>Цикл: <span class="font-semibold">{{ getBD(structure.left_child.right_child.participant_id)?.cycle_number ?? '-' }}</span></div>
+                            <div>Этап: <span class="font-semibold">{{ getBD(structure.left_child.right_child.participant_id)?.stage_number ?? '-' }}</span></div>
+                          </div>
                         </div>
-                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
-                          <div>
-                            <div class="text-[10px] opacity-70">Общий слева</div>
-                            <div class="font-semibold">{{ getBD(structure.left_child.right_child.participant_id)?.total_left ?? '-' }}</div>
+                        <div class="mt-2 text-[11px] text-gray-800 dark:text-white">
+                          <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                            <div>Общий слева</div>
+                            <div>Общий справа</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Общий справа</div>
-                            <div class="font-semibold">{{ getBD(structure.left_child.right_child.participant_id)?.total_right ?? '-' }}</div>
+                          <div class="grid grid-cols-2 gap-2 font-semibold mb-2">
+                            <div>{{ getBD(structure.left_child.right_child.participant_id)?.total_left ?? '-' }}</div>
+                            <div>{{ getBD(structure.left_child.right_child.participant_id)?.total_right ?? '-' }}</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Текущий слева</div>
-                            <div class="font-semibold">{{ currentLeft(structure.left_child.right_child.participant_id) }}</div>
+                          <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                            <div>Текущий слева</div>
+                            <div>Текущий справа</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Текущий справа</div>
-                            <div class="font-semibold">{{ currentRight(structure.left_child.right_child.participant_id) }}</div>
+                          <div class="grid grid-cols-2 gap-2 font-semibold">
+                            <div>{{ currentLeft(structure.left_child.right_child.participant_id) }}</div>
+                            <div>{{ currentRight(structure.left_child.right_child.participant_id) }}</div>
                           </div>
                         </div>
                       </div>
@@ -161,23 +177,27 @@
                     <div class="text-center">
                       <h6>{{ structure.right_child.participant_lastname }} {{ structure.right_child.participant_name }} {{ structure.right_child.participant_patronymic }}</h6>
                       <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.participant_personal_number }}</button>
+                      <div class="mt-2 text-[11px] text-gray-800 dark:text-white grid grid-cols-2 gap-2">
+                        <div>Цикл: <span class="font-semibold">{{ getBD(structure.right_child.participant_id)?.cycle_number ?? '-' }}</span></div>
+                        <div>Этап: <span class="font-semibold">{{ getBD(structure.right_child.participant_id)?.stage_number ?? '-' }}</span></div>
+                      </div>
                     </div>
-                    <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
-                      <div>
-                        <div class="text-[10px] opacity-70">Общий слева</div>
-                        <div class="font-semibold">{{ getBD(structure.right_child.participant_id)?.total_left ?? '-' }}</div>
+                    <div class="mt-2 text-[11px] text-gray-800 dark:text-white">
+                      <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                        <div>Общий слева</div>
+                        <div>Общий справа</div>
                       </div>
-                      <div>
-                        <div class="text-[10px] opacity-70">Общий справа</div>
-                        <div class="font-semibold">{{ getBD(structure.right_child.participant_id)?.total_right ?? '-' }}</div>
+                      <div class="grid grid-cols-2 gap-2 font-semibold mb-2">
+                        <div>{{ getBD(structure.right_child.participant_id)?.total_left ?? '-' }}</div>
+                        <div>{{ getBD(structure.right_child.participant_id)?.total_right ?? '-' }}</div>
                       </div>
-                      <div>
-                        <div class="text-[10px] opacity-70">Текущий слева</div>
-                        <div class="font-semibold">{{ currentLeft(structure.right_child.participant_id) }}</div>
+                      <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                        <div>Текущий слева</div>
+                        <div>Текущий справа</div>
                       </div>
-                      <div>
-                        <div class="text-[10px] opacity-70">Текущий справа</div>
-                        <div class="font-semibold">{{ currentRight(structure.right_child.participant_id) }}</div>
+                      <div class="grid grid-cols-2 gap-2 font-semibold">
+                        <div>{{ currentLeft(structure.right_child.participant_id) }}</div>
+                        <div>{{ currentRight(structure.right_child.participant_id) }}</div>
                       </div>
                     </div>
                   </div>
@@ -189,23 +209,27 @@
                         <div class="text-center">
                           <h6>{{ structure.right_child.left_child.participant_lastname }} {{ structure.right_child.left_child.participant_name }} {{ structure.right_child.left_child.participant_patronymic }}</h6>
                           <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.left_child.participant_personal_number }}</button>
+                          <div class="mt-2 text-[11px] text-gray-800 dark:text-white grid grid-cols-2 gap-2">
+                            <div>Цикл: <span class="font-semibold">{{ getBD(structure.right_child.left_child.participant_id)?.cycle_number ?? '-' }}</span></div>
+                            <div>Этап: <span class="font-semibold">{{ getBD(structure.right_child.left_child.participant_id)?.stage_number ?? '-' }}</span></div>
+                          </div>
                         </div>
-                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
-                          <div>
-                            <div class="text-[10px] opacity-70">Общий слева</div>
-                            <div class="font-semibold">{{ getBD(structure.right_child.left_child.participant_id)?.total_left ?? '-' }}</div>
+                        <div class="mt-2 text-[11px] text-gray-800 dark:text-white">
+                          <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                            <div>Общий слева</div>
+                            <div>Общий справа</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Общий справа</div>
-                            <div class="font-semibold">{{ getBD(structure.right_child.left_child.participant_id)?.total_right ?? '-' }}</div>
+                          <div class="grid grid-cols-2 gap-2 font-semibold mb-2">
+                            <div>{{ getBD(structure.right_child.left_child.participant_id)?.total_left ?? '-' }}</div>
+                            <div>{{ getBD(structure.right_child.left_child.participant_id)?.total_right ?? '-' }}</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Текущий слева</div>
-                            <div class="font-semibold">{{ currentLeft(structure.right_child.left_child.participant_id) }}</div>
+                          <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                            <div>Текущий слева</div>
+                            <div>Текущий справа</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Текущий справа</div>
-                            <div class="font-semibold">{{ currentRight(structure.right_child.left_child.participant_id) }}</div>
+                          <div class="grid grid-cols-2 gap-2 font-semibold">
+                            <div>{{ currentLeft(structure.right_child.left_child.participant_id) }}</div>
+                            <div>{{ currentRight(structure.right_child.left_child.participant_id) }}</div>
                           </div>
                         </div>
                       </div>
@@ -216,23 +240,27 @@
                         <div class="text-center">
                           <h6>{{ structure.right_child.right_child.participant_lastname }} {{ structure.right_child.right_child.participant_name }} {{ structure.right_child.right_child.participant_patronymic }}</h6>
                           <button class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-gray-800 text-xs hover:bg-gray-200 mt-1 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">{{ structure.right_child.right_child.participant_personal_number }}</button>
+                          <div class="mt-2 text-[11px] text-gray-800 dark:text-white grid grid-cols-2 gap-2">
+                            <div>Цикл: <span class="font-semibold">{{ getBD(structure.right_child.right_child.participant_id)?.cycle_number ?? '-' }}</span></div>
+                            <div>Этап: <span class="font-semibold">{{ getBD(structure.right_child.right_child.participant_id)?.stage_number ?? '-' }}</span></div>
+                          </div>
                         </div>
-                        <div class="mt-2 grid grid-cols-2 gap-2 text-[11px] text-gray-800 dark:text-white">
-                          <div>
-                            <div class="text-[10px] opacity-70">Общий слева</div>
-                            <div class="font-semibold">{{ getBD(structure.right_child.right_child.participant_id)?.total_left ?? '-' }}</div>
+                        <div class="mt-2 text-[11px] text-gray-800 dark:text-white">
+                          <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                            <div>Общий слева</div>
+                            <div>Общий справа</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Общий справа</div>
-                            <div class="font-semibold">{{ getBD(structure.right_child.right_child.participant_id)?.total_right ?? '-' }}</div>
+                          <div class="grid grid-cols-2 gap-2 font-semibold mb-2">
+                            <div>{{ getBD(structure.right_child.right_child.participant_id)?.total_left ?? '-' }}</div>
+                            <div>{{ getBD(structure.right_child.right_child.participant_id)?.total_right ?? '-' }}</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Текущий слева</div>
-                            <div class="font-semibold">{{ currentLeft(structure.right_child.right_child.participant_id) }}</div>
+                          <div class="grid grid-cols-2 gap-2 text-[10px] opacity-70 mb-1">
+                            <div>Текущий слева</div>
+                            <div>Текущий справа</div>
                           </div>
-                          <div>
-                            <div class="text-[10px] opacity-70">Текущий справа</div>
-                            <div class="font-semibold">{{ currentRight(structure.right_child.right_child.participant_id) }}</div>
+                          <div class="grid grid-cols-2 gap-2 font-semibold">
+                            <div>{{ currentLeft(structure.right_child.right_child.participant_id) }}</div>
+                            <div>{{ currentRight(structure.right_child.right_child.participant_id) }}</div>
                           </div>
                         </div>
                       </div>
