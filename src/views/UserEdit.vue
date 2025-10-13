@@ -96,11 +96,6 @@
                       class="block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600 dark:bg-[#3f3f47] dark:border-white dark:text-white"
                       placeholder="Персональный номер">
                   </div>
-                  <div class="md:col-span-6">
-                    <label for="phone_number_main" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Телефон</label>
-                    <input v-model="form.phone_number" type="text" id="phone_number_main"
-                      class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
-                  </div>
                 </div>
 
                 <!-- Паспортная информация -->
