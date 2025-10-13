@@ -181,6 +181,57 @@
               </div>
             </div>
 
+            <!-- Паспортная информация -->
+            <div class="mb-3 bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
+              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
+                <h5 class="m-0 dark:text-white">Дополнительная информация</h5>
+              </div>
+              <div class="p-4">
+                <div class="overflow-x-auto">
+                  <table class="min-w-full">
+                    <tbody>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">ПИН:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.passport_info?.pin || 'Не указано' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Номер паспорта:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.passport_info?.passport_id || 'Не указано' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Кем выдан:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.passport_info?.passport_issuer || 'Не указано' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Дата выдачи:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ formatSimpleDate(participant.passport_info?.passport_issue_date) }}</td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Дата рождения:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ formatSimpleDate(participant.passport_info?.date_birth) }}</td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Телефон:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.passport_info?.phone_number || 'Не указано' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Банк:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.passport_info?.bank || 'Не указано' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">ИП/ИНН:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.passport_info?.ip_inn ? 'Да' : 'Нет' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Пенсионер:</td>
+                        <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ participant.passport_info?.pensioner ? 'Да' : 'Нет' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+                    </div>
+
             <!-- Бонусы участника и История -->
             <div class="bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
               <div class="px-4 py-3 bg-gray-50 border-b dark:bg-[#3f3f47] dark:border-gray-700">
@@ -824,6 +875,21 @@ const formatDuration = (start, end) => {
     return parts.join(' ')
   } catch (e) {
     return '—'
+  }
+}
+
+// Форматирование простой даты (только дата без времени)
+const formatSimpleDate = (dateString) => {
+  if (!dateString) return 'Не указано'
+  try {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('ru-RU', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
+  } catch (error) {
+    return dateString
   }
 }
 

@@ -96,6 +96,78 @@
                       class="block w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600 dark:bg-[#3f3f47] dark:border-white dark:text-white"
                       placeholder="Персональный номер">
                   </div>
+                  <div class="md:col-span-6">
+                    <label for="phone_number_main" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Телефон</label>
+                    <input v-model="form.phone_number" type="text" id="phone_number_main"
+                      class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
+                  </div>
+                </div>
+
+                <!-- Паспортная информация -->
+                <div class="border-t pt-4 dark:border-gray-700">
+                  <h6 class="text-sm font-semibold mb-3 dark:text-white">Паспортная информация</h6>
+                  
+                  <div class="grid md:grid-cols-12 gap-4 mb-4">
+                    <div class="md:col-span-6">
+                      <label for="pin" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">ПИН</label>
+                      <input v-model="passportForm.pin" type="text" id="pin"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
+                    </div>
+                    <div class="md:col-span-6">
+                      <label for="passport_id" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Номер паспорта</label>
+                      <input v-model="passportForm.passport_id" type="text" id="passport_id"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
+                    </div>
+                  </div>
+
+                  <div class="grid md:grid-cols-12 gap-4 mb-4">
+                    <div class="md:col-span-6">
+                      <label for="passport_issuer" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Кем выдан</label>
+                      <input v-model="passportForm.passport_issuer" type="text" id="passport_issuer"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
+                    </div>
+                    <div class="md:col-span-6">
+                      <label for="passport_issue_date" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Дата выдачи</label>
+                      <input v-model="passportForm.passport_issue_date" type="date" id="passport_issue_date"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
+                    </div>
+                  </div>
+
+                  <div class="grid md:grid-cols-12 gap-4 mb-4">
+                    <div class="md:col-span-6">
+                      <label for="date_birth" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Дата рождения</label>
+                      <input v-model="passportForm.date_birth" type="date" id="date_birth"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
+                    </div>
+                    <div class="md:col-span-6">
+                      <label for="phone_number" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Телефон</label>
+                      <input v-model="passportForm.phone_number" type="text" id="phone_number"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
+                    </div>
+                  </div>
+
+                  <div class="grid md:grid-cols-12 gap-4 mb-4">
+                    <div class="md:col-span-12">
+                      <label for="bank" class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Банк</label>
+                      <input v-model="passportForm.bank" type="text" id="bank"
+                        class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white">
+                    </div>
+                  </div>
+
+                  <div class="grid md:grid-cols-12 gap-4 mb-4">
+                    <div class="md:col-span-6">
+                      <label class="flex items-center text-sm text-gray-700 dark:text-white">
+                        <input v-model="passportForm.ip_inn" type="checkbox" class="mr-2 rounded border-gray-300 text-black focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white">
+                        ИП/ИНН
+                      </label>
+                    </div>
+                    <div class="md:col-span-6">
+                      <label class="flex items-center text-sm text-gray-700 dark:text-white">
+                        <input v-model="passportForm.pensioner" type="checkbox" class="mr-2 rounded border-gray-300 text-black focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white">
+                        Пенсионер
+                      </label>
+                    </div>
+                  </div>
                 </div>
 
                 <div v-if="errorMessage" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-[#3f3f47] dark:border-gray-700 dark:text-white">{{ errorMessage }}</div>
@@ -135,7 +207,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/api'
 
@@ -156,6 +228,9 @@ const selectedSponsor = ref(null)
 
 const showPassword = ref(false)
 
+// Для определения откуда пришел пользователь
+const isRegistered = ref(null)
+
 const form = ref({
   email: '',
   password: '',
@@ -164,7 +239,20 @@ const form = ref({
   patronymic: '',
   sponsor_id: '',
   branch_id: '',
-  personal_number: ''
+  personal_number: '',
+  phone_number: ''
+})
+
+const passportForm = ref({
+  pin: '',
+  passport_id: '',
+  passport_issuer: '',
+  passport_issue_date: '',
+  bank: '',
+  ip_inn: false,
+  pensioner: false,
+  phone_number: '',
+  date_birth: ''
 })
 
 const togglePassword = () => { showPassword.value = !showPassword.value }
@@ -191,7 +279,27 @@ const loadParticipant = async () => {
     form.value.branch_id = p.branch_id || p.branch?.id || ''
     form.value.sponsor_id = p.sponsor_id || p.sponsor?.id || ''
     form.value.personal_number = p.personal_number || p.code || ''
+    form.value.phone_number = p.phone_number || ''
     selectedSponsor.value = p.sponsor || null
+    isRegistered.value = p.registered
+    
+    // Загружаем паспортную информацию
+    const passportInfo = p.passport_info || {}
+    passportForm.value.pin = passportInfo.pin || ''
+    passportForm.value.passport_id = passportInfo.passport_id || ''
+    passportForm.value.passport_issuer = passportInfo.passport_issuer || ''
+    passportForm.value.passport_issue_date = passportInfo.passport_issue_date || ''
+    passportForm.value.bank = passportInfo.bank || ''
+    passportForm.value.ip_inn = passportInfo.ip_inn || false
+    passportForm.value.pensioner = passportInfo.pensioner || false
+    passportForm.value.phone_number = passportInfo.phone_number || ''
+    passportForm.value.date_birth = passportInfo.date_birth || ''
+    
+    // Устанавливаем активный таб в navbar
+    if (typeof window !== 'undefined') {
+      window.__navActiveKey = p.registered ? 'participants' : 'registration'
+      try { window.dispatchEvent(new Event('nav-active-key-changed')) } catch {}
+    }
   } catch (error) {
     console.error('Ошибка загрузки пользователя:', error)
     errorMessage.value = 'Ошибка при загрузке данных пользователя'
@@ -234,22 +342,37 @@ const submitEdit = async () => {
   errorMessage.value = ''
   successMessage.value = ''
   try {
+    // Обновляем основную информацию
     const payload = {
       email: form.value.email,
       name: form.value.name,
       lastname: form.value.lastname,
       patronymic: form.value.patronymic || null,
       sponsor_id: form.value.sponsor_id || null,
-      branch_id: parseInt(form.value.branch_id)
+      branch_id: parseInt(form.value.branch_id),
+      phone_number: form.value.phone_number || null
     }
     if (form.value.password && form.value.password.trim().length > 0) {
       payload.password = form.value.password
     }
-    const response = await api.put(`participants/${participantId.value}`, payload)
-    if (response.status === 200 || response.status === 204) {
-      successMessage.value = 'Изменения сохранены'
-      setTimeout(() => { router.push(`/participants/${participantId.value}`) }, 1200)
+    await api.put(`participants/${participantId.value}`, payload)
+    
+    // Обновляем паспортную информацию
+    const passportPayload = {
+      pin: passportForm.value.pin || null,
+      passport_id: passportForm.value.passport_id || null,
+      passport_issuer: passportForm.value.passport_issuer || null,
+      passport_issue_date: passportForm.value.passport_issue_date || null,
+      bank: passportForm.value.bank || null,
+      ip_inn: passportForm.value.ip_inn || false,
+      pensioner: passportForm.value.pensioner || false,
+      phone_number: passportForm.value.phone_number || null,
+      date_birth: passportForm.value.date_birth || null
     }
+    await api.put(`participants/passport_info/${participantId.value}`, passportPayload)
+    
+    successMessage.value = 'Изменения сохранены'
+    setTimeout(() => { router.push(`/participants/${participantId.value}`) }, 1200)
   } catch (error) {
     console.error('Ошибка сохранения пользователя:', error)
     if (error.response?.data?.detail) {
@@ -267,6 +390,13 @@ const submitEdit = async () => {
 onMounted(() => {
   loadBranches()
   loadParticipant()
+})
+
+onBeforeUnmount(() => {
+  if (typeof window !== 'undefined' && window.__navActiveKey) {
+    try { delete window.__navActiveKey } catch {}
+    try { window.dispatchEvent(new Event('nav-active-key-changed')) } catch {}
+  }
 })
 </script>
 
