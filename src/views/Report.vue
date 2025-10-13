@@ -53,6 +53,7 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ФИО</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Структурный бонус</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Спонсорский бонус</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Паспорт</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
               </tr>
             </thead>
@@ -65,6 +66,14 @@
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ row.full_name }}</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ row.structure_bonus }}</strong></td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ row.sponsor_bonus }}</strong></td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-center">
+                  <span v-if="row.passport_complete" class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                    ✓
+                  </span>
+                  <span v-else class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500">
+                    ✗
+                  </span>
+                </td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm">
                   <button 
                     v-if="(row.status === 'pending' || !row.status) && !isCurrentWeek" 
@@ -85,6 +94,7 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white" colspan="3">Итого</th>
                 <th class="px-4 py-2 text-left text-sm text-gray-900 dark:text-white">{{ totalStructure }}</th>
                 <th class="px-4 py-2 text-left text-sm text-gray-900 dark:text-white">{{ totalSponsor }}</th>
+                <th class="px-4 py-2"></th>
                 <th class="px-4 py-2">
                   <div class="flex items-center justify-end gap-2">
                     <button @click="downloadSummary" type="button" :disabled="downloading"
@@ -265,10 +275,11 @@ async function copyPlainText() {
   try {
     const lines = summary.value.map((row) => {
       const branchName = row.branch?.name || '-'
-      return `${branchName}\t${row.personal_number}\t${row.full_name}\t${row.structure_bonus}\t${row.sponsor_bonus}`
+      const passportStatus = row.passport_complete ? '✓' : '✗'
+      return `${branchName}\t${row.personal_number}\t${row.full_name}\t${row.structure_bonus}\t${row.sponsor_bonus}\t${passportStatus}`
     })
-    const header = 'Филиал\tПерсональный номер\tФИО\tСтруктурный бонус\tСпонсорский бонус'
-    const totals = `Итого\t\t\t${totalStructure.value}\t${totalSponsor.value}`
+    const header = 'Филиал\tПерсональный номер\tФИО\tСтруктурный бонус\tСпонсорский бонус\tПаспорт'
+    const totals = `Итого\t\t\t${totalStructure.value}\t${totalSponsor.value}\t`
     const text = [header, ...lines, totals].join('\n')
     await navigator.clipboard.writeText(text)
   } catch (e) {
