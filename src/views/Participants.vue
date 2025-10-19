@@ -111,8 +111,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/api'
+
+const route = useRoute()
+const router = useRouter()
 
 // Реактивные данные
 const participants = ref([])
@@ -122,10 +126,10 @@ const pagination = ref(null)
 
 // Фильтры
 const filters = ref({
-  page_size: 20,
-  branch_id: '',
-  search: '',
-  page: 1
+  page_size: parseInt(route.query.page_size) || 20,
+  branch_id: route.query.branch_id || '',
+  search: route.query.search || '',
+  page: parseInt(route.query.page) || 1
 })
 
 // API базовый URL
@@ -139,6 +143,17 @@ const loadBranches = async () => {
   } catch (error) {
     console.error('Ошибка загрузки филиалов:', error)
   }
+}
+
+// Обновление URL с текущими фильтрами
+const updateURL = () => {
+  const query = {}
+  if (filters.value.page_size !== 20) query.page_size = filters.value.page_size
+  if (filters.value.branch_id) query.branch_id = filters.value.branch_id
+  if (filters.value.search) query.search = filters.value.search
+  if (filters.value.page !== 1) query.page = filters.value.page
+  
+  router.replace({ query })
 }
 
 // Поиск участников
@@ -168,6 +183,9 @@ const searchParticipants = async () => {
       total_pages: response.data.total_pages || 1,
       total_count: response.data.total_participants || 0
     }
+    
+    // Обновляем URL
+    updateURL()
   } catch (error) {
     console.error('Ошибка загрузки участников:', error)
     participants.value = []
@@ -183,6 +201,11 @@ const changePage = (page) => {
     searchParticipants()
   }
 }
+
+// Отслеживание изменений фильтров для обновления URL
+watch(filters, () => {
+  updateURL()
+}, { deep: true })
 
 // Получение названия филиала по ID
 const getBranchName = (branchId) => {
