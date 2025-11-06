@@ -449,8 +449,8 @@ const addToStructure = async () => {
     
     await api.post(`structure/add`, payload)
     
-    // Перенаправляем на страницу структуры
-    router.push(`/registration`)
+    // Перенаправляем на страницу регистраций
+    router.push(`/binar/registration`)
   } catch (error) {
     console.error('Ошибка добавления в структуру:', error)
     alert('Ошибка при добавлении в структуру: ' + (error.response?.data?.message || error.message))
@@ -464,6 +464,7 @@ onMounted(() => {
   if (participantId.value) {
     loadParticipantInfo()
   }
+  // (больше не требуется глобальный ключ - активность по маршруту)
 })
 </script>
 

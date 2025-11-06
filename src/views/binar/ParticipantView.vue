@@ -67,6 +67,79 @@
                     </div>
                   </div>
                 </div>
+        
+        <!-- Create Contract Modal -->
+        <div v-if="createContractModalVisible" class="fixed inset-0 z-50 flex items-center justify-center">
+          <div class="absolute inset-0 bg-black/40" @click="closeCreateContractModal"></div>
+          <div class="relative z-10 w-full max-w-md mx-4 overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700">
+            <div class="px-4 py-3 border-b dark:border-gray-700">
+              <h5 class="m-0 dark:text-white">Создать контракт</h5>
+              <button @click="closeCreateContractModal" class="absolute top-3 right-3 rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-white dark:hover:bg-[#4a4a52]">✕</button>
+            </div>
+            <div class="p-4">
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сумма контракта *</label>
+                  <input 
+                    v-model.number="contractForm.initial_amount" 
+                    type="number" 
+                    step="0.01"
+                    min="0"
+                    required
+                    class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Метод оплаты *</label>
+                  <select 
+                    v-model.number="contractForm.payment_method_id" 
+                    required
+                    :disabled="loadingPaymentMethods"
+                    class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white disabled:opacity-50"
+                  >
+                    <option value="">{{ loadingPaymentMethods ? 'Загрузка...' : 'Выберите метод оплаты' }}</option>
+                    <option 
+                      v-for="method in paymentMethods" 
+                      :key="method.id" 
+                      :value="method.id"
+                    >
+                      {{ method.name }}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Дата оплаты</label>
+                  <input 
+                    v-model="contractForm.paid_at" 
+                    type="datetime-local"
+                    class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Описание</label>
+                  <textarea 
+                    v-model="contractForm.description" 
+                    rows="3"
+                    class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
+                    placeholder="Введите описание контракта (необязательно)"
+                  ></textarea>
+                </div>
+                
+                <div v-if="contractError" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200">
+                  {{ contractError }}
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 px-4 py-3 border-t dark:border-gray-700">
+              <button @click="closeCreateContractModal" class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">Отмена</button>
+              <button @click="createContract" :disabled="!contractForm.initial_amount || !contractForm.payment_method_id || submittingContract"
+                class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-white text-sm hover:bg-green-700 disabled:opacity-40 dark:bg-green-800 dark:hover:bg-green-900">
+                <span v-if="submittingContract" class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white dark:border-gray-600 dark:border-t-white"></span>
+                {{ submittingContract ? 'Создание...' : 'Создать' }}
+              </button>
+            </div>
+          </div>
+        </div>
                 
         <!-- Загрузка -->
         <div v-if="loading" class="py-6 text-center">
@@ -422,7 +495,7 @@
                           <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                             <tr v-for="bonus in sponsorBonusesList" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                               <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                                <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                                <router-link :to="`/binar/participant/${bonus.from_participant_id}`" class="hover:underline">
                                   {{ bonus.from_participant_fio || '-' }}
                                 </router-link>
                               </td>
@@ -517,7 +590,7 @@
                           <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                             <tr v-for="bonus in healthDayList" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                               <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                                <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                                <router-link :to="`/binar/participant/${bonus.from_participant_id}`" class="hover:underline">
                                   {{ bonus.from_participant_fio || '-' }}
                                 </router-link>
                               </td>
@@ -605,11 +678,10 @@
               </div>
               <div class="p-4">
                 <div class="grid gap-2">
-                  <router-link :to="`/purchase/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-white text-sm hover:bg-gray-900">Покупки</router-link>
-                  <router-link v-if="participant.registered" :to="`/structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">Структура</router-link>
-                  <router-link v-if="participant.registered" :to="`/sponsored/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-slate-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Личники</router-link>
-                  <router-link v-if="!participant.registered" :to="`/registration/add-to-structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">+ Cтруктуру</router-link>
-                  <router-link :to="`/registration/edit/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-orange-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Изменить</router-link>
+                  <router-link v-if="participant.registered" :to="`/binar/add-to-structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">Структура</router-link>
+                  <router-link v-if="participant.registered" :to="`/binar/sponsored/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-slate-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Личники</router-link>
+                  <router-link v-if="!participant.registered" :to="`/binar/add-to-structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">+ Cтруктуру</router-link>
+                  <router-link :to="`/binar/user-edit/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-orange-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Изменить</router-link>
                   <button v-if="!participant.registered" @click="openConfirm(participant.id)" class="inline-flex items-center justify-center rounded-md bg-red-600 px-3 py-2 text-white text-sm hover:bg-red-700">Удалить</button>
                 </div>
               </div>
@@ -621,7 +693,7 @@
               </div>
               <div class="p-4">
                 <p class="text-sm text-gray-900 dark:text-white">{{ participant.sponsor?.lastname }} {{ participant.sponsor?.name }} {{ participant.sponsor?.patronymic }}</p>
-                <p class="text-sm text-gray-900 dark:text-white"><a :href="`/participants/${participant.sponsor?.id}`" class="text-blue-600 hover:underline dark:text-blue-300">{{ participant.sponsor?.personal_number }}</a></p>
+                <p class="text-sm text-gray-900 dark:text-white"><a :href="`/binar/participant/${participant.sponsor?.id}`" class="text-blue-600 hover:underline dark:text-blue-300">{{ participant.sponsor?.personal_number }}</a></p>
               </div>
             </div>
             <div class="bg-white rounded-lg ring-1 ring-gray-200 mt-3 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
@@ -630,7 +702,73 @@
               </div>
               <div class="p-4">
                 <p class="text-sm text-gray-900 dark:text-white">{{ participant.mentor?.lastname }} {{ participant.mentor?.name }} {{ participant.mentor?.patronymic }}</p>
-                <p class="text-sm text-gray-900 dark:text-white"><a :href="`/participants/${participant.mentor?.id}`" class="text-blue-600 hover:underline dark:text-blue-300">{{ participant.mentor?.personal_number }}</a></p>
+                <p class="text-sm text-gray-900 dark:text-white"><a :href="`/binar/participant/${participant.mentor?.id}`" class="text-blue-600 hover:underline dark:text-blue-300">{{ participant.mentor?.personal_number }}</a></p>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-lg ring-1 ring-gray-200 mt-3 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
+              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
+                <h5 class="m-0 dark:text-white">Контракт</h5>
+              </div>
+              <div class="p-4">
+                <div v-if="contractLoading" class="text-center py-4">
+                  <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+                </div>
+                <div v-else-if="contract" class="text-sm text-gray-900 dark:text-white space-y-4">
+                  <div class="space-y-2">
+                    <div>
+                      <span class="text-xs text-gray-500 dark:text-gray-400">Остаток:</span>
+                      <p class="font-semibold mt-1">${{ contract.remaining_amount }}</p>
+                    </div>
+                    <div>
+                      <span class="text-xs text-gray-500 dark:text-gray-400">Создан:</span>
+                      <p class="font-semibold mt-1">{{ formatDate(contract.created_at) }}</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Таблица использования контракта -->
+                  <div v-if="contractUsagesLoading" class="text-center py-4">
+                    <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+                  </div>
+                  <div v-else-if="contractUsages && contractUsages.length > 0" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-xs">
+                      <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                        <tr>
+                          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">#Заказ</th>
+                          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Использованная сумма</th>
+                          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                        <tr v-for="usage in contractUsages" :key="usage.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                          <td class="px-3 py-2 whitespace-nowrap text-sm">
+                            <button 
+                              @click="openOrderModal(usage.order_id)"
+                              class="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-300 dark:hover:text-blue-400 font-medium"
+                            >
+                              #{{ usage.order_id }}
+                            </button>
+                          </td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ usage.amount_used }}</td>
+                          <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(usage.created_at) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div v-else class="text-center py-2 text-xs text-gray-500 dark:text-gray-400">
+                    Нет данных об использовании
+                  </div>
+                </div>
+                <div v-else class="flex items-center justify-center py-4">
+                  <button 
+                    @click="openCreateContractModal" 
+                    class="w-full flex items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                  >
+                    <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -643,6 +781,13 @@
         </div>
       </div>
     </div>
+    
+    <!-- Order Detail Modal -->
+    <OrderDetailModal
+      :visible="orderDetailModalVisible"
+      :order-id="selectedOrderId"
+      @close="closeOrderModal"
+    />
   </div>
 </template>
 
@@ -650,6 +795,8 @@
 import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/api'
+import { store_api } from '@/api'
+import OrderDetailModal from '@/components/OrderDetailModal.vue'
 
 const router = useRouter()
 
@@ -659,6 +806,27 @@ const loading = ref(false)
 const bonusData = ref(null)
 const structureData = ref(null)
 const stageHistory = ref([])
+const contract = ref(null)
+const contractLoading = ref(false)
+const contractUsages = ref([])
+const contractUsagesLoading = ref(false)
+
+// Модальное окно заказа
+const orderDetailModalVisible = ref(false)
+const selectedOrderId = ref(null)
+
+// Модальное окно создания контракта
+const createContractModalVisible = ref(false)
+const contractForm = ref({
+  initial_amount: 230,
+  paid_at: '',
+  payment_method_id: null,
+  description: ''
+})
+const paymentMethods = ref([])
+const loadingPaymentMethods = ref(false)
+const submittingContract = ref(false)
+const contractError = ref('')
 
 // Уведомления
 const notice = ref({ visible: false, type: 'info', message: '' })
@@ -791,10 +959,7 @@ const loadParticipant = async () => {
   try {
     const response = await api.get(`participants/${participantId}`)
     participant.value = response.data
-    if (typeof window !== 'undefined') {
-      window.__navActiveKey = response.data?.registered ? 'participants' : 'registration'
-      try { window.dispatchEvent(new Event('nav-active-key-changed')) } catch {}
-    }
+    // Навигационная активность теперь вычисляется по маршруту, глобальный ключ не используется
   } catch (error) {
     console.error('Ошибка загрузки участника:', error)
     participant.value = null
@@ -1044,11 +1209,148 @@ const deleteParticipant = async (id) => {
     showNotice('Участник удалён', 'success')
     // Перенаправляем на страницу регистраций
     setTimeout(() => {
-      router.push('/registration')
+      router.push('/binar/registration')
     }, 1000)
   } catch (error) {
     console.error('Ошибка удаления участника:', error)
     showNotice('Не удалось удалить участника', 'error')
+  }
+}
+
+// Открытие модального окна заказа
+const openOrderModal = (orderId) => {
+  selectedOrderId.value = orderId
+  orderDetailModalVisible.value = true
+}
+
+// Закрытие модального окна заказа
+const closeOrderModal = () => {
+  orderDetailModalVisible.value = false
+  selectedOrderId.value = null
+}
+
+// Загрузка контракта
+const loadContract = async () => {
+  contractLoading.value = true
+  try {
+    const response = await api.get(`contracts/${participantId}`)
+    contract.value = response.data
+    // Загружаем использование контракта, если контракт существует
+    if (contract.value) {
+      await loadContractUsages()
+    }
+  } catch (error) {
+    if (error.response?.status === 404) {
+      contract.value = null
+    } else {
+      console.error('Ошибка загрузки контракта:', error)
+      contract.value = null
+    }
+  } finally {
+    contractLoading.value = false
+  }
+}
+
+// Загрузка использования контракта
+const loadContractUsages = async () => {
+  contractUsagesLoading.value = true
+  try {
+    const response = await api.get(`contracts/usages/${participantId}/contract-usage`)
+    contractUsages.value = Array.isArray(response.data) ? response.data : []
+  } catch (error) {
+    if (error.response?.status === 404) {
+      contractUsages.value = []
+    } else {
+      console.error('Ошибка загрузки использования контракта:', error)
+      contractUsages.value = []
+    }
+  } finally {
+    contractUsagesLoading.value = false
+  }
+}
+
+// Загрузка методов оплаты
+const loadPaymentMethods = async () => {
+  loadingPaymentMethods.value = true
+  try {
+    const response = await api.get('enums/payment-methods?limit=100&offset=0')
+    paymentMethods.value = response.data.filter(m => m.active)
+  } catch (error) {
+    console.error('Ошибка загрузки методов оплаты:', error)
+    contractError.value = 'Не удалось загрузить методы оплаты'
+  } finally {
+    loadingPaymentMethods.value = false
+  }
+}
+
+// Модальное окно создания контракта
+const openCreateContractModal = async () => {
+  contractForm.value = {
+    initial_amount: 230,
+    paid_at: '',
+    payment_method_id: null,
+    description: ''
+  }
+  contractError.value = ''
+  createContractModalVisible.value = true
+  // Загружаем методы оплаты при открытии модального окна
+  if (paymentMethods.value.length === 0) {
+    await loadPaymentMethods()
+  }
+}
+
+const closeCreateContractModal = () => {
+  createContractModalVisible.value = false
+  contractForm.value = {
+    initial_amount: 230,
+    paid_at: '',
+    payment_method_id: null,
+    description: ''
+  }
+  contractError.value = ''
+}
+
+const createContract = async () => {
+  if (!contractForm.value.initial_amount) {
+    contractError.value = 'Введите сумму контракта'
+    return
+  }
+  
+  if (!contractForm.value.payment_method_id) {
+    contractError.value = 'Выберите метод оплаты'
+    return
+  }
+  
+  submittingContract.value = true
+  contractError.value = ''
+  try {
+    const payload = {
+      participant_id: participantId,
+      initial_amount: contractForm.value.initial_amount,
+      payment_method_id: contractForm.value.payment_method_id
+    }
+    
+    // Если указана дата, добавляем её
+    if (contractForm.value.paid_at) {
+      payload.paid_at = contractForm.value.paid_at
+    }
+    
+    // Если указано описание, добавляем его
+    if (contractForm.value.description) {
+      payload.description = contractForm.value.description
+    }
+    
+    await api.post('contracts/', payload)
+    
+    // Перезагружаем контракт
+    await loadContract()
+    closeCreateContractModal()
+    showNotice('Контракт успешно создан', 'success')
+  } catch (error) {
+    console.error('Ошибка создания контракта:', error)
+    contractError.value = error.response?.data?.detail || error.response?.data?.message || 'Ошибка создания контракта'
+  } finally {
+    submittingContract.value = false
   }
 }
 
@@ -1058,16 +1360,12 @@ onMounted(async () => {
   await Promise.all([
     loadBonusData(),
     loadStructureData(),
-    loadStageHistory()
+    loadStageHistory(),
+    loadContract()
   ])
 })
 
-onBeforeUnmount(() => {
-  if (typeof window !== 'undefined' && window.__navActiveKey) {
-    try { delete window.__navActiveKey } catch {}
-    try { window.dispatchEvent(new Event('nav-active-key-changed')) } catch {}
-  }
-})
+onBeforeUnmount(() => {})
 </script>
 
 <style scoped>

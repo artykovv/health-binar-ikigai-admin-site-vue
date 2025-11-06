@@ -8,6 +8,7 @@ const items = [
   { to: '/participants', label: 'Участники', key: 'participants' },
   { to: '/registration', label: 'Регистрации', key: 'registration' },
   { to: '/branches', label: 'Филиалы', key: 'branches' },
+  { to: '/products', label: 'Товары', key: 'products' },
   { to: '/bonuses', label: 'Бонусы', key: 'bonuses' },
   // { to: '/purchase', label: 'Покупки', key: 'purchases' },
   { to: '/report', label: 'Отчет', key: 'report' },
@@ -280,11 +281,14 @@ watch(linkWidth, async () => {
 .nav-link {
   display: inline-block;
   padding: 8px 10px;
-  color: #111827;
+  color: #6B7280; /* gray-600 default */
   text-decoration: none;
   text-align: center;
   border-radius: 10px;
   transition: color 300ms ease, background-color 300ms ease;
+}
+.nav-link.is-active {
+  color: #000000; /* active black */
 }
 .nav-link:hover {
   color: #000000;
@@ -295,7 +299,7 @@ watch(linkWidth, async () => {
   left: 0;
   bottom: 0;
   height: 2px;
-  background-color: #000000;
+  background-color: #000000; /* black indicator */
   border-radius: 2px;
   transition: transform 450ms ease, width 250ms ease, opacity 150ms ease, background-color 300ms ease;
   will-change: transform, width;
@@ -358,15 +362,18 @@ watch(linkWidth, async () => {
 
 /* Dark theme overrides for navbar */
 :root.dark .nav-link {
-  color: #ffffff;
+  color: #9CA3AF; /* gray-400 in dark as default */
   transition: color 300ms ease, background-color 300ms ease;
 }
+:root.dark .nav-link.is-active {
+  color: #000000; /* keep active black as requested */
+}
 :root.dark .nav-link:hover {
-  color: #ffffff;
-  background-color: rgba(255,255,255,0.08);
+  color: #000000;
+  background-color: rgba(255,255,255,0.06);
 }
 :root.dark .nav-indicator {
-  background-color: #ffffff;
+  background-color: #000000; /* keep indicator black in dark too */
   transition: transform 450ms ease, width 250ms ease, opacity 150ms ease, background-color 300ms ease;
 }
 :root.dark .theme-toggle {

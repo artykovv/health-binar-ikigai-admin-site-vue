@@ -330,7 +330,7 @@ const nodeStyle = (node) => {
 
 const goTo = (id) => {
   if (!id) return
-  router.push(`/structure/${id}`)
+  router.push(`/binar/structure/${id}`)
 }
 
 onMounted(() => {
@@ -388,7 +388,7 @@ const selectParticipant = (p) => {
   if (!p?.id) return
   showResults.value = false
   searchResults.value = []
-  router.push(`/structure/${p.id}`)
+  router.push(`/binar/structure/${p.id}`)
 }
 
 // Сбор всех participant_id из дерева

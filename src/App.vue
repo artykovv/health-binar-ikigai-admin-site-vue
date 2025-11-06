@@ -1,18 +1,10 @@
 <script setup>
 import { RouterView } from 'vue-router'
-import NavBar from './components/NavBar.vue'
 </script>
 
 <template>
   <div id="app">
-    <NavBar />
-
-    <!-- Основной контент -->
-    <main class="py-4">
-      <div class="container">
-        <RouterView />
-      </div>
-    </main>
+    <RouterView />
   </div>
 </template>
 

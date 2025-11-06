@@ -31,7 +31,7 @@
                   <tr v-for="participant in participants" :key="participant.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ getBranchName(participant.branch_id, participant.branch) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${participant.id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${participant.id}`" class="hover:underline">
                         {{ participant.personal_number }}
                       </router-link>
                     </td>
@@ -40,9 +40,9 @@
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ calculateTimeRemaining(participant.bonus_data?.stage_start_date) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(participant.register_at) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${participant.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
-                      <router-link :to="`/purchase/${participant.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Покупки</router-link>
-                      <router-link :to="`/structure/${participant.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-xs hover:bg-gray-900">Структура</router-link>
+                      <router-link :to="`/binar/participant/${participant.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
+                      <router-link :to="`/binar/purchase/${participant.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Покупки</router-link>
+                      <router-link :to="`/binar/add-to-structure/${participant.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-xs hover:bg-gray-900">Структура</router-link>
                     </td>
                   </tr>
                 </tbody>

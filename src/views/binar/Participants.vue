@@ -4,7 +4,7 @@
       <div>
         <div class="flex items-center justify-between mb-3">
           <h1 class="dark:text-white">Участники</h1>
-          <router-link to="/registration/new" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Добавить</router-link>
+          <router-link to="/binar/user-registration" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Добавить</router-link>
         </div>
         
         <!-- Фильтры -->
@@ -61,18 +61,18 @@
                   <tr v-for="participant in participants" :key="participant.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ participant.branch?.name || 'Неизвестно' }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${participant.id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${participant.id}`" class="hover:underline">
                         {{ participant.personal_number }}
                       </router-link>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ participant.lastname }} {{ participant.name }} {{ participant.patronymic }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(participant.register_at) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${participant.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
-                      <router-link :to="`/purchase/${participant.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Покупки</router-link>
-                      <router-link :to="`/structure/${participant.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Структура</router-link>
-                      <router-link :to="`/sponsored/${participant.id}`" class="inline-flex items-center rounded-md bg-slate-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Личники</router-link>
-                      <router-link :to="`/registration/edit/${participant.id}`" class="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-white text-xs hover:bg-gray-900">Изменить</router-link>
+                      <router-link :to="`/binar/participant/${participant.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
+                      <router-link :to="`/binar/purchase/${participant.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Покупки</router-link>
+                      <router-link :to="`/binar/structure/${participant.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Структура</router-link>
+                      <router-link :to="`/binar/sponsored/${participant.id}`" class="inline-flex items-center rounded-md bg-slate-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Личники</router-link>
+                      <router-link :to="`/binar/user-edit/${participant.id}`" class="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-white text-xs hover:bg-gray-900">Изменить</router-link>
                       <!-- <button class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-xs hover:bg-gray-900">Редактировать</button> -->
                     </td>
                   </tr>

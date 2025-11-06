@@ -349,7 +349,7 @@ const submitRegistration = async () => {
       // Перенаправляем на страницу просмотра участника
       if (response.data && response.data.id) {
         setTimeout(() => {
-          router.push(`/registration`)
+          router.push(`/binar/registration`)
         }, 1500) // Небольшая задержка для показа сообщения об успехе
       } else {
         resetForm()
@@ -394,5 +394,7 @@ const resetForm = () => {
 onMounted(() => {
   loadBranches()
   generatePersonalNumber() // Автоматически генерируем номер при загрузке
+  // Активируем вкладку Регистрации в верхнем меню
+  // (больше не требуется глобальный ключ - активность по маршруту)
 })
 </script>

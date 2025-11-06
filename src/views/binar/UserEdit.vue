@@ -367,7 +367,7 @@ const submitEdit = async () => {
     await api.put(`participants/passport_info/${participantId.value}`, passportPayload)
     
     successMessage.value = 'Изменения сохранены'
-    setTimeout(() => { router.push(`/participants/${participantId.value}`) }, 1200)
+    setTimeout(() => { router.push(`/binar/participant/${participantId.value}`) }, 1200)
   } catch (error) {
     console.error('Ошибка сохранения пользователя:', error)
     if (error.response?.data?.detail) {

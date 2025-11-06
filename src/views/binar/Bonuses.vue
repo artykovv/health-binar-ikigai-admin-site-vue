@@ -197,22 +197,22 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                   <tr v-for="bonus in healthDayBonuses" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.participant_id}`" class="hover:underline">
                         {{ bonus.participant_personal_number || '-' }}
                       </router-link>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.participant_id}`" class="hover:underline">
                         {{ bonus.participant_fio || '-' }}
                       </router-link>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.from_participant_id}`" class="hover:underline">
                         {{ bonus.from_participant_personal_number || '-' }}
                       </router-link>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.from_participant_id}`" class="hover:underline">
                         {{ bonus.from_participant_fio || '-' }}
                       </router-link>
                     </td>
@@ -335,12 +335,12 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                   <tr v-for="gift in gifts" :key="gift.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${gift.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${gift.participant_id}`" class="hover:underline">
                         {{ gift.participant_personal_number || '-' }}
                       </router-link>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${gift.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${gift.participant_id}`" class="hover:underline">
                         {{ gift.participant_fio || '-' }}
                       </router-link>
                     </td>
@@ -465,12 +465,12 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                   <tr v-for="bonus in multibonuses" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.participant_id}`" class="hover:underline">
                             {{ bonus.participant_personal_number || '-' }}
                           </router-link>
                         </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.participant_id}`" class="hover:underline">
                         {{ bonus.participant_fio || '-' }}
                       </router-link>
                     </td>
@@ -591,12 +591,12 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                   <tr v-for="bonus in structuralBonuses" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.participant_id}`" class="hover:underline">
                             {{ bonus.participant_personal_number || '-' }}
                           </router-link>
                         </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.participant_id}`" class="hover:underline">
                         {{ bonus.participant_fio || '-' }}
                       </router-link>
                     </td>
@@ -713,22 +713,22 @@
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                   <tr v-for="bonus in sponsorBonuses" :key="bonus.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.participant_id}`" class="hover:underline">
                         {{ bonus.participant_personal_number || '-' }}
                           </router-link>
                         </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${bonus.participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.participant_id}`" class="hover:underline">
                         {{ bonus.participant_fio || '-' }}
                           </router-link>
                         </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.from_participant_id}`" class="hover:underline">
                         {{ bonus.from_participant_personal_number || '-' }}
                       </router-link>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${bonus.from_participant_id}`" class="hover:underline">
+                      <router-link :to="`/binar/participant/${bonus.from_participant_id}`" class="hover:underline">
                         {{ bonus.from_participant_fio || '-' }}
                       </router-link>
                     </td>
@@ -992,7 +992,7 @@ const sponsorFilters = ref({
 // Функция для переключения вкладок
 const setActiveTab = (tab) => {
   activeTab.value = tab
-  router.push(`/bonuses/${tab}`)
+  router.push(`/binar/bonuses/${tab}`)
   if (tab === 'multibonus') {
     loadMultibonuses()
   } else if (tab === 'structural') {

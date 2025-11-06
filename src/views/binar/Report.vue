@@ -61,7 +61,7 @@
               <tr v-for="row in summary" :key="row.participant_id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ row.branch?.name || '-' }}</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                  <router-link :to="`/participants/${row.participant_id}`" class="hover:underline">{{ row.personal_number }}</router-link>
+                  <router-link :to="`/binar/participant/${row.participant_id}`" class="hover:underline">{{ row.personal_number }}</router-link>
                 </td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ row.full_name }}</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ row.structure_bonus }}</strong></td>

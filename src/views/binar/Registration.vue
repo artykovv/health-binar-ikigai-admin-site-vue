@@ -4,7 +4,7 @@
       <div>
         <div class="flex items-center justify-between mb-3">
           <h1 class="dark:text-white">Регистрации</h1>
-          <router-link to="/registration/new" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Добавить</router-link>
+          <router-link to="/binar/user-registration" class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white">Добавить</router-link>
         </div>
         
         <!-- Tailwind Notification -->
@@ -93,17 +93,16 @@
                   <tr v-for="registration in registrations" :key="registration.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ registration.branch?.name || 'Неизвестно' }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-300">
-                      <router-link :to="`/participants/${registration.id}`" class="hover:underline">
+                      <router-link :to="`/binar/registration/participant/${registration.id}`" class="hover:underline">
                         {{ registration.personal_number }}
                       </router-link>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ registration.lastname }} {{ registration.name }} {{ registration.patronymic }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(registration.created_at) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <router-link :to="`/participants/${registration.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
-                      <router-link :to="`/purchase/${registration.id}`" class="inline-flex items-center rounded-md bg-primary px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Покупки</router-link>
-                      <router-link :to="`/registration/add-to-structure/${registration.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">+ Cтруктуру</router-link>
-                      <router-link :to="`/registration/edit/${registration.id}`" class="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Изменить</router-link>
+                      <router-link :to="`/binar/registration/participant/${registration.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
+                      <router-link :to="`/binar/add-to-structure/${registration.id}`" class="inline-flex items-center rounded-md bg-success px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">+ Cтруктуру</router-link>
+                      <router-link :to="`/binar/registration/user-edit/${registration.id}`" class="inline-flex items-center rounded-md bg-orange-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Изменить</router-link>
                       <button class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-white text-xs hover:bg-red-700" @click="openConfirm(registration.id)">Удалить</button>
                     </td>
                   </tr>
