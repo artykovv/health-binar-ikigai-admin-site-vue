@@ -678,7 +678,7 @@
               </div>
               <div class="p-4">
                 <div class="grid gap-2">
-                  <router-link v-if="participant.registered" :to="`/binar/add-to-structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">Структура</router-link>
+                  <router-link v-if="participant.registered" :to="`/binar/structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">Структура</router-link>
                   <router-link v-if="participant.registered" :to="`/binar/sponsored/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-slate-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Личники</router-link>
                   <router-link v-if="!participant.registered" :to="`/binar/add-to-structure/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-success px-3 py-2 text-white text-sm hover:bg-gray-900">+ Cтруктуру</router-link>
                   <router-link :to="`/binar/user-edit/${participant.id}`" class="inline-flex items-center justify-center rounded-md bg-orange-600 px-3 py-2 text-white text-sm hover:bg-gray-900">Изменить</router-link>
