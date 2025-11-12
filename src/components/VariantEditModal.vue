@@ -314,7 +314,7 @@ const closeModal = () => {
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null
   if (imagePath.startsWith('http')) return imagePath
-  const baseUrl = import.meta.env.VITE_STORE_API_URL || 'http://127.0.0.1:8000'
+  const baseUrl = 'https://catalog-api-production-a903.up.railway.app/'
   return `${baseUrl}${imagePath}`
 }
 
