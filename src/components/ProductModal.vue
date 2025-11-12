@@ -423,7 +423,7 @@ const getImageUrl = (imagePath) => {
   // Если путь уже содержит полный URL, возвращаем как есть
   if (imagePath.startsWith('http')) return imagePath
   // Добавляем базовый URL API
-  const baseUrl = 'https://catalog-api-production-a903.up.railway.app/'
+  const baseUrl = 'https://catalog-api-production-a903.up.railway.app'
   return `${baseUrl}${imagePath}`
 }
 

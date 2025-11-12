@@ -314,7 +314,7 @@ const closeModal = () => {
 const getImageUrl = (imagePath) => {
   if (!imagePath) return null
   if (imagePath.startsWith('http')) return imagePath
-  const baseUrl = 'https://catalog-api-production-a903.up.railway.app/'
+  const baseUrl = 'https://catalog-api-production-a903.up.railway.app'
   return `${baseUrl}${imagePath}`
 }
 
