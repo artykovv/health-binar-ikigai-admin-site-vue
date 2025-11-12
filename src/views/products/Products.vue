@@ -620,7 +620,7 @@ const getImageUrl = (imagePath) => {
   // Если путь уже содержит полный URL, возвращаем как есть
   if (imagePath.startsWith('http')) return imagePath
   // Добавляем базовый URL API
-  const baseUrl = import.meta.env.VITE_STORE_API_URL || 'http://127.0.0.1:8000'
+  const baseUrl = 'https://catalog-api-production-a903.up.railway.app'
   return `${baseUrl}${imagePath}`
 }
 
