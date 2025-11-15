@@ -74,6 +74,19 @@
             <p class="text-sm text-blue-700 dark:text-blue-300">{{ selectedParticipant.personal_number }}</p>
           </div>
 
+          <!-- Exchange Rate Input -->
+          <div class="mb-4 p-3 bg-gray-50 dark:bg-[#4a4a52] border border-gray-200 dark:border-gray-600 rounded-lg">
+            <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Курс валюты (1$ = X сом)</label>
+            <input
+              v-model.number="exchangeRate"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="Введите курс (например, 88)"
+              class="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
+            />
+          </div>
+
           <div v-if="loadingProducts" class="text-center py-8">
             <span class="inline-block h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
           </div>
@@ -86,6 +99,7 @@
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Название</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена со скидкой</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена в сомах</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Кол-во</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Остаток</th>
                 </tr>
@@ -114,6 +128,11 @@
                   </td>
                   <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <span class="font-semibold text-green-600 dark:text-green-400">${{ getDiscountedPrice(product.price) }}</span>
+                  </td>
+                  <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    <span class="font-semibold text-blue-600 dark:text-blue-400">
+                      {{ exchangeRate ? Math.round(parseFloat(getDiscountedPrice(product.price)) * exchangeRate) : '-' }} сом
+                    </span>
                   </td>
                   <td class="px-4 py-2 whitespace-nowrap" @click.stop>
                     <input
@@ -223,10 +242,14 @@
       <div class="px-4 py-3 border-t dark:border-gray-700 sticky bottom-0 bg-white dark:bg-[#3f3f47]">
         <!-- Summary for Step 2 -->
         <div v-if="step === 2" class="mb-4">
-          <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
+          <div class="grid grid-cols-3 gap-4 p-3 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
             <div>
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Товары</p>
               <p class="text-sm font-bold text-gray-900 dark:text-white">${{ selectedProductsTotal.toFixed(2) }}</p>
+            </div>
+            <div v-if="exchangeRate">
+              <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Товары (сом)</p>
+              <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ Math.round(selectedProductsTotal * exchangeRate) }} сом</p>
             </div>
             <div>
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Выбрано товаров</p>
@@ -264,10 +287,14 @@
             <button
               v-if="step === 3"
               @click="createOrder"
-              :disabled="!selectedPaymentMethodId"
-              class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 disabled:opacity-40 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
+              :disabled="creatingOrder || !selectedPaymentMethodId"
+              class="inline-flex items-center gap-2 rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 disabled:opacity-40 disabled:cursor-not-allowed dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
             >
-              Создать
+              <span 
+                v-if="creatingOrder"
+                class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
+              ></span>
+              <span>{{ creatingOrder ? 'Создание...' : 'Создать' }}</span>
             </button>
           </div>
         </div>
@@ -309,6 +336,12 @@ const productQuantities = ref({})
 const paymentMethods = ref([])
 const loadingPaymentMethods = ref(false)
 const selectedPaymentMethodId = ref(null)
+
+// Creating order state
+const creatingOrder = ref(false)
+
+// Exchange rate (1$ = X сом)
+const exchangeRate = ref(88)
 
 // Discount constant (50% off for Health Day)
 const DISCOUNT_RATE = 0.5
@@ -449,8 +482,9 @@ const loadPaymentMethods = async () => {
 }
 
 const createOrder = async () => {
-  if (!selectedParticipant.value || selectedProducts.value.length === 0 || !selectedPaymentMethodId.value) return
+  if (!selectedParticipant.value || selectedProducts.value.length === 0 || !selectedPaymentMethodId.value || creatingOrder.value) return
   
+  creatingOrder.value = true
   try {
     const payload = {
       participant_id: selectedParticipant.value.id,
@@ -473,6 +507,8 @@ const createOrder = async () => {
   } catch (error) {
     console.error('Ошибка создания заказа Health Day:', error)
     alert(error.response?.data?.detail || 'Ошибка создания заказа')
+  } finally {
+    creatingOrder.value = false
   }
 }
 
@@ -486,6 +522,8 @@ watch(() => props.visible, (newVal) => {
     selectedProducts.value = []
     productQuantities.value = {}
     selectedPaymentMethodId.value = null
+    creatingOrder.value = false
+    exchangeRate.value = 88
   }
 })
 </script>

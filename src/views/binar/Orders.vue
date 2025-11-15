@@ -155,16 +155,17 @@
                 <thead class="bg-gray-50 dark:bg-[#3f3f47]">
                   <tr>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Общая сумма</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Способ оплаты</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Участник</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Общая сумма</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Способ оплаты</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
                     <tr v-if="healthDayOrders.length === 0">
-                      <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                      <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                         Нет заказов
                     </td>
                   </tr>
@@ -175,6 +176,13 @@
                       @click="openHealthDayOrderDetailModal(order.id)"
                     >
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.id }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                        <div v-if="order.participant">
+                          <div class="font-medium">{{ order.participant.name }} {{ order.participant.lastname }} {{ order.participant.patronymic }}</div>
+                          <div class="text-xs text-gray-500 dark:text-gray-400">{{ order.participant.personal_number }}</div>
+                        </div>
+                        <span v-else class="text-gray-500 dark:text-gray-400">-</span>
+                      </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch?.name || '-' }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ order.total_amount }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.payment_method?.name || '-' }}</td>
