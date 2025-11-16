@@ -1086,7 +1086,7 @@ const loadStructuralBonuses = async () => {
         order_dir: 'desc'
       }
     })
-    structuralBonusesList.value = response.data.results || response.data || []
+    structuralBonusesList.value = response.data.items || response.data.results || response.data || []
   } catch (error) {
     console.error('Ошибка загрузки структурных бонусов:', error)
     structuralBonusesList.value = []
@@ -1107,7 +1107,7 @@ const loadSponsorBonuses = async () => {
         order_dir: 'desc'
       }
     })
-    sponsorBonusesList.value = response.data.results || response.data || []
+    sponsorBonusesList.value = response.data.items || response.data.results || response.data || []
   } catch (error) {
     console.error('Ошибка загрузки спонсорских бонусов:', error)
     sponsorBonusesList.value = []
@@ -1128,7 +1128,7 @@ const loadMultibonuses = async () => {
         order_dir: 'desc'
       }
     })
-    multibonusesList.value = response.data.results || response.data || []
+    multibonusesList.value = response.data.items || response.data.results || response.data || []
   } catch (error) {
     console.error('Ошибка загрузки мультибонусов:', error)
     multibonusesList.value = []
@@ -1149,7 +1149,7 @@ const loadGifts = async () => {
         order_dir: 'desc'
       }
     })
-    giftsList.value = response.data.results || response.data || []
+    giftsList.value = response.data.items || response.data.results || response.data || []
   } catch (error) {
     console.error('Ошибка загрузки подарков:', error)
     giftsList.value = []
@@ -1170,7 +1170,7 @@ const loadHealthDay = async () => {
         order_dir: 'desc'
       }
     })
-    healthDayList.value = response.data.results || response.data || []
+    healthDayList.value = response.data.items || response.data.results || response.data || []
   } catch (error) {
     console.error('Ошибка загрузки Health Day:', error)
     healthDayList.value = []
