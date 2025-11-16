@@ -137,7 +137,7 @@
         <div class="grid md:grid-cols-12 gap-3 mb-3">
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
-            <select v-model="healthDayFilters.page_size" @change="loadHealthDay"
+            <select v-model="healthDayFilters.page_size" @change="onHealthDayFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="10">10</option>
                       <option value="20">20</option>
@@ -147,7 +147,7 @@
                   </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сортировка:</label>
-            <select v-model="healthDayFilters.order_by" @change="loadHealthDay"
+            <select v-model="healthDayFilters.order_by" @change="onHealthDayFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="created_at">Дата создания</option>
                       <option value="received_at">Дата получения</option>
@@ -156,7 +156,7 @@
           </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Направление:</label>
-            <select v-model="healthDayFilters.order_dir" @change="loadHealthDay"
+            <select v-model="healthDayFilters.order_dir" @change="onHealthDayFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
               <option value="desc">По убыванию</option>
               <option value="asc">По возрастанию</option>
@@ -275,7 +275,7 @@
         <div class="grid md:grid-cols-12 gap-3 mb-3">
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
-            <select v-model="giftsFilters.page_size" @change="loadGifts"
+            <select v-model="giftsFilters.page_size" @change="onGiftsFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
               <option value="10">10</option>
               <option value="20">20</option>
@@ -285,7 +285,7 @@
           </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сортировка:</label>
-            <select v-model="giftsFilters.order_by" @change="loadGifts"
+            <select v-model="giftsFilters.order_by" @change="onGiftsFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
               <option value="created_at">Дата создания</option>
               <option value="received_at">Дата получения</option>
@@ -295,7 +295,7 @@
                   </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Направление:</label>
-            <select v-model="giftsFilters.order_dir" @change="loadGifts"
+            <select v-model="giftsFilters.order_dir" @change="onGiftsFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="desc">По убыванию</option>
                       <option value="asc">По возрастанию</option>
@@ -404,7 +404,7 @@
         <div class="grid md:grid-cols-12 gap-3 mb-3">
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
-            <select v-model="multibonusFilters.page_size" @change="loadMultibonuses"
+            <select v-model="multibonusFilters.page_size" @change="onMultibonusFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="10">10</option>
                       <option value="20">20</option>
@@ -414,7 +414,7 @@
                   </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сортировка:</label>
-            <select v-model="multibonusFilters.order_by" @change="loadMultibonuses"
+            <select v-model="multibonusFilters.order_by" @change="onMultibonusFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="created_at">Дата создания</option>
                       <option value="received_at">Дата получения</option>
@@ -425,7 +425,7 @@
                   </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Направление:</label>
-            <select v-model="multibonusFilters.order_dir" @change="loadMultibonuses"
+            <select v-model="multibonusFilters.order_dir" @change="onMultibonusFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="desc">По убыванию</option>
                       <option value="asc">По возрастанию</option>
@@ -533,7 +533,7 @@
         <div class="grid md:grid-cols-12 gap-3 mb-3">
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
-            <select v-model="structuralFilters.page_size" @change="loadStructuralBonuses"
+            <select v-model="structuralFilters.page_size" @change="onStructuralFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="10">10</option>
                       <option value="20">20</option>
@@ -543,7 +543,7 @@
                   </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сортировка:</label>
-            <select v-model="structuralFilters.order_by" @change="loadStructuralBonuses"
+            <select v-model="structuralFilters.order_by" @change="onStructuralFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="created_at">Дата создания</option>
                       <option value="received_at">Дата получения</option>
@@ -554,7 +554,7 @@
                   </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Направление:</label>
-            <select v-model="structuralFilters.order_dir" @change="loadStructuralBonuses"
+            <select v-model="structuralFilters.order_dir" @change="onStructuralFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="desc">По убыванию</option>
                       <option value="asc">По возрастанию</option>
@@ -652,7 +652,7 @@
         <div class="grid md:grid-cols-12 gap-3 mb-3">
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Размер страницы:</label>
-            <select v-model="sponsorFilters.page_size" @change="loadSponsorBonuses"
+            <select v-model="sponsorFilters.page_size" @change="onSponsorFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="10">10</option>
                       <option value="20">20</option>
@@ -662,7 +662,7 @@
                   </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сортировка:</label>
-            <select v-model="sponsorFilters.order_by" @change="loadSponsorBonuses"
+            <select v-model="sponsorFilters.order_by" @change="onSponsorFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="created_at">Дата создания</option>
                       <option value="received_at">Дата получения</option>
@@ -673,7 +673,7 @@
                   </div>
           <div class="md:col-span-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Направление:</label>
-            <select v-model="sponsorFilters.order_dir" @change="loadSponsorBonuses"
+            <select v-model="sponsorFilters.order_dir" @change="onSponsorFilterChange"
               class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-[#3f3f47] dark:text-white dark:focus:ring-white">
                       <option value="desc">По убыванию</option>
                       <option value="asc">По возрастанию</option>
@@ -1018,13 +1018,15 @@ const loadMultibonuses = async () => {
         page_size: multibonusFilters.value.page_size
       }
     })
-    const bonuses = response.data.results || response.data
+    const bonuses = response.data.items || response.data.results || response.data
     // Бэкенд уже отдает FIO и персональные номера, дополнительные запросы не нужны
     multibonuses.value = bonuses
+    const totalCount = response.data.total_items ?? response.data.total_count ?? response.data.count ?? (Array.isArray(bonuses) ? bonuses.length : 0)
+    const totalPages = response.data.total_pages ?? Math.max(1, Math.ceil(totalCount / (response.data.page_size ?? multibonusFilters.value.page_size)))
     multibonusPagination.value = {
-      current_page: response.data.current_page || 1,
-      total_pages: response.data.total_pages || 1,
-      total_count: response.data.total_count || response.data.count || 0
+      current_page: response.data.page ?? multibonusFilters.value.page ?? 1,
+      total_pages: totalPages,
+      total_count: totalCount
     }
   } catch (error) {
     console.error('Ошибка загрузки мультибонусов:', error)
@@ -1041,6 +1043,12 @@ const changeMultibonusPage = (page) => {
   }
 }
 
+// Сброс страницы при смене фильтров (мультибонусы)
+const onMultibonusFilterChange = () => {
+  multibonusFilters.value.page = 1
+  loadMultibonuses()
+}
+
 // Загрузка структурных бонусов
 const loadStructuralBonuses = async () => {
   structuralLoading.value = true
@@ -1053,13 +1061,15 @@ const loadStructuralBonuses = async () => {
         page_size: structuralFilters.value.page_size
       }
     })
-    const bonuses = response.data.results || response.data
+    const bonuses = response.data.items || response.data.results || response.data
     // Бэкенд уже отдает FIO и персональные номера, дополнительные запросы не нужны
     structuralBonuses.value = bonuses
+    const totalCount = response.data.total_items ?? response.data.total_count ?? response.data.count ?? (Array.isArray(bonuses) ? bonuses.length : 0)
+    const totalPages = response.data.total_pages ?? Math.max(1, Math.ceil(totalCount / (response.data.page_size ?? structuralFilters.value.page_size)))
     structuralPagination.value = {
-      current_page: response.data.current_page || 1,
-      total_pages: response.data.total_pages || 1,
-      total_count: response.data.total_count || response.data.count || 0
+      current_page: response.data.page ?? structuralFilters.value.page ?? 1,
+      total_pages: totalPages,
+      total_count: totalCount
     }
   } catch (error) {
     console.error('Ошибка загрузки структурных бонусов:', error)
@@ -1076,6 +1086,12 @@ const changeStructuralPage = (page) => {
   }
 }
 
+// Сброс страницы при смене фильтров (структурные)
+const onStructuralFilterChange = () => {
+  structuralFilters.value.page = 1
+  loadStructuralBonuses()
+}
+
 // Загрузка спонсорских бонусов
 const loadSponsorBonuses = async () => {
   sponsorLoading.value = true
@@ -1088,13 +1104,15 @@ const loadSponsorBonuses = async () => {
         page_size: sponsorFilters.value.page_size
       }
     })
-    const bonuses = response.data.results || response.data
+    const bonuses = response.data.items || response.data.results || response.data
     // Бэкенд уже отдает FIO и персональные номера, дополнительные запросы не нужны
     sponsorBonuses.value = bonuses
+    const totalCount = response.data.total_items ?? response.data.total_count ?? response.data.count ?? (Array.isArray(bonuses) ? bonuses.length : 0)
+    const totalPages = response.data.total_pages ?? Math.max(1, Math.ceil(totalCount / (response.data.page_size ?? sponsorFilters.value.page_size)))
     sponsorPagination.value = {
-      current_page: response.data.current_page || 1,
-      total_pages: response.data.total_pages || 1,
-      total_count: response.data.total_count || response.data.count || 0
+      current_page: response.data.page ?? sponsorFilters.value.page ?? 1,
+      total_pages: totalPages,
+      total_count: totalCount
     }
   } catch (error) {
     console.error('Ошибка загрузки спонсорских бонусов:', error)
@@ -1111,6 +1129,12 @@ const changeSponsorPage = (page) => {
   }
 }
 
+// Сброс страницы при смене фильтров (спонсорские)
+const onSponsorFilterChange = () => {
+  sponsorFilters.value.page = 1
+  loadSponsorBonuses()
+}
+
 // Загрузка подарков
 const loadGifts = async () => {
   giftsLoading.value = true
@@ -1123,13 +1147,15 @@ const loadGifts = async () => {
         page_size: giftsFilters.value.page_size
       }
     })
-    const giftsList = response.data.results || response.data
+    const giftsList = response.data.items || response.data.results || response.data
     // Бэкенд уже отдает FIO и персональные номера, дополнительные запросы не нужны
     gifts.value = giftsList
+    const totalCount = response.data.total_items ?? response.data.total_count ?? response.data.count ?? (Array.isArray(giftsList) ? giftsList.length : 0)
+    const totalPages = response.data.total_pages ?? Math.max(1, Math.ceil(totalCount / (response.data.page_size ?? giftsFilters.value.page_size)))
     giftsPagination.value = {
-      current_page: response.data.current_page || 1,
-      total_pages: response.data.total_pages || 1,
-      total_count: response.data.total_count || response.data.count || giftsList.length
+      current_page: response.data.page ?? giftsFilters.value.page ?? 1,
+      total_pages: totalPages,
+      total_count: totalCount
     }
   } catch (error) {
     console.error('Ошибка загрузки подарков:', error)
@@ -1146,6 +1172,12 @@ const changeGiftsPage = (page) => {
   }
 }
 
+// Сброс страницы при смене фильтров (подарки)
+const onGiftsFilterChange = () => {
+  giftsFilters.value.page = 1
+  loadGifts()
+}
+
 // Загрузка Health Day
 const loadHealthDay = async () => {
   healthDayLoading.value = true
@@ -1158,13 +1190,15 @@ const loadHealthDay = async () => {
         page_size: healthDayFilters.value.page_size
       }
     })
-    const bonuses = response.data.results || response.data
+    const bonuses = response.data.items || response.data.results || response.data
     // Бэкенд уже отдает FIO и персональные номера, дополнительные запросы не нужны
     healthDayBonuses.value = bonuses
+    const totalCount = response.data.total_items ?? response.data.total_count ?? response.data.count ?? (Array.isArray(bonuses) ? bonuses.length : 0)
+    const totalPages = response.data.total_pages ?? Math.max(1, Math.ceil(totalCount / (response.data.page_size ?? healthDayFilters.value.page_size)))
     healthDayPagination.value = {
-      current_page: response.data.current_page || 1,
-      total_pages: response.data.total_pages || 1,
-      total_count: response.data.total_count || response.data.count || bonuses.length
+      current_page: response.data.page ?? healthDayFilters.value.page ?? 1,
+      total_pages: totalPages,
+      total_count: totalCount
     }
   } catch (error) {
     console.error('Ошибка загрузки Health Day:', error)
@@ -1179,6 +1213,12 @@ const changeHealthDayPage = (page) => {
     healthDayFilters.value.page = page
     loadHealthDay()
   }
+}
+
+// Сброс страницы при смене фильтров (Health Day)
+const onHealthDayFilterChange = () => {
+  healthDayFilters.value.page = 1
+  loadHealthDay()
 }
 
 // Форматирование даты
