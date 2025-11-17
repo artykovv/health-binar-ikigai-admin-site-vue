@@ -28,7 +28,7 @@
           </div>
           <div class="mb-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сумма:</label>
-            <p class="text-sm font-bold text-gray-900 dark:text-white">{{ payModal.amount }}</p>
+            <p class="text-sm font-bold text-gray-900 dark:text-white">{{ formatNumber(payModal.amount) }}</p>
           </div>
           <div class="mb-3">
             <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Участник:</label>
@@ -216,7 +216,7 @@
                         {{ bonus.from_participant_fio || '-' }}
                       </router-link>
                     </td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ formatNumber(bonus.amount) }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.depth }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.branch || '-' }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(bonus.received_at) }}</td>
@@ -344,7 +344,7 @@
                         {{ gift.participant_fio || '-' }}
                       </router-link>
                     </td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ gift.reward }}</strong></td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ formatNumber(gift.reward) }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ gift.cycle_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ gift.stage_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ gift.branch || '-' }}</td>
@@ -474,7 +474,7 @@
                         {{ bonus.participant_fio || '-' }}
                       </router-link>
                     </td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.reward }}</strong></td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ formatNumber(bonus.reward) }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.branch || '-' }}</td>
@@ -600,7 +600,7 @@
                         {{ bonus.participant_fio || '-' }}
                       </router-link>
                     </td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ formatNumber(bonus.amount) }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.branch || '-' }}</td>
@@ -732,7 +732,7 @@
                         {{ bonus.from_participant_fio || '-' }}
                       </router-link>
                     </td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ bonus.amount }}</strong></td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white"><strong>{{ formatNumber(bonus.amount) }}</strong></td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.cycle_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.stage_number }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ bonus.branch || '-' }}</td>
@@ -1232,6 +1232,12 @@ const formatDate = (dateString) => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+// Форматирование чисел (замена точки на запятую)
+const formatNumber = (value) => {
+  if (value === null || value === undefined) return '-'
+  return String(value).replace('.', ',')
 }
 
 // Получение текста статуса
