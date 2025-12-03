@@ -15,8 +15,6 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">SKU</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Остаток</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Описание</th>
-                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Изображение</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
               </tr>
             </thead>
@@ -55,40 +53,6 @@
                          :disabled="isVariantExists(variant.attribute_value_ids)"
                          class="block w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white disabled:opacity-50 disabled:cursor-not-allowed"
                          placeholder="Остаток">
-                </td>
-                <!-- Описание -->
-                <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">
-                  <input v-model="variants[index].description" type="text" 
-                         :disabled="isVariantExists(variant.attribute_value_ids)"
-                         class="block w-full rounded-md border border-gray-300 bg-white px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white disabled:opacity-50 disabled:cursor-not-allowed"
-                         placeholder="Описание">
-                </td>
-                <!-- Изображение -->
-                <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">
-                  <div v-if="isVariantExists(variant.attribute_value_ids)" class="text-xs text-gray-500 dark:text-gray-400">
-                    -
-                  </div>
-                  <div v-else class="flex items-center gap-2">
-                    <input 
-                      :id="`image-${index}`"
-                      type="file" 
-                      accept="image/*"
-                      @change="(e) => handleImageChange(index, e)"
-                      class="hidden"
-                    >
-                    <label 
-                      :for="`image-${index}`"
-                      class="cursor-pointer text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline"
-                    >
-                      Выбрать
-                    </label>
-                    <img 
-                      v-if="variants[index].imagePreview" 
-                      :src="variants[index].imagePreview" 
-                      class="h-10 w-10 object-cover rounded border border-gray-300 dark:border-gray-600"
-                      alt="Preview"
-                    />
-                  </div>
                 </td>
                 <!-- Действия -->
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
@@ -196,9 +160,6 @@ watch(combinations, (newCombinations) => {
       sku: '',
       price: null,
       stock: null,
-      description: '',
-      imageFile: null,
-      imagePreview: null,
       attribute_value_ids: attributeValueIds
     }
   })
@@ -278,25 +239,6 @@ const removeVariant = (index) => {
   emit('update:variants', variants.value)
 }
 
-// Обработка загрузки изображения
-const handleImageChange = (index, event) => {
-  const file = event.target.files[0]
-  if (!file) return
-  
-  const variant = variants.value[index]
-  if (!variant) return
-  
-  variant.imageFile = file
-  
-  // Создаем preview
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    variant.imagePreview = e.target.result
-    // Эмитим обновленные варианты после изменения изображения
-    emit('update:variants', variants.value)
-  }
-  reader.readAsDataURL(file)
-}
 </script>
 
 <style scoped>

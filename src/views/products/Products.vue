@@ -31,6 +31,9 @@
           </div>
         </div>
         
+        <!-- Filters and Sorting (only for variants view) -->
+
+        
         <!-- Загрузка -->
         <div v-if="loading" class="py-6 text-center">
           <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
@@ -46,13 +49,75 @@
                     <!-- Заголовки для товаров с вариантами -->
                     <template v-if="currentView === 'variants'">
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Изображение</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Полное название</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Товар</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Атрибуты</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Остаток</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">SKU</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
+                      
+                      <!-- Sortable: Full Name -->
+                      <th @click="handleSort('full_name')" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none">
+                        <div class="flex items-center gap-1">
+                          Полное название
+                          <span v-if="filters.sort_by === 'full_name'" class="text-blue-600 dark:text-blue-400">
+                            {{ filters.sort_order === 'asc' ? '↑' : '↓' }}
+                          </span>
+                        </div>
+                      </th>
+                      
+                      <!-- Sortable: Price -->
+                      <th @click="handleSort('price')" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none">
+                        <div class="flex items-center gap-1">
+                          Цена
+                          <span v-if="filters.sort_by === 'price'" class="text-blue-600 dark:text-blue-400">
+                            {{ filters.sort_order === 'asc' ? '↑' : '↓' }}
+                          </span>
+                        </div>
+                      </th>
+                      
+                      <!-- Sortable: Stock -->
+                      <th @click="handleSort('stock')" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none">
+                        <div class="flex items-center gap-1">
+                          Остаток
+                          <span v-if="filters.sort_by === 'stock'" class="text-blue-600 dark:text-blue-400">
+                            {{ filters.sort_order === 'asc' ? '↑' : '↓' }}
+                          </span>
+                        </div>
+                      </th>
+                      
+                      <!-- Filterable: Binar -->
+                      <th @click="handleFilter('is_binar')" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none">
+                        <div class="flex items-center gap-1" :class="{'text-green-600 dark:text-green-400': filters.is_binar}">
+                          Binar
+                          <span v-if="filters.is_binar" class="text-green-600 dark:text-green-400">✓</span>
+                        </div>
+                      </th>
+                      
+                      <!-- Filterable: HealthStore -->
+                      <th @click="handleFilter('is_healthstore')" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none">
+                        <div class="flex items-center gap-1" :class="{'text-green-600 dark:text-green-400': filters.is_healthstore}">
+                          HealthStore
+                          <span v-if="filters.is_healthstore" class="text-green-600 dark:text-green-400">✓</span>
+                        </div>
+                      </th>
+                      
+                      <!-- Filterable: HealthDay -->
+                      <th @click="handleFilter('is_healthday')" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none">
+                        <div class="flex items-center gap-1" :class="{'text-green-600 dark:text-green-400': filters.is_healthday}">
+                          HealthDay
+                          <span v-if="filters.is_healthday" class="text-green-600 dark:text-green-400">✓</span>
+                        </div>
+                      </th>
+                      
+                      <!-- Filterable: Active -->
+                      <th @click="handleFilter('is_active')" class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors select-none">
+                        <div class="flex items-center gap-1" :class="{'text-green-600 dark:text-green-400': filters.is_active}">
+                          Активен
+                          <span v-if="filters.is_active" class="text-green-600 dark:text-green-400">✓</span>
+                        </div>
+                      </th>
+                      
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">
+                        <button @click="resetFilters" v-if="hasActiveFilters" class="text-xs text-red-500 hover:text-red-700 underline">
+                          Сброс
+                        </button>
+                        <span v-else>Действия</span>
+                      </th>
                     </template>
                     <!-- Заголовки для товаров без вариантов -->
                     <template v-else>
@@ -83,23 +148,28 @@
                           {{ variant.full_name }}
                         </button>
                       </td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        <button @click="openProductModal(variant.product_id)" 
-                                class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline">
-                          {{ variant.product_name }}
-                        </button>
-                      </td>
-                      <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">
-                        <div class="flex flex-wrap gap-1">
-                          <span v-for="attr in variant.variant_attributes" :key="`${attr.attribute}-${attr.value}`" 
-                                class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-600 px-2 py-1 text-xs text-blue-800 dark:text-blue-200">
-                            {{ attr.attribute }}: {{ attr.value }}
-                          </span>
-                        </div>
-                      </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ variant.price }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ variant.stock }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ variant.sku }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-center">
+                        <span v-if="variant.is_binar === true" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-green-500 text-white text-xs">✓</span>
+                        <span v-else-if="variant.is_binar === false" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs">✗</span>
+                        <span v-else class="text-gray-400 dark:text-gray-500 text-xs">—</span>
+                      </td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-center">
+                        <span v-if="variant.is_healthstore === true" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-green-500 text-white text-xs">✓</span>
+                        <span v-else-if="variant.is_healthstore === false" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs">✗</span>
+                        <span v-else class="text-gray-400 dark:text-gray-500 text-xs">—</span>
+                      </td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-center">
+                        <span v-if="variant.is_healthday === true" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-green-500 text-white text-xs">✓</span>
+                        <span v-else-if="variant.is_healthday === false" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs">✗</span>
+                        <span v-else class="text-gray-400 dark:text-gray-500 text-xs">—</span>
+                      </td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-center">
+                        <span v-if="variant.is_active === true" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-green-500 text-white text-xs">✓</span>
+                        <span v-else-if="variant.is_active === false" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs">✗</span>
+                        <span v-else class="text-gray-400 dark:text-gray-500 text-xs">—</span>
+                      </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         <button @click="openVariantEditModal(variant.id)" class="inline-flex items-center rounded-md bg-gray-800 dark:bg-gray-600 px-3 py-2 text-white text-xs mr-2 hover:bg-gray-700 dark:hover:bg-gray-500">Редактировать</button>
                         <button @click="openConfirm(variant.id)" class="inline-flex items-center rounded-md bg-red-600 px-3 py-2 text-white text-xs hover:bg-red-700">Удалить</button>
@@ -334,6 +404,49 @@ const currentView = ref(route.query.view || 'variants')
 const confirm = ref({ visible: false, id: null })
 const deleting = ref(false)
 
+// Filters and sorting
+const filters = ref({
+  is_binar: false,
+  is_healthstore: false,
+  is_healthday: false,
+  is_active: false,
+  sort_by: '',
+  sort_order: 'asc'
+})
+
+// Computed property to check if any filters are active
+const hasActiveFilters = computed(() => {
+  return filters.value.is_binar || 
+         filters.value.is_healthstore || 
+         filters.value.is_healthday || 
+         filters.value.is_active || 
+         filters.value.sort_by !== ''
+})
+
+// Handle Sort Click
+const handleSort = (field) => {
+  if (filters.value.sort_by === field) {
+    // Toggle order: asc -> desc -> remove sort
+    if (filters.value.sort_order === 'asc') {
+      filters.value.sort_order = 'desc'
+    } else {
+      filters.value.sort_by = ''
+      filters.value.sort_order = 'asc'
+    }
+  } else {
+    // New sort field
+    filters.value.sort_by = field
+    filters.value.sort_order = 'asc'
+  }
+  loadVariants()
+}
+
+// Handle Filter Click
+const handleFilter = (field) => {
+  filters.value[field] = !filters.value[field]
+  loadVariants()
+}
+
 // Модальное окно просмотра товара
 const isProductModalOpen = ref(false)
 const selectedProductId = ref(null)
@@ -418,7 +531,33 @@ const loadProducts = async () => {
 const loadVariants = async () => {
   loading.value = true
   try {
-    const response = await store_api.get(`products/variants?skip=0&limit=100`)
+    // Build query parameters
+    const params = new URLSearchParams({
+      skip: '0',
+      limit: '100'
+    })
+    
+    // Add boolean filters (only if checked)
+    if (filters.value.is_binar) {
+      params.append('is_binar', 'true')
+    }
+    if (filters.value.is_healthstore) {
+      params.append('is_healthstore', 'true')
+    }
+    if (filters.value.is_healthday) {
+      params.append('is_healthday', 'true')
+    }
+    if (filters.value.is_active) {
+      params.append('is_active', 'true')
+    }
+    
+    // Add sorting parameters
+    if (filters.value.sort_by) {
+      params.append('sort_by', filters.value.sort_by)
+      params.append('sort_order', filters.value.sort_order)
+    }
+    
+    const response = await store_api.get(`products/variants?${params.toString()}`)
     variants.value = response.data
   } catch (error) {
     console.error('Ошибка загрузки вариантов:', error)
@@ -435,6 +574,21 @@ const loadAttributes = async () => {
   } catch (error) {
     console.error('Ошибка загрузки атрибутов:', error)
   }
+}
+
+
+
+// Reset filters
+const resetFilters = () => {
+  filters.value = {
+    is_binar: false,
+    is_healthstore: false,
+    is_healthday: false,
+    is_active: false,
+    sort_by: '',
+    sort_order: 'asc'
+  }
+  loadVariants()
 }
 
 // Модальное окно добавления товара
