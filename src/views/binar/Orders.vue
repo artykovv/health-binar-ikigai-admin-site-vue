@@ -80,7 +80,17 @@
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead class="bg-gray-50 dark:bg-[#3f3f47]">
                     <tr>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID</th>
+                      <th 
+                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                        @click="toggleContractsSort('id')"
+                      >
+                        <div class="flex items-center gap-1">
+                          ID
+                          <span v-if="contractsSortBy === 'id'">
+                            {{ contractsSortOrder === 'asc' ? '↑' : '↓' }}
+                          </span>
+                        </div>
+                      </th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Общая сумма</th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
@@ -127,6 +137,29 @@
                 </table>
               </div>
             </div>
+            
+            <!-- Pagination -->
+            <div class="flex items-center justify-between mt-4">
+              <div class="text-sm text-gray-700 dark:text-gray-300">
+                Страница {{ contractsPage }}
+              </div>
+              <div class="flex gap-2">
+                <button
+                  @click="changeContractsPage(-1)"
+                  :disabled="contractsPage === 1"
+                  class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
+                >
+                  Назад
+                </button>
+                <button
+                  @click="changeContractsPage(1)"
+                  :disabled="orders.length < contractsLimit"
+                  class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
+                >
+                  Вперед
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -154,7 +187,17 @@
               <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-[#3f3f47]">
                   <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID</th>
+                    <th 
+                      class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                      @click="toggleHealthDaySort('id')"
+                    >
+                      <div class="flex items-center gap-1">
+                        ID
+                        <span v-if="healthDaySortBy === 'id'">
+                          {{ healthDaySortOrder === 'asc' ? '↑' : '↓' }}
+                        </span>
+                      </div>
+                    </th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Участник</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Общая сумма</th>
@@ -202,6 +245,29 @@
                   </tbody>
                 </table>
               </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="flex items-center justify-between mt-4">
+                  <div class="text-sm text-gray-700 dark:text-gray-300">
+                    Страница {{ healthDayPage }}
+                  </div>
+                  <div class="flex gap-2">
+                    <button
+                      @click="changeHealthDayPage(-1)"
+                      :disabled="healthDayPage === 1"
+                      class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
+                    >
+                      Назад
+                    </button>
+                    <button
+                      @click="changeHealthDayPage(1)"
+                      :disabled="healthDayOrders.length < healthDayLimit"
+                      class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
+                    >
+                      Вперед
+                    </button>
+                  </div>
                 </div>
                 </div>
         </div>
@@ -259,10 +325,18 @@ const activeTab = ref(route.query.tab || 'contracts')
 // Заказы для вкладки Контракты
 const orders = ref([])
 const loadingOrders = ref(false)
+const contractsPage = ref(1)
+const contractsLimit = ref(20)
+const contractsSortBy = ref('id')
+const contractsSortOrder = ref('desc')
 
 // Заказы для вкладки Health Day
 const healthDayOrders = ref([])
 const loadingHealthDayOrders = ref(false)
+const healthDayPage = ref(1)
+const healthDayLimit = ref(20)
+const healthDaySortBy = ref('id')
+const healthDaySortOrder = ref('desc')
 
 // Филиалы
 const branches = ref([])
@@ -338,8 +412,10 @@ const loadOrders = async () => {
   loadingOrders.value = true
   try {
     const params = {
-      skip: 0,
-      limit: 100
+      page: contractsPage.value,
+      limit: contractsLimit.value,
+      sort_by: contractsSortBy.value,
+      sort_order: contractsSortOrder.value
     }
     
     if (selectedBranchId.value) {
@@ -347,11 +423,38 @@ const loadOrders = async () => {
     }
     
     const response = await api.get('orders/', { params })
-    orders.value = response.data
+    // Handle both array response and paginated response structure if backend changes
+    if (Array.isArray(response.data)) {
+      orders.value = response.data
+    } else if (response.data && response.data.items) {
+      orders.value = response.data.items
+    } else {
+      orders.value = []
+    }
   } catch (error) {
     console.error('Ошибка загрузки заказов:', error)
   } finally {
     loadingOrders.value = false
+  }
+}
+
+// Сортировка контрактов
+const toggleContractsSort = (column) => {
+  if (contractsSortBy.value === column) {
+    contractsSortOrder.value = contractsSortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    contractsSortBy.value = column
+    contractsSortOrder.value = 'desc'
+  }
+  loadOrders()
+}
+
+// Пагинация контрактов
+const changeContractsPage = (delta) => {
+  const newPage = contractsPage.value + delta
+  if (newPage >= 1) {
+    contractsPage.value = newPage
+    loadOrders()
   }
 }
 
@@ -408,18 +511,47 @@ const handleHealthDayOrderCreated = async () => {
 const loadHealthDayOrders = async () => {
   loadingHealthDayOrders.value = true
   try {
-    const response = await api.get('health-day/orders', {
-      params: {
-        skip: 0,
-        limit: 100
-      }
-    })
-    healthDayOrders.value = response.data || []
+    const params = {
+      page: healthDayPage.value,
+      limit: healthDayLimit.value,
+      sort_by: healthDaySortBy.value,
+      sort_order: healthDaySortOrder.value
+    }
+    
+    const response = await api.get('health-day/orders', { params })
+    // Handle both array response and paginated response structure if backend changes
+    if (Array.isArray(response.data)) {
+      healthDayOrders.value = response.data
+    } else if (response.data && response.data.items) {
+      healthDayOrders.value = response.data.items
+    } else {
+      healthDayOrders.value = []
+    }
   } catch (error) {
     console.error('Ошибка загрузки заказов Health Day:', error)
     healthDayOrders.value = []
   } finally {
     loadingHealthDayOrders.value = false
+  }
+}
+
+// Сортировка Health Day
+const toggleHealthDaySort = (column) => {
+  if (healthDaySortBy.value === column) {
+    healthDaySortOrder.value = healthDaySortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    healthDaySortBy.value = column
+    healthDaySortOrder.value = 'desc'
+  }
+  loadHealthDayOrders()
+}
+
+// Пагинация Health Day
+const changeHealthDayPage = (delta) => {
+  const newPage = healthDayPage.value + delta
+  if (newPage >= 1) {
+    healthDayPage.value = newPage
+    loadHealthDayOrders()
   }
 }
 
