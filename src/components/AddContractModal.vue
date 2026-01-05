@@ -397,6 +397,15 @@
         </div>
       </div>
     </div>
+    
+    <!-- Image Upload Modal -->
+    <ImageUploadModal
+      :is-open="imageUploadModalOpen"
+      title="Загрузка чека оплаты"
+      directory="receipts"
+      @close="imageUploadModalOpen = false"
+      @uploaded="handleImageUploaded"
+    />
   </div>
 </template>
 
@@ -404,6 +413,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { api } from '@/api'
 import { store_api } from '@/api'
+import ImageUploadModal from '@/components/ImageUploadModal.vue'
 
 const props = defineProps({
   visible: {
@@ -440,11 +450,15 @@ const selectedResponsible = ref(null)
 const extraPaymentForm = ref({
   amount: null,
   payment_method_id: null,
-  description: ''
+  description: '',
+  receipt_image: null
 })
 const paymentMethods = ref([])
 const loadingPaymentMethods = ref(false)
 const createdOrderId = ref(null)
+
+// Image Upload Modal
+const imageUploadModalOpen = ref(false)
 
 // Computed
 const totalRemainingAmount = computed(() => {
@@ -727,6 +741,21 @@ const createOrder = async () => {
   }
 }
 
+// Image Upload Functions
+const openImageUpload = () => {
+  imageUploadModalOpen.value = true
+}
+
+const handleImageUploaded = (imageData) => {
+  extraPaymentForm.value.receipt_image = {
+    id: imageData.id,
+    url: imageData.url,
+    filename: imageData.filename,
+    size: imageData.size,
+    content_type: imageData.content_type
+  }
+}
+
 // Reset on close
 watch(() => props.visible, (newVal) => {
   if (newVal) {
@@ -743,7 +772,8 @@ watch(() => props.visible, (newVal) => {
     extraPaymentForm.value = {
       amount: null,
       payment_method_id: null,
-      description: ''
+      description: '',
+      receipt_image: null
     }
     createdOrderId.value = null
     if (paymentMethods.value.length === 0) {

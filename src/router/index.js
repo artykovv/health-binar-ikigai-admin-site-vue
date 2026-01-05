@@ -25,6 +25,13 @@ import IVBarDashboard from '../views/ivbar/Dashboard.vue'
 // MyBeauty views
 import MyBeautyDashboard from '../views/mybeauty/Dashboard.vue'
 
+// Kassa views
+import KassaDashboard from '../views/kassa/Dashboard.vue'
+import KassaTerminal from '../views/kassa/Kassa.vue'
+import KassaExpenses from '../views/kassa/Expenses.vue'
+import KassaIncome from '../views/kassa/Income.vue'
+import KassaSettings from '../views/kassa/Settings.vue'
+
 // Products views
 import ProductsDashboard from '../views/products/Dashboard.vue'
 import Attributes from '../views/products/Attributes.vue'
@@ -193,6 +200,44 @@ const routes = [
         name: 'MyBeautyDashboard',
         component: MyBeautyDashboard,
         meta: { title: 'MyBeauty' }
+      }
+    ]
+  },
+
+  // Kassa routes
+  {
+    path: '/kassa',
+    component: SidebarLayout,
+    children: [
+      {
+        path: '',
+        name: 'KassaDashboard',
+        component: KassaDashboard,
+        meta: { title: 'Главная' }
+      },
+      {
+        path: 'pos',
+        name: 'KassaPOS',
+        component: KassaTerminal,
+        meta: { title: 'Касса' }
+      },
+      {
+        path: 'expenses',
+        name: 'KassaExpenses',
+        component: KassaExpenses,
+        meta: { title: 'Расходы' }
+      },
+      {
+        path: 'income',
+        name: 'KassaIncome',
+        component: KassaIncome,
+        meta: { title: 'Доходы' }
+      },
+      {
+        path: 'settings',
+        name: 'KassaSettings',
+        component: KassaSettings,
+        meta: { title: 'Настройки кассы' }
       }
     ]
   },

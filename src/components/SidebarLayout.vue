@@ -44,6 +44,29 @@
             </span>
           </router-link>
 
+          <!-- Касса -->
+          <router-link 
+            to="/kassa" 
+            class="group flex items-center justify-center text-sm font-medium rounded-[20px] transition-all duration-300 px-3 py-3 overflow-visible relative"
+            :class="[
+              isActive('/kassa') ? 'bg-gray-200 text-gray-900 dark:bg-gray-700 dark:text-gray-100' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600'
+            ]"
+          >
+            <svg 
+              class="w-6 h-6 flex-shrink-0 transition-transform duration-300 ease-in-out group-hover:scale-110" 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <span 
+              class="whitespace-nowrap transition-all duration-300 ease-in-out max-w-0 opacity-0 group-hover:max-w-[200px] group-hover:opacity-100 absolute left-full ml-2 px-3 py-1 bg-white dark:bg-[#3f3f47] rounded-lg shadow-lg z-50 pointer-events-none"
+            >
+              Касса
+            </span>
+          </router-link>
+
           <!-- Health Store - Temporarily disabled -->
           <!-- <router-link 
             to="/health-store" 
@@ -250,6 +273,39 @@
                 :class="isActive('/binar/orders') ? 'border-gray-900 text-gray-900 dark:text-gray-100 dark:border-gray-100' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
               >
                 Заказы
+              </router-link>
+            </template>
+            
+            <!-- Kassa sub-navigation -->
+            <template v-if="isActive('/kassa')">
+              <router-link 
+                to="/kassa" 
+                class="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+                :class="route.path === '/kassa' ? 'border-gray-900 text-gray-900 dark:text-gray-100 dark:border-gray-100' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+              >
+                Главная
+              </router-link>
+
+              <router-link 
+                to="/kassa/income" 
+                class="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+                :class="isActive('/kassa/income') ? 'border-gray-900 text-gray-900 dark:text-gray-100 dark:border-gray-100' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+              >
+                Доходы
+              </router-link>
+              <router-link 
+                to="/kassa/expenses" 
+                class="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+                :class="isActive('/kassa/expenses') ? 'border-gray-900 text-gray-900 dark:text-gray-100 dark:border-gray-100' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+              >
+                Расходы
+              </router-link>
+              <router-link 
+                to="/kassa/settings" 
+                class="py-2 px-1 border-b-2 font-medium text-sm transition-colors"
+                :class="isActive('/kassa/settings') ? 'border-gray-900 text-gray-900 dark:text-gray-100 dark:border-gray-100' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+              >
+                Настройки
               </router-link>
             </template>
             

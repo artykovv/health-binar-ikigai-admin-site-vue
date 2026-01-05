@@ -37,7 +37,7 @@
               <div v-if="images.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                 <div v-for="(image, index) in images" :key="image.id" class="relative group">
                   <img 
-                    :src="getImageUrl(image.src)" 
+                    :src="image.url" 
                     :alt="image.alt || 'Product image'"
                     class="w-full h-32 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600"
                   />
@@ -67,52 +67,16 @@
                 </div>
               </div>
               
-              <!-- Upload Area -->
-              <div
-                @dragover.prevent="isDragging = true"
-                @dragleave.prevent="isDragging = false"
-                @drop.prevent="handleDrop"
-                :class="[
-                  'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
-                  isDragging 
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
-                ]"
-              >
-                <input
-                  ref="fileInput"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  @change="handleFileSelect"
-                  class="hidden"
-                />
-                
-                <div class="space-y-2">
-                  <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                  <p class="text-sm text-gray-600 dark:text-gray-300">
-                    <button @click="$refs.fileInput.click()" type="button" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-                      Выберите файлы
-                    </button>
-                    или перетащите их сюда
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
-                    PNG, JPG, GIF до 10MB
-                  </p>
-                </div>
-                
-                <!-- Upload Progress -->
-                <div v-if="uploadingFiles.length > 0" class="mt-4 space-y-2">
-                  <div v-for="(file, index) in uploadingFiles" :key="index" class="flex items-center gap-2 text-sm">
-                    <div class="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div class="bg-blue-600 h-2 rounded-full transition-all" :style="{ width: file.progress + '%' }"></div>
-                    </div>
-                    <span class="text-xs text-gray-600 dark:text-gray-400">{{ file.name }}</span>
-                  </div>
-                </div>
-              </div>
+              <!-- Upload Button -->
+              <button
+                @click="openImageUpload"
+                type="button"
+                class="w-full inline-flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#3f3f47] hover:bg-gray-50 dark:hover:bg-[#4a4a52] hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Загрузить изображение
+              </button>
             </div>
 
             <!-- Form Fields -->
@@ -265,12 +229,22 @@
         </div>
       </div>
     </div>
+    
+    <!-- Image Upload Modal -->
+    <ImageUploadModal
+      :is-open="imageUploadModalOpen"
+      title="Загрузка изображения товара"
+      directory="products"
+      @close="imageUploadModalOpen = false"
+      @uploaded="handleImageUploaded"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue'
 import { store_api } from '@/api'
+import ImageUploadModal from '@/components/ImageUploadModal.vue'
 
 // Props
 const props = defineProps({
@@ -303,10 +277,8 @@ const form = ref({
 
 // Image upload state
 const images = ref([])
-const isDragging = ref(false)
-const uploadingFiles = ref([])
 const deletingImageId = ref(null)
-const fileInput = ref(null)
+const imageUploadModalOpen = ref(false)
 
 // Методы
 const loadVariantData = async () => {
@@ -356,78 +328,30 @@ const closeModal = () => {
 }
 
 // Image handling methods
-const getImageUrl = (imagePath) => {
-  if (!imagePath) return null
-  // Если путь уже содержит полный URL, возвращаем как есть
-  if (imagePath.startsWith('http')) return imagePath
-  // Добавляем базовый URL API
-  const baseUrl = import.meta.env.VITE_STORE_API_URL || 'http://127.0.0.1:8001'
-  return `${baseUrl}${imagePath}`
+const openImageUpload = () => {
+  imageUploadModalOpen.value = true
 }
 
-const handleFileSelect = (event) => {
-  const files = Array.from(event.target.files)
-  uploadFiles(files)
-  // Reset input
-  event.target.value = ''
-}
-
-const handleDrop = (event) => {
-  isDragging.value = false
-  const files = Array.from(event.dataTransfer.files).filter(file => file.type.startsWith('image/'))
-  uploadFiles(files)
-}
-
-const uploadFiles = async (files) => {
-  for (const file of files) {
-    // Validate file size (10MB max)
-    if (file.size > 10 * 1024 * 1024) {
-      alert(`Файл ${file.name} слишком большой. Максимальный размер: 10MB`)
-      continue
-    }
-    
-    // Add to uploading list
-    const uploadingFile = {
-      name: file.name,
-      progress: 0
-    }
-    uploadingFiles.value.push(uploadingFile)
-    
-    try {
-      // Create FormData
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('alt', file.name.split('.')[0]) // Use filename without extension as alt text
-      
-      // Upload with progress tracking
-      const response = await store_api.post(
-        `variants/${props.variantId}/images`,
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
-          onUploadProgress: (progressEvent) => {
-            uploadingFile.progress = Math.round((progressEvent.loaded * 100) / progressEvent.total)
-          }
-        }
-      )
-      
-      // Add new image to the list
-      images.value.push(response.data)
-      
-      // Emit update event
-      emit('variant-updated')
-    } catch (error) {
-      console.error('Ошибка загрузки изображения:', error)
-      alert(`Ошибка загрузки ${file.name}`)
-    } finally {
-      // Remove from uploading list
-      const index = uploadingFiles.value.indexOf(uploadingFile)
-      if (index > -1) {
-        uploadingFiles.value.splice(index, 1)
+const handleImageUploaded = async (imageData) => {
+  try {
+    // Save image data to variant
+    const response = await store_api.post(
+      `variants/${props.variantId}/images`,
+      {
+        url: imageData.url,
+        file_id: imageData.id,
+        alt: imageData.filename.split('.')[0]
       }
-    }
+    )
+    
+    // Add new image to the list
+    images.value.push(response.data)
+    
+    // Emit update event
+    emit('variant-updated')
+  } catch (error) {
+    console.error('Ошибка сохранения изображения:', error)
+    alert('Ошибка сохранения изображения')
   }
 }
 

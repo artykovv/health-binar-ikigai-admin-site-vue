@@ -30,6 +30,20 @@
           <p class="text-gray-600 dark:text-gray-400 text-sm">Сетевой маркетинг</p>
         </router-link>
 
+        <!-- Касса -->
+        <router-link
+          to="/kassa"
+          class="group bg-white dark:bg-[#3f3f47] rounded-[20px] p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center text-center"
+        >
+          <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors">
+            <svg class="w-8 h-8 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Касса</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm">Кассовые операции</p>
+        </router-link>
+
         <!-- Health Store - Temporarily disabled -->
         <!-- <router-link
           to="/health-store"
