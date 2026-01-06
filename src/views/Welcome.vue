@@ -44,8 +44,8 @@
           <p class="text-gray-600 dark:text-gray-400 text-sm">Кассовые операции</p>
         </router-link>
 
-        <!-- Health Store - Temporarily disabled -->
-        <!-- <router-link
+        <!-- Health Store -->
+        <router-link
           to="/health-store"
           class="group bg-white dark:bg-[#3f3f47] rounded-[20px] p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center text-center"
         >
@@ -56,7 +56,7 @@
           </div>
           <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Health Store</h3>
           <p class="text-gray-600 dark:text-gray-400 text-sm">Интернет магазин</p>
-        </router-link> -->
+        </router-link>
 
         <!-- IV Bar - Temporarily disabled -->
         <!-- <router-link
@@ -98,6 +98,20 @@
           </div>
           <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Склад</h3>
           <p class="text-gray-600 dark:text-gray-400 text-sm">Управление товарами</p>
+        </router-link>
+
+        <!-- Списания -->
+        <router-link
+          to="/ek"
+          class="group bg-white dark:bg-[#3f3f47] rounded-[20px] p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex flex-col items-center text-center"
+        >
+          <div class="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4 group-hover:bg-gray-200 dark:group-hover:bg-gray-600 transition-colors">
+            <svg class="w-8 h-8 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Списания</h3>
+          <p class="text-gray-600 dark:text-gray-400 text-sm">Бесплатная выдача (EK)</p>
         </router-link>
       </div>
     </div>

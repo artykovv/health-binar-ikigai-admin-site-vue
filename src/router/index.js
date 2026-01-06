@@ -18,6 +18,10 @@ import Orders from '../views/binar/Orders.vue'
 
 // Health Store views
 import HealthStoreDashboard from '../views/health-store/Dashboard.vue'
+import HealthStoreOrders from '../views/health-store/Orders.vue'
+import HealthStoreSettings from '../views/health-store/Settings.vue'
+import HealthStoreSalespeople from '../views/health-store/Salespeople.vue'
+import HealthStoreEK from '../views/health-store/EK.vue'
 
 // IV Bar views
 import IVBarDashboard from '../views/ivbar/Dashboard.vue'
@@ -172,6 +176,38 @@ const routes = [
         name: 'HealthStoreDashboard',
         component: HealthStoreDashboard,
         meta: { title: 'Health Store' }
+      },
+      {
+        path: 'orders',
+        name: 'HealthStoreOrders',
+        component: HealthStoreOrders,
+        meta: { title: 'Заказы Health Store' }
+      },
+      {
+        path: 'settings',
+        name: 'HealthStoreSettings',
+        component: HealthStoreSettings,
+        meta: { title: 'Настройки Health Store' }
+      },
+      {
+        path: 'salespeople',
+        name: 'HealthStoreSalespeople',
+        component: HealthStoreSalespeople,
+        meta: { title: 'Отчет по продажникам' }
+      }
+    ]
+  },
+
+  // EK routes
+  {
+    path: '/ek',
+    component: SidebarLayout,
+    children: [
+      {
+        path: '',
+        name: 'HealthStoreEK',
+        component: HealthStoreEK,
+        meta: { title: 'Списания товаров (EK)' }
       }
     ]
   },
