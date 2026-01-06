@@ -48,20 +48,26 @@
                 
                 <!-- Image info -->
                 <div class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                  <p class="text-sm text-gray-700 dark:text-gray-300">
-                    <strong>Имя файла:</strong> {{ uploadedImage.filename }}
-                  </p>
+                  <!-- URL Input for copying -->
+                  <div class="mb-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">URL (src)</label>
+                    <div class="flex gap-2">
+                      <input 
+                        type="text" 
+                        readonly 
+                        :value="uploadedImage.url" 
+                        class="flex-1 text-xs p-2 rounded border dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 pointer-events-none select-all"
+                      >
+                      <button 
+                        @click="copyUrl(uploadedImage.url)" 
+                        class="px-3 py-1 bg-black text-white text-xs rounded hover:bg-gray-800"
+                      >
+                        Копировать
+                      </button>
+                    </div>
+                  </div>
                   <p class="text-sm text-gray-700 dark:text-gray-300">
                     <strong>Размер:</strong> {{ formatFileSize(uploadedImage.size) }}
-                  </p>
-                  <p class="text-sm text-gray-700 dark:text-gray-300">
-                    <strong>Тип:</strong> {{ uploadedImage.content_type }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 break-all">
-                    <strong>URL:</strong> {{ uploadedImage.url }}
-                  </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    <strong>ID:</strong> {{ uploadedImage.id }}
                   </p>
                 </div>
               </div>
@@ -74,10 +80,10 @@
                 @dragleave.prevent="isDragging = false"
                 @drop.prevent="handleDrop"
                 :class="[
-                  'border-2 border-dashed rounded-lg p-12 text-center transition-colors',
+                  'border-2 border-dashed rounded-[24px] p-12 text-center transition-colors',
                   isDragging 
                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                    : 'border-gray-300 dark:border-gray-600 hover:border-black dark:hover:border-white'
                 ]">
                 <input
                   ref="fileInput"
@@ -88,16 +94,18 @@
                 />
                 
                 <div class="space-y-3">
-                  <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
+                  <div class="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
                   <p class="text-base text-gray-600 dark:text-gray-300">
-                    <button @click="$refs.fileInput.click()" type="button" class="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
+                    <button @click="$refs.fileInput.click()" type="button" class="font-bold text-black dark:text-white underline">
                       Выберите файл
                     </button>
                     или перетащите его сюда
                   </p>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                     PNG, JPG, GIF до 10MB
                   </p>
                 </div>
@@ -115,8 +123,8 @@
               </div>
               
               <!-- Error message -->
-              <div v-if="errorMessage" class="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p class="text-sm text-red-800 dark:text-red-200">{{ errorMessage }}</p>
+              <div v-if="errorMessage" class="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-center">
+                <p class="text-sm text-red-800 dark:text-red-200 font-medium">{{ errorMessage }}</p>
               </div>
             </div>
           </div>
@@ -126,14 +134,14 @@
         <div class="flex items-center justify-end gap-2 px-6 py-4 border-t border-gray-200 dark:border-gray-600">
           <button
             @click="closeModal"
-            class="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500">
+            class="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-700">
             {{ uploadedImage ? 'Закрыть' : 'Отмена' }}
           </button>
           <button
             v-if="uploadedImage"
             @click="confirmUpload"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-            Использовать изображение
+            class="px-6 py-2 bg-black text-white dark:bg-white dark:text-black rounded-xl text-sm font-bold hover:scale-105 transition-transform active:scale-95">
+            Использовать URL
           </button>
         </div>
       </div>
@@ -186,6 +194,11 @@ const resetState = () => {
   uploadProgress.value = 0
   uploadedImage.value = null
   errorMessage.value = ''
+}
+
+const copyUrl = (url) => {
+  navigator.clipboard.writeText(url)
+  alert('URL скопирован!')
 }
 
 const handleFileSelect = (event) => {
@@ -269,11 +282,8 @@ const removeUploadedImage = () => {
 const confirmUpload = () => {
   if (uploadedImage.value) {
     emit('uploaded', {
-      id: uploadedImage.value.id,
       url: uploadedImage.value.url,
-      filename: uploadedImage.value.filename,
-      size: uploadedImage.value.size,
-      content_type: uploadedImage.value.content_type
+      // We pass the URL back to the parent to fill the "src" field
     })
     resetState()
     emit('close')

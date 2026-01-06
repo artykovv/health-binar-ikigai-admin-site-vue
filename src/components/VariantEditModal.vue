@@ -67,15 +67,19 @@
                 </div>
               </div>
               
-              <!-- Upload Button -->
+              
+              <!-- Upload Image Button -->
               <button
                 @click="openImageUpload"
                 type="button"
-                class="w-full inline-flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-[#3f3f47] hover:bg-gray-50 dark:hover:bg-[#4a4a52] hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                Загрузить изображение
+                class="w-full inline-flex items-center justify-center px-4 py-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl shadow-sm text-sm font-bold text-gray-700 dark:text-gray-300 bg-white dark:bg-[#3f3f47] hover:bg-gray-50 dark:hover:bg-[#4a4a52] hover:border-black dark:hover:border-white transition-all group"
+              >
+                <div class="flex items-center gap-2">
+                  <svg class="w-6 h-6 text-gray-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <span>Загрузить новое изображение</span>
+                </div>
               </button>
             </div>
 
@@ -275,10 +279,11 @@ const form = ref({
   is_active: false
 })
 
-// Image upload state
+// Image state
 const images = ref([])
 const deletingImageId = ref(null)
 const imageUploadModalOpen = ref(false)
+const addingImage = ref(false)
 
 // Методы
 const loadVariantData = async () => {
@@ -327,31 +332,27 @@ const closeModal = () => {
   emit('close')
 }
 
-// Image handling methods
 const openImageUpload = () => {
   imageUploadModalOpen.value = true
 }
 
-const handleImageUploaded = async (imageData) => {
+const handleImageUploaded = async (data) => {
   try {
-    // Save image data to variant
+    addingImage.value = true
     const response = await store_api.post(
       `variants/${props.variantId}/images`,
       {
-        url: imageData.url,
-        file_id: imageData.id,
-        alt: imageData.filename.split('.')[0]
+        src: data.url,
+        alt: '' // Alt is empty as requested
       }
     )
-    
-    // Add new image to the list
     images.value.push(response.data)
-    
-    // Emit update event
     emit('variant-updated')
   } catch (error) {
     console.error('Ошибка сохранения изображения:', error)
-    alert('Ошибка сохранения изображения')
+    alert('Ошибка при сохранении изображения')
+  } finally {
+    addingImage.value = false
   }
 }
 
