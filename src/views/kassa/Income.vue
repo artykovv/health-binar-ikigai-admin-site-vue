@@ -21,8 +21,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Доходы сегодня</p>
-              <p class="text-xl font-bold text-green-600 dark:text-green-400 mt-1">${{ formatPrice(stats.today_amount) }}</p>
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ formatPrice(stats.today_amount * CURRENCY_RATE) }} сом</p>
+              <p class="text-xl font-bold text-green-600 dark:text-green-400 mt-1">${{ formatUSD(stats.today_amount) }}</p>
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ toSOM(stats.today_amount).toLocaleString() }} сом</p>
             </div>
             <div class="p-2 bg-green-100 dark:bg-green-900/20 rounded-full">
               <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,8 +37,8 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">За месяц</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">${{ formatPrice(stats.month_amount) }}</p>
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ formatPrice(stats.month_amount * CURRENCY_RATE) }} сом</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">${{ formatUSD(stats.month_amount) }}</p>
+              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ toSOM(stats.month_amount).toLocaleString() }} сом</p>
             </div>
             <div class="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-full">
               <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,6 +77,7 @@
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Категория</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Метод</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Описание</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Теги</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма ($)</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма (сом)</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
@@ -97,7 +98,12 @@
                   {{ tx.category?.name || '-' }}
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  {{ tx.payment_method?.name || '-' }}
+                  <div v-if="tx.payments && tx.payments.length">
+                      <div v-for="p in tx.payments" :key="p.id" class="text-xs">
+                          {{ p.payment_method?.name }}: ${{ formatUSD(p.amount) }} / {{ toSOM(p.amount).toLocaleString() }} сом
+                      </div>
+                  </div>
+                  <span v-else>{{ tx.payment_method?.name || '-' }}</span>
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                   <div class="flex items-center gap-2">
@@ -107,121 +113,30 @@
                     <span>{{ tx.description || 'Без описания' }}</span>
                   </div>
                 </td>
+                <td class="px-4 py-3 text-sm">
+                  <div class="flex flex-wrap gap-1">
+                    <span 
+                      v-for="tag in tx.tags" 
+                      :key="tag.id"
+                      class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                    >
+                      {{ tag.name }}
+                    </span>
+                    <span v-if="!tx.tags?.length" class="text-gray-400 text-xs">-</span>
+                  </div>
+                </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-green-600 dark:text-green-400">
-                  +${{ formatPrice(tx.amount) }}
+                  +{{ formatUSD(tx.amount) }}
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-green-600 dark:text-green-300">
-                  {{ formatPrice(tx.amount * CURRENCY_RATE) }} сом
+                  {{ toSOM(tx.amount).toLocaleString() }}
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm space-x-2">
-                  <button @click="viewIncome(tx)" class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-white text-xs hover:bg-blue-700">Просмотр</button>
+                <td class="px-4 py-3 whitespace-nowrap text-sm">
                   <button @click="editIncome(tx)" class="inline-flex items-center rounded-md bg-orange-600 px-3 py-1.5 text-white text-xs hover:bg-orange-700">Изменить</button>
                 </td>
               </tr>
             </tbody>
           </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Modal for viewing transaction details -->
-    <div v-if="showDetailsModal" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="flex min-h-full items-center justify-center p-4">
-        <div class="fixed inset-0 bg-black/60 transition-opacity" @click="showDetailsModal = false"></div>
-        
-        <div class="relative bg-white dark:bg-[#3f3f47] rounded-lg shadow-xl max-w-2xl w-full p-0 overflow-hidden animate-in fade-in zoom-in duration-200" @click.stop>
-          <!-- Header -->
-          <div class="flex items-center justify-between p-4 border-b dark:border-gray-700">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Детали дохода</h3>
-            <button @click="showDetailsModal = false" class="text-gray-400 hover:text-gray-500">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-          
-          <div class="p-6 space-y-6">
-            <div class="grid grid-cols-2 gap-6">
-              <div>
-                <p class="text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Сумма</p>
-                <p class="text-2xl font-bold text-green-600 dark:text-green-400 mt-1">+${{ formatPrice(selectedTransaction?.amount) }}</p>
-              </div>
-              <div>
-                <p class="text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Дата и время</p>
-                <p class="text-lg text-gray-900 dark:text-white mt-1">{{ formatDate(selectedTransaction?.date) }}</p>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-3 gap-6">
-              <div>
-                <p class="text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Категория</p>
-                <p class="text-lg text-gray-900 dark:text-white mt-1 font-medium">{{ selectedTransaction?.category?.name || 'Без категории' }}</p>
-              </div>
-              <div>
-                <p class="text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Метод оплаты</p>
-                <p class="text-lg text-gray-900 dark:text-white mt-1 font-medium">{{ selectedTransaction?.payment_method?.name || '-' }}</p>
-              </div>
-              <div>
-                <p class="text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Теги</p>
-                <div class="flex flex-wrap gap-1 mt-1">
-                  <span 
-                    v-for="t in selectedTransaction?.tags" 
-                    :key="t.id"
-                    class="px-2 py-0.5 rounded-full text-[10px] text-white bg-blue-600"
-                  >
-                    {{ t.name }}
-                  </span>
-                  <span v-if="!selectedTransaction?.tags?.length" class="text-gray-400 text-sm">-</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <p class="text-xs font-medium text-gray-500 uppercase dark:text-gray-400">Описание</p>
-              <p class="text-gray-900 dark:text-white mt-1 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border dark:border-gray-700">
-                {{ selectedTransaction?.description || 'Описание отсутствует' }}
-              </p>
-            </div>
-
-            <div v-if="selectedTransaction?.images?.length > 0">
-              <p class="text-xs font-medium text-gray-500 uppercase dark:text-gray-400 mb-3">Вложения ({{ selectedTransaction.images.length }})</p>
-              <div class="grid grid-cols-4 gap-4">
-                <div 
-                  v-for="img in selectedTransaction.images" 
-                  :key="img.id"
-                  @click="fullscreenImage = img.url"
-                  class="relative aspect-square cursor-zoom-in group overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
-                >
-                  <img :src="img.url" class="absolute inset-0 w-full h-full object-cover transition-transform group-hover:scale-110">
-                  <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 pt-4 border-t dark:border-gray-700 text-[10px] text-gray-400">
-              <p>Создано: {{ formatDate(selectedTransaction?.created_at) }}</p>
-              <p v-if="selectedTransaction?.updated_at">Изменено: {{ formatDate(selectedTransaction?.updated_at) }}</p>
-            </div>
-          </div>
-
-          <div class="bg-gray-50 dark:bg-[#34343d] px-6 py-4 flex justify-between gap-2">
-            <button
-               @click="editIncome(selectedTransaction); showDetailsModal = false"
-               class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 transition-colors text-sm"
-            >
-              Изменить
-            </button>
-            <button
-              @click="showDetailsModal = false"
-              class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500 transition-colors text-sm"
-            >
-              Закрыть
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -313,14 +228,68 @@
                 </select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Метод оплаты</label>
-                <select 
-                  v-model="form.payment_method_id" 
-                  class="mt-1 block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Методы оплаты</label>
+                <div class="space-y-2">
+                    <div v-for="(payment, index) in form.payments" :key="index" class="flex flex-col gap-2 p-3 border rounded-md dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                        <div class="flex gap-2">
+                             <select 
+                                v-model="payment.payment_method_id" 
+                                class="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                            >
+                                <option :value="null">Выберите метод</option>
+                                <option v-for="pm in paymentMethods" :key="pm.id" :value="pm.id">{{ pm.name }}</option>
+                            </select>
+                            <button 
+                                @click.prevent="removePaymentMethod(index)" 
+                                type="button"
+                                class="text-red-500 hover:text-red-700 items-center justify-center px-2"
+                                v-if="form.payments.length > 1"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                             <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-xs">$</span>
+                                </div>
+                                <input 
+                                    v-model.number="payment.amount"
+                                    @input="syncSomRow(payment)"
+                                    type="number"
+                                    placeholder="USD"
+                                    step="0.01"
+                                    class="block w-full pl-6 rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                >
+                            </div>
+                            <div class="relative rounded-md shadow-sm">
+                                <input 
+                                    v-model.number="payment.somAmount"
+                                    @input="syncUsdRow(payment)"
+                                    type="number"
+                                    placeholder="SOM"
+                                    step="0.01"
+                                    class="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                                >
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-gray-500 sm:text-xs">сом</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <button 
+                    @click.prevent="addPaymentMethod"
+                    type="button"
+                    class="mt-1 text-xs text-blue-600 hover:text-blue-500 font-medium"
                 >
-                  <option :value="null">Не выбрано</option>
-                  <option v-for="pm in paymentMethods" :key="pm.id" :value="pm.id">{{ pm.name }}</option>
-                </select>
+                    + Добавить еще метод оплаты
+                </button>
+                 <div class="text-xs mt-1" :class="Math.abs(form.payments.reduce((s, p) => s + Number(p.amount), 0) - form.amount) < 0.01 ? 'text-green-600' : 'text-red-500'">
+                    Всего распределено: {{ form.payments.reduce((s, p) => s + Number(p.amount), 0) }} / {{ form.amount }}
+                </div>
               </div>
             </div>
 
@@ -419,6 +388,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { kassa_api } from '@/api'
+import { formatUSD, toSOM, toUSD } from '@/utils/currency'
 import ImageUploadModal from '@/components/ImageUploadModal.vue'
 
 // State
@@ -429,14 +399,11 @@ const paymentMethods = ref([])
 const loading = ref(false)
 const saving = ref(false)
 const showModal = ref(false)
-const showDetailsModal = ref(false)
 const imageModalOpen = ref(false)
 const fullscreenImage = ref(null)
 const isEditing = ref(false)
 const editingId = ref(null)
-const selectedTransaction = ref(null)
 const somAmount = ref(0)
-const CURRENCY_RATE = 88
 
 const stats = ref({
   today_amount: 0,
@@ -450,7 +417,8 @@ const defaultForm = {
   description: '',
   date: new Date().toISOString().slice(0, 16),
   category_id: null,
-  payment_method_id: null,
+  category_id: null,
+  payments: [],
   tag_ids: [],
   user_id: null,
   images: []
@@ -511,17 +479,6 @@ const fetchIncome = async () => {
   }
 }
 
-const viewIncome = async (tx) => {
-  try {
-    const response = await kassa_api.get(`/transactions/${tx.id}`)
-    selectedTransaction.value = response.data
-    showDetailsModal.value = true
-  } catch (error) {
-    console.error('Error fetching transaction details:', error)
-    selectedTransaction.value = tx
-    showDetailsModal.value = true
-  }
-}
 
 const openAddModal = () => {
   isEditing.value = false
@@ -530,7 +487,8 @@ const openAddModal = () => {
     ...defaultForm, 
     date: new Date().toISOString().slice(0, 16),
     images: [],
-    tag_ids: []
+    tag_ids: [],
+    payments: [{ payment_method_id: null, amount: 0, somAmount: 0 }] 
   }
   somAmount.value = 0
   showModal.value = true
@@ -541,19 +499,40 @@ const editIncome = (tx) => {
   editingId.value = tx.id
   form.value = { 
     ...tx,
+    payments: tx.payments && tx.payments.length > 0 
+      ? tx.payments.map(p => ({ 
+          payment_method_id: p.payment_method_id || (p.payment_method ? p.payment_method.id : null), 
+          amount: parseFloat(p.amount),
+          somAmount: toSOM(parseFloat(p.amount))
+        }))
+      : (tx.payment_method_id ? [{ payment_method_id: tx.payment_method_id, amount: parseFloat(tx.amount), somAmount: toSOM(parseFloat(tx.amount)) }] : []),
     date: tx.date ? new Date(tx.date).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
     tag_ids: tx.tags ? tx.tags.map(t => t.id) : (tx.tag_ids || [])
   }
-  somAmount.value = Number((form.value.amount * CURRENCY_RATE).toFixed(2))
+  somAmount.value = toSOM(form.value.amount)
+
+  // Если при редактировании массив платежей пустой
+  if (form.value.payments.length === 0) {
+      form.value.payments.push({ payment_method_id: null, amount: parseFloat(form.value.amount) || 0, somAmount: toSOM(parseFloat(form.value.amount) || 0) })
+  }
+  
   showModal.value = true
 }
 
 const syncSom = () => {
-  somAmount.value = Number((form.value.amount * CURRENCY_RATE).toFixed(2))
+  somAmount.value = toSOM(form.value.amount)
 }
 
 const syncUsd = () => {
-  form.value.amount = Number((somAmount.value / CURRENCY_RATE).toFixed(2))
+  form.value.amount = toUSD(somAmount.value)
+}
+
+const syncSomRow = (payment) => {
+    payment.somAmount = toSOM(payment.amount)
+}
+
+const syncUsdRow = (payment) => {
+    payment.amount = toUSD(payment.somAmount)
 }
 
 const closeModal = () => {
@@ -563,6 +542,23 @@ const closeModal = () => {
 const saveIncome = async () => {
   saving.value = true
   try {
+    // Validate payments sum and methods
+    const totalPayments = form.value.payments.reduce((sum, p) => sum + Number(p.amount), 0)
+    
+    // Check if any payment method is missing
+    const missingMethod = form.value.payments.find(p => !p.payment_method_id)
+    if (missingMethod) {
+        alert('Выберите метод оплаты для всех строк')
+        saving.value = false
+        return
+    }
+
+    if (Math.abs(totalPayments - form.value.amount) > 0.01) {
+        alert(`Сумма платежей (${totalPayments}) не совпадает с общей суммой (${form.value.amount})`)
+        saving.value = false
+        return
+    }
+    
     const payload = { ...form.value, type: 'income' }
     
     if (isEditing.value) {
@@ -604,6 +600,16 @@ const handleImageUploaded = (data) => {
 
 const removeImage = (index) => {
   form.value.images.splice(index, 1)
+}
+
+const addPaymentMethod = () => {
+    form.value.payments.push({ payment_method_id: null, amount: 0, somAmount: 0 })
+}
+
+const removePaymentMethod = (index) => {
+    if (form.value.payments.length > 1) {
+        form.value.payments.splice(index, 1)
+    }
 }
 
 const formatPrice = (value) => {

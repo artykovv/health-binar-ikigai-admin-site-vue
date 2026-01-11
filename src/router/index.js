@@ -14,7 +14,10 @@ import AddToStructure from '../views/binar/AddToStructure.vue'
 import UserRegistration from '../views/binar/UserRegistration.vue'
 import UserEdit from '../views/binar/UserEdit.vue'
 import Sponsored from '../views/binar/Sponsored.vue'
+
 import Orders from '../views/binar/Orders.vue'
+import ExtraPaymentsView from '../views/binar/ExtraPaymentsView.vue'
+
 
 // Health Store views
 import HealthStoreDashboard from '../views/health-store/Dashboard.vue'
@@ -132,6 +135,17 @@ const routes = [
         name: 'RegistrationParticipantView',
         component: ParticipantView,
         meta: { title: 'Участник' }
+      },
+      {
+        path: 'contracts',
+        name: 'Contracts',
+        component: () => import('@/views/binar/ContractsView.vue'),
+        meta: { title: 'Контракты' }
+      },
+      {
+        path: 'extra-payments',
+        component: ExtraPaymentsView,
+        meta: { title: 'Доплаты по заказам' }
       },
       {
         path: 'add-to-structure/:id',

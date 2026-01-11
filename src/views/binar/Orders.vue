@@ -92,7 +92,8 @@
                         </div>
                       </th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Общая сумма</th>
+                      <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">USD</th>
+                      <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">СОМ</th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Ответственный</th>
@@ -112,7 +113,8 @@
                     >
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.id }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch || '-' }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ order.total_amount }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-blue-600 dark:text-blue-400">{{ formatUSD(order.total_amount) }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(order.total_amount).toLocaleString() }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
@@ -200,8 +202,10 @@
                     </th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Участник</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Общая сумма</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">USD</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">СОМ</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Способ оплаты</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Изображения</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
                   </tr>
@@ -227,8 +231,25 @@
                         <span v-else class="text-gray-500 dark:text-gray-400">-</span>
                       </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch?.name || '-' }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ order.total_amount }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-blue-600 dark:text-blue-400">{{ formatUSD(order.total_amount) }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(order.total_amount).toLocaleString() }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.payment_method?.name || '-' }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white" @click.stop>
+                        <div v-if="order.images && order.images.length > 0" class="flex gap-1">
+                          <img 
+                            v-for="img in order.images.slice(0, 3)" 
+                            :key="img.url"
+                            :src="img.url" 
+                            :alt="img.alt"
+                            class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
+                            @click="openImagePreview(img.url)"
+                          >
+                          <span v-if="order.images.length > 3" class="text-xs text-gray-500 dark:text-gray-400 self-center">
+                            +{{ order.images.length - 3 }}
+                          </span>
+                        </div>
+                        <span v-else class="text-gray-400">-</span>
+                      </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
@@ -301,6 +322,16 @@
         :order-id="selectedHealthDayOrderId"
         @close="closeHealthDayOrderDetailModal"
       />
+
+    <!-- Image Preview Modal -->
+    <div v-if="previewImage" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4" @click="previewImage = null">
+      <button class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <img :src="previewImage" class="max-w-full max-h-full object-contain" @click.stop>
+    </div>
   </div>
 </template>
 
@@ -308,6 +339,7 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/api'
+import { formatUSD, toSOM } from '@/utils/currency'
 import OrderDetailModal from '@/components/OrderDetailModal.vue'
 import AddContractModal from '@/components/AddContractModal.vue'
 import AddHealthDayModal from '@/components/AddHealthDayModal.vue'
@@ -355,6 +387,7 @@ const addContractModalVisible = ref(false)
 
 // Health Day Modal
 const addHealthDayModalVisible = ref(false)
+const previewImage = ref(null)
 
 // Установка вкладки с сохранением в URL
 const setTab = (tab) => {
@@ -518,6 +551,7 @@ const loadHealthDayOrders = async () => {
       sort_order: healthDaySortOrder.value
     }
     
+    // Note: Assuming backend returns 'images' field eager loaded as per previous backend changes
     const response = await api.get('health-day/orders', { params })
     // Handle both array response and paginated response structure if backend changes
     if (Array.isArray(response.data)) {
@@ -565,6 +599,10 @@ const openHealthDayOrderDetailModal = (orderId) => {
 const closeHealthDayOrderDetailModal = () => {
   healthDayOrderDetailModalVisible.value = false
   selectedHealthDayOrderId.value = null
+}
+
+const openImagePreview = (url) => {
+  previewImage.value = url
 }
 
 onMounted(async () => {

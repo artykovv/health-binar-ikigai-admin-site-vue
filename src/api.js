@@ -9,9 +9,9 @@ const HEALTH_STORE = import.meta.env.VITE_HEALTH_STORE || 'https://health-health
 
 // const BINAR_API_URL = import.meta.env.VITE_BINAR_API_URL || 'http://127.0.0.1:8000/api'
 // const STORE_API_URL = import.meta.env.VITE_STORE_API_URL || 'http://127.0.0.1:8001/api'
-// const STORAGE_API_URL = import.meta.env.VITE_STORAGE_API_URL || 'http://127.0.0.1:8005'
-// const KASSA_API_URL = import.meta.env.VITE_KASSA_API_URL || 'http://127.0.0.1:8006/api'
-// const HEALTH_STORE = import.meta.env.VITE_HEALTH_STORE || 'http://127.0.0.1:8007/api'
+// const STORAGE_API_URL = import.meta.env.VITE_STORAGE_API_URL || 'http://127.0.0.1:8002'
+// const KASSA_API_URL = import.meta.env.VITE_KASSA_API_URL || 'http://127.0.0.1:8003/api'
+// const HEALTH_STORE = import.meta.env.VITE_HEALTH_STORE || 'http://127.0.0.1:8004/api'
 
 // binar_api for all pages except Products.vue
 export const binar_api = axios.create({

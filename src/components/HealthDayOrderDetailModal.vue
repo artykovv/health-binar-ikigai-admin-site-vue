@@ -57,7 +57,24 @@
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Общая сумма</p>
               <p class="text-sm font-bold text-gray-900 dark:text-white">${{ orderDetail.total_amount }}</p>
             </div>
+
           </div>
+
+          <!-- Images -->
+          <div v-if="orderDetail.images && orderDetail.images.length > 0" class="p-4 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Изображения</h3>
+            <div class="flex flex-wrap gap-2">
+              <img 
+                v-for="img in orderDetail.images" 
+                :key="img.url" 
+                :src="img.url" 
+                :alt="img.alt"
+                class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                @click="openImagePreview(img.url)"
+              >
+            </div>
+          </div>
+
 
           <!-- Items Table -->
           <div>
@@ -156,6 +173,16 @@
         @close="detailsVisible = false"
       />
     </div>
+
+    <!-- Image Preview (Simple implementation inside modal) -->
+    <div v-if="previewImage" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4" @click="previewImage = null">
+      <button class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <img :src="previewImage" class="max-w-full max-h-full object-contain" @click.stop>
+    </div>
   </div>
 </template>
 
@@ -183,6 +210,7 @@ const detailsVisible = ref(false)
 // const editingIssuedQuantity = ref(null)
 // const editingIssuedQuantityValue = ref(0)
 const variantsMap = ref({})
+const previewImage = ref(null)
 
 const formatDate = (dateString) => {
   if (!dateString) return '-'
@@ -357,6 +385,11 @@ watch(() => props.orderId, (newId) => {
 // const cancelEditIssuedQuantity = () => {
 //   editingIssuedQuantity.value = null
 //   editingIssuedQuantityValue.value = 0
+//   editingIssuedQuantityValue.value = 0
 // }
+
+const openImagePreview = (url) => {
+  previewImage.value = url
+}
 </script>
 

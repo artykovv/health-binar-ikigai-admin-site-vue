@@ -205,6 +205,34 @@
               </table>
             </div>
 
+            <!-- Images -->
+            <div class="p-4 bg-gray-50 dark:bg-[#4a4a52] border border-gray-200 dark:border-gray-600 rounded-lg">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Изображения (чеки, подтверждения)</label>
+              <div class="flex flex-wrap gap-2 mb-2">
+                <div v-for="(img, idx) in images" :key="idx" class="relative w-20 h-20 group">
+                  <img :src="img.url" class="w-full h-full object-cover rounded-lg">
+                  <button
+                    @click.prevent="removeImage(idx)"
+                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                  >
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </button>
+                </div>
+                <button
+                  @click.prevent="openImageUpload"
+                  type="button"
+                  class="w-20 h-20 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-blue-500 transition-colors"
+                >
+                  <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  <span class="text-[10px] text-gray-500 mt-1">Загрузить</span>
+                </button>
+              </div>
+            </div>
+
             <!-- Payment Method Selection -->
             <div class="p-4 bg-gray-50 dark:bg-[#4a4a52] border border-gray-200 dark:border-gray-600 rounded-lg">
               <p class="text-sm font-medium text-gray-900 dark:text-white mb-3">Способ оплаты *</p>
@@ -226,10 +254,14 @@
             </div>
 
             <!-- Summary -->
-            <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
+            <div class="grid grid-cols-3 gap-4 p-3 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
               <div>
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Общая сумма</p>
                 <p class="text-sm font-bold text-gray-900 dark:text-white">${{ selectedProductsTotal.toFixed(2) }}</p>
+              </div>
+              <div v-if="exchangeRate">
+                <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Общая сумма (сом)</p>
+                <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ Math.round(selectedProductsTotal * exchangeRate).toLocaleString() }} сом</p>
               </div>
               <div>
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Выбрано товаров</p>
@@ -300,6 +332,15 @@
         </div>
       </div>
     </div>
+
+    <!-- Image Upload Modal -->
+    <ImageUploadModal
+      v-if="imageModalOpen"
+      :isOpen="imageModalOpen"
+      directory="health-day"
+      @close="imageModalOpen = false"
+      @uploaded="handleImageUploaded"
+    />
   </div>
 </template>
 
@@ -307,6 +348,7 @@
 import { ref, computed, watch } from 'vue'
 import { api } from '@/api'
 import { store_api } from '@/api'
+import ImageUploadModal from '@/components/ImageUploadModal.vue'
 
 const props = defineProps({
   visible: {
@@ -339,6 +381,8 @@ const selectedPaymentMethodId = ref(null)
 
 // Creating order state
 const creatingOrder = ref(false)
+const images = ref([])
+const imageModalOpen = ref(false)
 
 // Exchange rate (1$ = X сом)
 const exchangeRate = ref(88)
@@ -481,6 +525,23 @@ const loadPaymentMethods = async () => {
   }
 }
 
+// Image handling
+const openImageUpload = () => {
+  imageModalOpen.value = true
+}
+
+const handleImageUploaded = (data) => {
+  images.value.push({
+    url: data.url,
+    alt: data.filename || 'HealthDay order document',
+    order: images.value.length
+  })
+}
+
+const removeImage = (index) => {
+  images.value.splice(index, 1)
+}
+
 const createOrder = async () => {
   if (!selectedParticipant.value || selectedProducts.value.length === 0 || !selectedPaymentMethodId.value || creatingOrder.value) return
   
@@ -497,7 +558,12 @@ const createOrder = async () => {
           quantity: quantity,
           original_price: parseFloat(product?.price || 0)
         }
-      })
+      }),
+      images: images.value.map(img => ({
+          url: img.url,
+          alt: img.alt,
+          order: img.order
+      }))
     }
     
     await api.post('health-day/orders', payload)
@@ -524,6 +590,7 @@ watch(() => props.visible, (newVal) => {
     selectedPaymentMethodId.value = null
     creatingOrder.value = false
     exchangeRate.value = 88
+    images.value = []
   }
 })
 </script>

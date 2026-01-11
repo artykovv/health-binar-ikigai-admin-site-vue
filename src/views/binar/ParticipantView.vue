@@ -196,6 +196,15 @@
                           <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Дата регистрации:</td>
                           <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">{{ formatDate(participant.register_at) }}</td>
                         </tr>
+                        <tr>
+                          <td class="py-2 pr-4 text-sm text-gray-700 dark:text-white whitespace-nowrap">Статус контракта:</td>
+                          <td class="py-2 text-sm font-bold text-gray-900 dark:text-white">
+                            <span v-if="participant.contract_status" :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getContractStatusColor(participant.contract_status)]">
+                                {{ getContractStatusText(participant.contract_status) }}
+                            </span>
+                            <span v-else class="text-gray-500 text-xs">-</span>
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -203,6 +212,8 @@
                   </div>
 
               <!-- Данные структуры -->
+
+
               <div class="bg-white rounded-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
                 <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
                   <h5 class="m-0 dark:text-white">Данные структуры</h5>
@@ -1352,6 +1363,28 @@ const createContract = async () => {
   } finally {
     submittingContract.value = false
   }
+}
+
+const getContractStatusColor = (statusObj) => {
+    const status = statusObj?.status
+    if (!status) return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+    switch(status) {
+        case 'not_used': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'
+        case 'partially_used': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
+        case 'fully_used': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+        default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+    }
+}
+
+const getContractStatusText = (statusObj) => {
+    const status = statusObj?.status
+    if (!status) return 'Нет контракта'
+     switch(status) {
+        case 'not_used': return 'Не использован'
+        case 'partially_used': return 'Частично'
+        case 'fully_used': return 'Использован'
+        default: return 'Неизвестно'
+    }
 }
 
 // Загрузка при монтировании компонента

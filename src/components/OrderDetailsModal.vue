@@ -50,6 +50,7 @@
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Метод оплаты</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Описание</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
+                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Чек</th>
                 <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
               </tr>
             </thead>
@@ -63,6 +64,23 @@
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ payment.payment_method?.name || '-' }}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ payment.description || '-' }}</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(payment.created_at) }}</td>
+
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    <div v-if="payment.images && payment.images.length > 0" class="flex gap-1">
+                      <img 
+                        v-for="img in payment.images.slice(0, 3)" 
+                        :key="img.url"
+                        :src="img.url" 
+                        :alt="img.alt"
+                        class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
+                        @click="openImagePreview(img.url)"
+                      >
+                      <span v-if="payment.images.length > 3" class="text-xs text-gray-500 dark:text-gray-400 self-center">
+                        +{{ payment.images.length - 3 }}
+                      </span>
+                    </div>
+                    <span v-else class="text-gray-400">-</span>
+                </td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm">
                   <button
                     @click="openEditPaymentModal(payment)"
@@ -133,6 +151,16 @@
       @close="closeEditPaymentModal"
       @saved="handlePaymentSaved"
     />
+
+    <!-- Image Preview Modal -->
+    <div v-if="previewImage" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4" @click="previewImage = null">
+      <button class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+      <img :src="previewImage" class="max-w-full max-h-full object-contain" @click.stop>
+    </div>
   </div>
 </template>
 
@@ -164,6 +192,11 @@ const loadingResponsibleParticipant = ref(false)
 // Модальное окно редактирования доплаты
 const editPaymentModalVisible = ref(false)
 const selectedPayment = ref(null)
+
+const previewImage = ref(null)
+const openImagePreview = (url) => {
+  previewImage.value = url
+}
 
 const formatDate = (dateString) => {
   if (!dateString) return '-'

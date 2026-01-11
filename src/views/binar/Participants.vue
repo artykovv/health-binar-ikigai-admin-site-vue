@@ -53,6 +53,7 @@
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Персональный номер</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ФИО</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Контракт</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
                   </tr>
@@ -66,6 +67,12 @@
                       </router-link>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ participant.lastname }} {{ participant.name }} {{ participant.patronymic }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm">
+                      <span v-if="participant.contract_status" :class="['px-2 inline-flex text-xs leading-5 font-semibold rounded-full', getContractStatusColor(participant.contract_status)]">
+                        {{ getContractStatusText(participant.contract_status) }}
+                      </span>
+                      <span v-else class="text-gray-500 text-xs">-</span>
+                    </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(participant.register_at) }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       <router-link :to="`/binar/participant/${participant.id}`" class="inline-flex items-center rounded-md bg-purple-600 px-3 py-2 text-white text-xs hover:bg-gray-900 mr-2">Просмотр</router-link>
@@ -226,6 +233,28 @@ const formatDate = (dateString) => {
   } catch (error) {
     return dateString
   }
+}
+
+const getContractStatusColor = (statusObj) => {
+    const status = statusObj?.status
+    if (!status) return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+    switch(status) {
+        case 'not_used': return 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'
+        case 'partially_used': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300'
+        case 'fully_used': return 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+        default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+    }
+}
+
+const getContractStatusText = (statusObj) => {
+    const status = statusObj?.status
+    if (!status) return 'Нет контракта'
+     switch(status) {
+        case 'not_used': return 'Не использован'
+        case 'partially_used': return 'Частично'
+        case 'fully_used': return 'Использован'
+        default: return 'Неизвестно'
+    }
 }
 
 // Загрузка при монтировании компонента
