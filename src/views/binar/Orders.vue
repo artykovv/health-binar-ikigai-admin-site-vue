@@ -49,23 +49,50 @@
             </button>
           </div>
           
-          <!-- Filter by Branch -->
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Филиал</label>
-            <select 
-              v-model="selectedBranchId"
-              @change="loadOrders"
-              class="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
-            >
-              <option :value="null">Все филиалы</option>
-              <option 
-                v-for="branch in branches" 
-                :key="branch.id" 
-                :value="branch.id"
+          <!-- Filters -->
+          <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Filter by Branch -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Филиал</label>
+              <select 
+                v-model="selectedBranchId"
+                @change="handleBranchChange"
+                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
               >
-                {{ branch.name }}
-              </option>
-            </select>
+                <option :value="null">Все филиалы</option>
+                <option 
+                  v-for="branch in branches" 
+                  :key="branch.id" 
+                  :value="branch.id"
+                >
+                  {{ branch.name }}
+                </option>
+              </select>
+            </div>
+            
+            <!-- Search by FIO or Personal Number -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Поиск по ФИО или личному номеру</label>
+              <input
+                v-model="searchQuery"
+                @input="handleSearchInput"
+                type="text"
+                placeholder="Введите имя, фамилию или номер..."
+                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white dark:placeholder-gray-400"
+              >
+            </div>
+            
+            <!-- Search by Order ID -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Поиск по ID заказа</label>
+              <input
+                v-model.number="orderIdSearch"
+                @input="handleOrderIdInput"
+                type="number"
+                placeholder="Введите ID заказа..."
+                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white dark:placeholder-gray-400"
+              >
+            </div>
           </div>
           
           <!-- Loading Orders -->
@@ -362,6 +389,11 @@ const contractsLimit = ref(20)
 const contractsSortBy = ref('id')
 const contractsSortOrder = ref('desc')
 
+// Поиск для контрактов
+const searchQuery = ref('')
+const orderIdSearch = ref(null)
+let searchDebounceTimer = null
+
 // Заказы для вкладки Health Day
 const healthDayOrders = ref([])
 const loadingHealthDayOrders = ref(false)
@@ -455,6 +487,14 @@ const loadOrders = async () => {
       params.branch_id = selectedBranchId.value
     }
     
+    if (searchQuery.value && searchQuery.value.trim()) {
+      params.search = searchQuery.value.trim()
+    }
+    
+    if (orderIdSearch.value) {
+      params.order_id = orderIdSearch.value
+    }
+    
     const response = await api.get('orders/', { params })
     // Handle both array response and paginated response structure if backend changes
     if (Array.isArray(response.data)) {
@@ -469,6 +509,34 @@ const loadOrders = async () => {
   } finally {
     loadingOrders.value = false
   }
+}
+
+// Обработчик изменения филиала
+const handleBranchChange = () => {
+  contractsPage.value = 1
+  loadOrders()
+}
+
+// Обработчик ввода поиска с debouncing
+const handleSearchInput = () => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+  searchDebounceTimer = setTimeout(() => {
+    contractsPage.value = 1
+    loadOrders()
+  }, 300)
+}
+
+// Обработчик ввода ID заказа с debouncing
+const handleOrderIdInput = () => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer)
+  }
+  searchDebounceTimer = setTimeout(() => {
+    contractsPage.value = 1
+    loadOrders()
+  }, 300)
 }
 
 // Сортировка контрактов
