@@ -67,79 +67,7 @@
                     </div>
                   </div>
                 </div>
-        
-        <!-- Create Contract Modal -->
-        <div v-if="createContractModalVisible" class="fixed inset-0 z-50 flex items-center justify-center">
-          <div class="absolute inset-0 bg-black/40" @click="closeCreateContractModal"></div>
-          <div class="relative z-10 w-full max-w-md mx-4 overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-gray-200 dark:bg-[#3f3f47] dark:ring-gray-700">
-            <div class="px-4 py-3 border-b dark:border-gray-700">
-              <h5 class="m-0 dark:text-white">Создать контракт</h5>
-              <button @click="closeCreateContractModal" class="absolute top-3 right-3 rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-white dark:hover:bg-[#4a4a52]">✕</button>
-            </div>
-            <div class="p-4">
-              <div class="space-y-3">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Сумма контракта *</label>
-                  <input 
-                    v-model.number="contractForm.initial_amount" 
-                    type="number" 
-                    step="0.01"
-                    min="0"
-                    required
-                    class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Метод оплаты *</label>
-                  <select 
-                    v-model.number="contractForm.payment_method_id" 
-                    required
-                    :disabled="loadingPaymentMethods"
-                    class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white disabled:opacity-50"
-                  >
-                    <option value="">{{ loadingPaymentMethods ? 'Загрузка...' : 'Выберите метод оплаты' }}</option>
-                    <option 
-                      v-for="method in paymentMethods" 
-                      :key="method.id" 
-                      :value="method.id"
-                    >
-                      {{ method.name }}
-                    </option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Дата оплаты</label>
-                  <input 
-                    v-model="contractForm.paid_at" 
-                    type="datetime-local"
-                    class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
-                  />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1 dark:text-white">Описание</label>
-                  <textarea 
-                    v-model="contractForm.description" 
-                    rows="3"
-                    class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
-                    placeholder="Введите описание контракта (необязательно)"
-                  ></textarea>
-                </div>
-                
-                <div v-if="contractError" class="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200">
-                  {{ contractError }}
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center justify-end gap-2 px-4 py-3 border-t dark:border-gray-700">
-              <button @click="closeCreateContractModal" class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">Отмена</button>
-              <button @click="createContract" :disabled="!contractForm.initial_amount || !contractForm.payment_method_id || submittingContract"
-                class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-white text-sm hover:bg-green-700 disabled:opacity-40 dark:bg-green-800 dark:hover:bg-green-900">
-                <span v-if="submittingContract" class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-white dark:border-gray-600 dark:border-t-white"></span>
-                {{ submittingContract ? 'Создание...' : 'Создать' }}
-              </button>
-            </div>
-          </div>
-        </div>
+
                 
         <!-- Загрузка -->
         <div v-if="loading" class="py-6 text-center">
@@ -772,7 +700,6 @@
                 </div>
                 <div v-else class="flex items-center justify-center py-4">
                   <button 
-                    @click="openCreateContractModal" 
                     class="w-full flex items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
                   >
                     <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -826,18 +753,7 @@ const contractUsagesLoading = ref(false)
 const orderDetailModalVisible = ref(false)
 const selectedOrderId = ref(null)
 
-// Модальное окно создания контракта
-const createContractModalVisible = ref(false)
-const contractForm = ref({
-  initial_amount: 230,
-  paid_at: '',
-  payment_method_id: null,
-  description: ''
-})
-const paymentMethods = ref([])
-const loadingPaymentMethods = ref(false)
-const submittingContract = ref(false)
-const contractError = ref('')
+
 
 // Уведомления
 const notice = ref({ visible: false, type: 'info', message: '' })
@@ -1280,90 +1196,6 @@ const loadContractUsages = async () => {
   }
 }
 
-// Загрузка методов оплаты
-const loadPaymentMethods = async () => {
-  loadingPaymentMethods.value = true
-  try {
-    const response = await api.get('enums/payment-methods?limit=100&offset=0')
-    paymentMethods.value = response.data.filter(m => m.active)
-  } catch (error) {
-    console.error('Ошибка загрузки методов оплаты:', error)
-    contractError.value = 'Не удалось загрузить методы оплаты'
-  } finally {
-    loadingPaymentMethods.value = false
-  }
-}
-
-// Модальное окно создания контракта
-const openCreateContractModal = async () => {
-  contractForm.value = {
-    initial_amount: 230,
-    paid_at: '',
-    payment_method_id: null,
-    description: ''
-  }
-  contractError.value = ''
-  createContractModalVisible.value = true
-  // Загружаем методы оплаты при открытии модального окна
-  if (paymentMethods.value.length === 0) {
-    await loadPaymentMethods()
-  }
-}
-
-const closeCreateContractModal = () => {
-  createContractModalVisible.value = false
-  contractForm.value = {
-    initial_amount: 230,
-    paid_at: '',
-    payment_method_id: null,
-    description: ''
-  }
-  contractError.value = ''
-}
-
-const createContract = async () => {
-  if (!contractForm.value.initial_amount) {
-    contractError.value = 'Введите сумму контракта'
-    return
-  }
-  
-  if (!contractForm.value.payment_method_id) {
-    contractError.value = 'Выберите метод оплаты'
-    return
-  }
-  
-  submittingContract.value = true
-  contractError.value = ''
-  try {
-    const payload = {
-      participant_id: participantId,
-      initial_amount: contractForm.value.initial_amount,
-      payment_method_id: contractForm.value.payment_method_id
-    }
-    
-    // Если указана дата, добавляем её
-    if (contractForm.value.paid_at) {
-      payload.paid_at = contractForm.value.paid_at
-    }
-    
-    // Если указано описание, добавляем его
-    if (contractForm.value.description) {
-      payload.description = contractForm.value.description
-    }
-    
-    await api.post('contracts/', payload)
-    
-    // Перезагружаем контракт
-    await loadContract()
-    closeCreateContractModal()
-    showNotice('Контракт успешно создан', 'success')
-  } catch (error) {
-    console.error('Ошибка создания контракта:', error)
-    contractError.value = error.response?.data?.detail || error.response?.data?.message || 'Ошибка создания контракта'
-  } finally {
-    submittingContract.value = false
-  }
-}
 
 const getContractStatusColor = (statusObj) => {
     const status = statusObj?.status
