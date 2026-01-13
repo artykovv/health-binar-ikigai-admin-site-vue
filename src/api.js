@@ -2,7 +2,7 @@ import axios from 'axios'
 
 
 const BINAR_API_URL = import.meta.env.VITE_BINAR_API_URL || 'https://health-binar-ikigai-api-production.up.railway.app/api'
-const STORE_API_URL = import.meta.env.VITE_CATALOG_API || 'https://catalog-api-production-a903.up.railway.app/api'
+const CATALOG_API = import.meta.env.VITE_CATALOG_API || 'https://catalog-api-production-a903.up.railway.app/api'
 const STORAGE_API_URL = import.meta.env.VITE_STORAGE_API_URL || 'https://health-storage-production.up.railway.app'
 const KASSA_API_URL = import.meta.env.VITE_KASSA_API_URL || 'https://health-kassa-production.up.railway.app/api'
 const HEALTH_STORE = import.meta.env.VITE_HEALTH_STORE || 'https://health-health-store-production.up.railway.app/api'
