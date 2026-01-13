@@ -22,6 +22,7 @@
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Оплата</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Акция</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сотрудник</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Прим.</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Изображения</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
@@ -29,10 +30,10 @@
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
               <tr v-if="loading">
-                <td colspan="8" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Загрузка...</td>
+                <td colspan="9" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Загрузка...</td>
               </tr>
               <tr v-else-if="orders.length === 0">
-                <td colspan="8" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Нет заказов</td>
+                <td colspan="9" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Нет заказов</td>
               </tr>
               <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-bold">#{{ order.id }}</td>
@@ -65,6 +66,18 @@
                     {{ order.employee.lastname }} {{ order.employee.name }}
                   </div>
                   <div v-else class="text-xs italic opacity-30 text-gray-400">Не указан</div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm">
+                   <div v-if="order.description" class="group relative">
+                      <div class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[100px] cursor-help">
+                        {{ order.description }}
+                      </div>
+                      <!-- Tooltip -->
+                      <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 p-2 bg-black text-white text-xs rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-20 min-w-[200px] whitespace-normal">
+                        {{ order.description }}
+                      </div>
+                   </div>
+                   <div v-else class="text-xs italic opacity-30 text-gray-400">-</div>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm">
@@ -157,6 +170,11 @@
                 <span class="text-gray-500">Сотрудник:</span>
                 <span class="dark:text-white font-medium">{{ selectedOrder.employee.lastname }} {{ selectedOrder.employee.name }}</span>
               </div>
+            </div>
+            
+            <div v-if="selectedOrder.description" class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-100 dark:border-blue-800">
+               <h4 class="text-xs font-bold text-blue-800 dark:text-blue-300 uppercase mb-1">Примечание:</h4>
+               <p class="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line">{{ selectedOrder.description }}</p>
             </div>
 
             <div class="mt-4">

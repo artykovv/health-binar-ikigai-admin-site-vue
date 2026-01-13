@@ -380,6 +380,12 @@ const routes = [
   {
     path: '/products',
     redirect: '/products/products'
+  },
+  {
+    path: '/binar/orders/:id/print-act',
+    name: 'PrintAct',
+    component: () => import('@/views/binar/PrintAct.vue'),
+    meta: { title: 'Печать Акта' }
   }
 ]
 

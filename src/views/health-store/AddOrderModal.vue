@@ -210,6 +210,17 @@
                   </div>
                 </div>
               </div>
+              
+              <!-- Description Input -->
+              <div class="space-y-2">
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-wider">Примечание к заказу</label>
+                <textarea 
+                  v-model="description" 
+                  rows="2" 
+                  class="w-full py-2 px-3 rounded-xl border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                  placeholder="Дополнительная информация..."
+                ></textarea>
+              </div>
 
               <!-- Summary -->
               <div class="space-y-2 pt-4">
@@ -291,6 +302,8 @@ const payments = ref([])
 const newPaymentMethod = ref('')
 const newPaymentAmountUSD = ref(null)
 const newPaymentAmountSOM = ref(null)
+
+const description = ref('')
 
 const isUpdatingPayment = ref(false) // Flag to prevent circular updates
 const images = ref([])
@@ -452,6 +465,7 @@ const submitOrder = async () => {
       payment_method: null, // Deprecated field
       payments: payments.value,
       images: images.value.map(img => ({ image_path: img.url })),
+      description: description.value,
       items: cart.value.map(item => ({
         variant_id: item.id,
         quantity: item.quantity,
@@ -468,6 +482,7 @@ const submitOrder = async () => {
 
     payments.value = []
     images.value = []
+    description.value = ''
     newPaymentMethod.value = ''
     newPaymentAmountUSD.value = null
     newPaymentAmountSOM.value = null
