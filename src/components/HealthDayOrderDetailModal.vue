@@ -88,7 +88,7 @@
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Оригинальная цена</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена со скидкой</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Количество</th>
-                    <!-- <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Выдано</th> -->
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Выдано</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                     <!-- <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th> -->
                   </tr>
@@ -110,48 +110,20 @@
                       <span class="font-semibold text-green-600 dark:text-green-400">${{ item.discounted_price }}</span>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.quantity }}</td>
-                    <!-- <td class="px-4 py-2 whitespace-nowrap text-sm" @click.stop>
-                      <div v-if="editingIssuedQuantity === item.id" class="flex items-center gap-2">
-                        <input
-                          ref="issuedQuantityInput"
-                          type="number"
-                          v-model.number="editingIssuedQuantityValue"
-                          :max="item.quantity"
-                          :min="0"
-                          @input="validateIssuedQuantity(item.quantity)"
-                          @keyup.enter="saveIssuedQuantity(item.id)"
-                          @keyup.esc="cancelEditIssuedQuantity"
-                          class="issued-quantity-input w-20 rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#4a4a52] dark:border-gray-600 dark:text-white dark:focus:ring-white"
-                        />
-                        <button
-                          @click="saveIssuedQuantity(item.id)"
-                          class="inline-flex items-center rounded-md bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
-                        >
-                          ✓
-                        </button>
-                        <button
-                          @click="cancelEditIssuedQuantity"
-                          class="inline-flex items-center rounded-md bg-gray-600 px-2 py-1 text-xs text-white hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-800"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      <span v-else class="text-gray-900 dark:text-white">{{ item.issued_quantity || 0 }}</span>
-                    </td> -->
+                    <td class="px-4 py-2 whitespace-nowrap text-sm">
+                      <span 
+                        :class="{
+                          'text-green-600 font-bold': (item.issued_quantity || 0) >= item.quantity,
+                          'text-yellow-600': (item.issued_quantity || 0) < item.quantity && (item.issued_quantity || 0) > 0,
+                          'text-gray-400': !(item.issued_quantity || 0)
+                        }"
+                      >
+                        {{ item.issued_quantity || 0 }} / {{ item.quantity }}
+                      </span>
+                    </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       <span class="font-semibold">${{ item.subtotal }}</span>
                     </td>
-                    <!-- <td class="px-4 py-2 whitespace-nowrap text-sm" @click.stop>
-                      <button
-                        v-if="editingIssuedQuantity !== item.id && (item.issued_quantity || 0) < item.quantity"
-                        @click="handleIssueItem(item.id)"
-                        class="inline-flex items-center rounded-md bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
-                      >
-                        Выдать
-                      </button>
-                      <span v-else-if="editingIssuedQuantity === item.id" class="text-xs text-gray-500 dark:text-gray-400">Редактирование...</span>
-                      <span v-else-if="(item.issued_quantity || 0) >= item.quantity" class="text-xs text-gray-500 dark:text-gray-400"></span>
-                    </td> -->
                   </tr>
                 </tbody>
               </table>
@@ -160,6 +132,13 @@
         </div>
       </div>
       <div class="flex items-center justify-end gap-2 px-4 py-3 border-t dark:border-gray-700">
+        <button 
+          v-if="itemsToIssue.length > 0"
+          @click="showIssueModal = true"
+          class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+        >
+          Выдать товары
+        </button>
         <button @click="handleOpenDetails" class="inline-flex items-center rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800">Детали</button>
         <button @click="handleClose" class="inline-flex items-center rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-200 dark:bg-[#3f3f47] dark:text-white dark:hover:bg-[#4a4a52]">Закрыть</button>
       </div>
@@ -171,6 +150,20 @@
         :visible="detailsVisible"
         :order-id="props.orderId || orderDetail?.id"
         @close="detailsVisible = false"
+      />
+
+      <!-- Issue Items Modal -->
+      <IssueItemsModal
+        v-if="orderDetail"
+        :visible="showIssueModal"
+        :items="itemsToIssue"
+        :order-id="orderDetail.id"
+        :order-number="String(orderDetail.id)"
+        source-type="health-day"
+        :total-price="totalPriceForIssue"
+        @close="showIssueModal = false"
+        @success="handleIssueSuccess"
+        @error="handleIssueError"
       />
     </div>
 
@@ -187,9 +180,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { api, store_api } from '@/api'
 import HealthDayOrderDetailsModal from './HealthDayOrderDetailsModal.vue'
+import IssueItemsModal from './IssueItemsModal.vue'
 
 const props = defineProps({
   visible: {
@@ -305,91 +299,74 @@ watch(() => props.orderId, (newId) => {
   }
 })
 
-// Выдача товаров - закомментировано
-// Выдача одного товара - начинаем редактирование
-// const handleIssueItem = (itemId) => {
-//   const item = orderDetail.value.items.find(i => i.id === itemId)
-//   if (!item) return
-//   
-//   editingIssuedQuantity.value = itemId
-//   editingIssuedQuantityValue.value = item.issued_quantity || 0
-// }
-
-// // Валидация выданного количества
-// const validateIssuedQuantity = (maxQuantity) => {
-//   if (editingIssuedQuantityValue.value > maxQuantity) {
-//     editingIssuedQuantityValue.value = maxQuantity
-//   }
-//   if (editingIssuedQuantityValue.value < 0) {
-//     editingIssuedQuantityValue.value = 0
-//   }
-// }
-
-// // Сохранение выданного количества
-// const saveIssuedQuantity = async (itemId) => {
-//   const item = orderDetail.value.items.find(i => i.id === itemId)
-//   if (!item || !orderDetail.value) return
-//   
-//   // Валидация перед сохранением
-//   if (editingIssuedQuantityValue.value > item.quantity) {
-//     editingIssuedQuantityValue.value = item.quantity
-//   }
-//   if (editingIssuedQuantityValue.value < 0) {
-//     editingIssuedQuantityValue.value = 0
-//   }
-//   
-//   const oldIssuedQuantity = item.issued_quantity || 0
-//   const newIssuedQuantity = editingIssuedQuantityValue.value
-//   const quantityToIssue = newIssuedQuantity - oldIssuedQuantity
-//   
-//   // Если количество не изменилось, просто закрываем редактирование
-//   if (quantityToIssue === 0) {
-//     editingIssuedQuantity.value = null
-//     editingIssuedQuantityValue.value = 0
-//     return
-//   }
-//   
-//   // Нельзя выдавать отрицательное количество
-//   if (quantityToIssue <= 0) {
-//     alert('Невозможно уменьшить выданное количество')
-//     return
-//   }
-//   
-//   try {
-//     // POST запрос на store_api (http://127.0.0.1:8001/api/issued-items/)
-//     const orderId = orderDetail.value.id
-//     const price = parseFloat(item.discounted_price || item.original_price || 0)
-//     await store_api.post('issued-items/', {
-//       order_id: Number(orderId),
-//       order_number: String(orderId),
-//       variant_id: Number(item.variant_id),
-//       quantity: Number(quantityToIssue),
-//       source_type: 'mlm',
-//       price: price
-//     })
-//     
-//     // Обновляем значение в локальном состоянии только после успешного запроса
-//     item.issued_quantity = newIssuedQuantity
-//     
-//     // Завершаем редактирование
-//     editingIssuedQuantity.value = null
-//     editingIssuedQuantityValue.value = 0
-//   } catch (error) {
-//     console.error('Ошибка при выдаче товара:', error)
-//     console.error('Детали ошибки:', error.response?.data)
-//     alert(error.response?.data?.detail || error.response?.data?.message || 'Ошибка при выдаче товара. Попробуйте еще раз.')
-//   }
-// }
-
-// // Отмена редактирования
-// const cancelEditIssuedQuantity = () => {
-//   editingIssuedQuantity.value = null
-//   editingIssuedQuantityValue.value = 0
-//   editingIssuedQuantityValue.value = 0
-// }
-
 const openImagePreview = (url) => {
   previewImage.value = url
+}
+
+// === ISSUE ITEMS LOGIC ===
+const showIssueModal = ref(false)
+
+const itemsToIssue = computed(() => {
+  if (!orderDetail.value || !orderDetail.value.items) return []
+  return orderDetail.value.items.map(item => {
+    const remaining = item.quantity - (item.issued_quantity || 0)
+    if (remaining <= 0) return null
+    return {
+      variant_id: item.variant_id,
+      quantity: remaining,
+      maxQuantity: remaining, // important for validation
+      itemId: item.id
+    }
+  }).filter(item => item !== null)
+})
+
+const totalPriceForIssue = computed(() => {
+  return orderDetail.value ? Number(orderDetail.value.total_amount) : 0
+})
+
+const handleIssueSuccess = async (response) => {
+  console.log('Items issued successfully:', response)
+  const issuedItems = response.issued_items || []
+  const issuedQuantities = {} // Map variant_id to quantity
+  
+  issuedItems.forEach(item => {
+    issuedQuantities[item.variant_id] = item.quantity
+  })
+  
+  // Update issued_quantity in health-day API for each item
+  for (const item of orderDetail.value.items) {
+    const qty = issuedQuantities[item.variant_id]
+    if (qty) {
+      try {
+        await api.patch(`health-day/${item.id}/issue`, {
+          quantity: qty
+        })
+        
+        // Update local state
+        item.issued_quantity = (item.issued_quantity || 0) + qty
+        
+        // Update order status locally if needed
+        // (Logic is duplicated from backend, but good for UI responsiveness)
+        const allDelivered = orderDetail.value.items.every(
+          i => (i.issued_quantity || 0) >= i.quantity
+        )
+        if (allDelivered) {
+          orderDetail.value.status = 'delivered'
+        } else {
+          orderDetail.value.status = 'issued'
+        }
+        
+      } catch (e) {
+        console.error(`Failed to update issue status for item ${item.id}`, e)
+      }
+    }
+  }
+  
+  showIssueModal.value = false
+}
+
+const handleIssueError = (error) => {
+  console.error('Issue error:', error)
 }
 </script>
 

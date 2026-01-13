@@ -149,7 +149,42 @@
                         </button>
                       </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ variant.price }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ variant.stock }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white relative">
+                        <button 
+                          @click="toggleWarehouseDropdown(variant.id)"
+                          class="hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer underline decoration-dotted"
+                          :class="{ 'text-blue-600 dark:text-blue-400': openDropdownId === variant.id }"
+                        >
+                          {{ variant.stock }}
+                        </button>
+                        
+                        <!-- Warehouse Stock Dropdown -->
+                        <div 
+                          v-if="openDropdownId === variant.id && variant.warehouse_stocks && variant.warehouse_stocks.length > 0"
+                          class="absolute z-50 mt-1 left-0 bg-white dark:bg-[#3f3f47] border border-gray-300 dark:border-gray-600 rounded-md shadow-lg min-w-[200px]"
+                        >
+                          <div class="py-1">
+                            <div 
+                              v-for="stock in variant.warehouse_stocks" 
+                              :key="stock.warehouse_id"
+                              class="px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-600"
+                            >
+                              <div class="font-medium text-gray-900 dark:text-white">{{ stock.warehouse_name }}</div>
+                              <div class="text-xs text-gray-500 dark:text-gray-400">Количество: {{ stock.quantity }}</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <!-- No warehouse stocks message -->
+                        <div 
+                          v-if="openDropdownId === variant.id && (!variant.warehouse_stocks || variant.warehouse_stocks.length === 0)"
+                          class="absolute z-50 mt-1 left-0 bg-white dark:bg-[#3f3f47] border border-gray-300 dark:border-gray-600 rounded-md shadow-lg min-w-[200px]"
+                        >
+                          <div class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+                            Нет данных по складам
+                          </div>
+                        </div>
+                      </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-center">
                         <span v-if="variant.is_binar === true" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-green-500 text-white text-xs">✓</span>
                         <span v-else-if="variant.is_binar === false" class="inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-white text-xs">✗</span>
@@ -413,6 +448,19 @@ const filters = ref({
   sort_by: '',
   sort_order: 'asc'
 })
+
+// Warehouse dropdown state
+const openDropdownId = ref(null)
+
+// Toggle warehouse dropdown
+const toggleWarehouseDropdown = (variantId) => {
+  if (openDropdownId.value === variantId) {
+    openDropdownId.value = null
+  } else {
+    openDropdownId.value = variantId
+  }
+}
+
 
 // Computed property to check if any filters are active
 const hasActiveFilters = computed(() => {
@@ -782,6 +830,13 @@ const getImageUrl = (imagePath) => {
 onMounted(() => {
   loadData()
   loadAttributes()
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('button') && !e.target.closest('.absolute')) {
+      openDropdownId.value = null
+    }
+  })
 })
 
 // Отслеживание изменений в URL для синхронизации с состоянием

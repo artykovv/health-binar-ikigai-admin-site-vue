@@ -152,6 +152,7 @@
                     <tr>
                       <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">Товар</th>
                       <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400">Кол-во</th>
+                      <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400">Выдано</th>
                       <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400">Цена</th>
                     </tr>
                   </thead>
@@ -159,6 +160,17 @@
                     <tr v-for="item in selectedOrder.items" :key="item.id">
                       <td class="px-3 py-2 text-sm dark:text-white font-medium">{{ getVariantName(item.variant_id) }}</td>
                       <td class="px-3 py-2 text-sm text-right dark:text-white">{{ item.quantity }} шт</td>
+                      <td class="px-3 py-2 text-sm text-right">
+                        <span 
+                          :class="{
+                            'text-green-600 font-bold': item.issued_quantity >= item.quantity,
+                            'text-yellow-600': (item.issued_quantity || 0) < item.quantity && (item.issued_quantity || 0) > 0,
+                            'text-gray-400': !item.issued_quantity
+                          }"
+                        >
+                          {{ item.issued_quantity || 0 }} / {{ item.quantity }}
+                        </span>
+                      </td>
                       <td class="px-3 py-2 text-sm text-right">
                         <div class="flex flex-col">
                           <span class="text-blue-600 dark:text-blue-400 font-bold text-xs">{{ formatUSD(item.price) }}</span>
@@ -185,12 +197,33 @@
             </div>
           </div>
           
-          <div class="mt-6 flex justify-end">
+          <div class="mt-6 flex justify-end gap-2">
+            <button 
+              v-if="itemsToIssue.length > 0"
+              @click="showIssueModal = true"
+              class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
+            >
+              Выдать товары
+            </button>
             <button @click="selectedOrder = null" class="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-white">Закрыть</button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Issue Items Modal -->
+    <IssueItemsModal
+      v-if="selectedOrder"
+      :visible="showIssueModal"
+      :items="itemsToIssue"
+      :order-id="selectedOrder.id"
+      :order-number="String(selectedOrder.id)"
+      source-type="health-store"
+      :total-price="totalPriceForIssue"
+      @close="showIssueModal = false"
+      @success="handleIssueSuccess"
+      @error="handleIssueError"
+    />
 
     <!-- Add Order Modal -->
     <AddOrderModal 
@@ -208,10 +241,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { store_api, health_store } from '@/api'
 import { formatUSD, toSOM } from '@/utils/currency'
 import AddOrderModal from './AddOrderModal.vue'
+import IssueItemsModal from '@/components/IssueItemsModal.vue'
 
 const loading = ref(false)
 const orders = ref([])
@@ -219,6 +253,26 @@ const selectedOrder = ref(null)
 const showAddOrderModal = ref(false)
 const productVariants = ref([])
 const lightboxImage = ref(null)
+
+// Issue Items Modal State
+const showIssueModal = ref(false)
+const itemsToIssue = computed(() => {
+  if (!selectedOrder.value || !selectedOrder.value.items) return []
+  return selectedOrder.value.items.map(item => {
+    const remaining = item.quantity - (item.issued_quantity || 0)
+    if (remaining <= 0) return null
+    return {
+      variant_id: item.variant_id,
+      quantity: remaining,
+      itemId: item.id // Keep track for updating later
+    }
+  }).filter(item => item !== null)
+})
+
+const totalPriceForIssue = computed(() => {
+  if (!selectedOrder.value) return 0
+  return selectedOrder.value.total_amount
+})
 
 const openLightbox = (url) => {
   lightboxImage.value = url
@@ -258,6 +312,42 @@ const viewOrder = async (order) => {
 }
 
 const formatDate = (d) => d ? new Date(d).toLocaleString() : '-'
+
+// Handle Issue Success
+const handleIssueSuccess = async (response) => {
+  console.log('Items issued successfully:', response)
+  
+  const issuedItems = response.issued_items || []
+  const issuedQuantities = {} // Map variant_id to quantity
+  
+  issuedItems.forEach(item => {
+    issuedQuantities[item.variant_id] = item.quantity
+  })
+  
+  // Update issued_quantity in health_store API for each item
+  for (const item of selectedOrder.value.items) {
+    const qty = issuedQuantities[item.variant_id]
+    if (qty) {
+      try {
+        await health_store.patch(`/orders/${item.id}/issue?order_id=${selectedOrder.value.id}`, {
+          quantity: qty
+        })
+        
+        // Update local state
+        item.issued_quantity = (item.issued_quantity || 0) + qty
+      } catch (e) {
+        console.error(`Failed to update issue status for item ${item.id}`, e)
+      }
+    }
+  }
+  
+  // Close modal
+  showIssueModal.value = false
+}
+
+const handleIssueError = (error) => {
+  console.error('Issue error:', error)
+}
 
 onMounted(() => {
   fetchOrders()

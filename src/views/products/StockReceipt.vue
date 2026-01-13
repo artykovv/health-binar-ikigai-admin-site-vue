@@ -36,6 +36,23 @@
         </div>
       </div>
 
+      <!-- Warehouse Selection -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Склад *
+        </label>
+        <select
+          v-model="selectedWarehouseId"
+          required
+          class="w-full max-w-md px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-[10px] bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#015C3B] focus:border-transparent transition-all"
+        >
+          <option :value="null" disabled>Выберите склад</option>
+          <option v-for="warehouse in warehouses" :key="warehouse.id" :value="warehouse.id">
+            {{ warehouse.name }}
+          </option>
+        </select>
+      </div>
+
       <!-- Note Field -->
       <div class="mb-6">
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -253,6 +270,8 @@ const router = useRouter()
 
 const allVariants = ref([]) // Все загруженные варианты для поиска
 const selectedVariants = ref([]) // Варианты, добавленные в таблицу
+const warehouses = ref([]) // Список складов
+const selectedWarehouseId = ref(null) // Выбранный склад
 const searchQuery = ref('')
 const searchResults = ref([])
 const searching = ref(false)
@@ -262,6 +281,21 @@ const note = ref('')
 const saving = ref(false)
 const successMessage = ref('')
 const errorMessage = ref('')
+
+// Загрузка складов
+const loadWarehouses = async () => {
+  try {
+    const response = await store_api.get('warehouses/?is_active=true')
+    warehouses.value = response.data
+    // Автоматически выбираем первый склад, если он один
+    if (warehouses.value.length === 1) {
+      selectedWarehouseId.value = warehouses.value[0].id
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки складов:', error)
+    errorMessage.value = 'Ошибка загрузки списка складов'
+  }
+}
 
 // Загрузка всех вариантов товаров для поиска
 const loadAllVariants = async () => {
@@ -375,12 +409,13 @@ const reset = () => {
   searchResults.value = []
   successMessage.value = ''
   errorMessage.value = ''
+  // Не сбрасываем selectedWarehouseId, чтобы пользователь не выбирал заново
 }
 
 // Валидация формы
 const isValid = computed(() => {
   const items = getItemsForSubmit()
-  return items.length > 0 && items.every(item => item.quantity > 0)
+  return selectedWarehouseId.value && items.length > 0 && items.every(item => item.quantity > 0)
 })
 
 // Получить элементы для отправки
@@ -404,6 +439,11 @@ const getItemsForSubmit = () => {
 
 // Отправка формы
 const submit = async () => {
+  if (!selectedWarehouseId.value) {
+    errorMessage.value = 'Выберите склад для прихода товара'
+    return
+  }
+  
   if (!isValid.value) {
     errorMessage.value = 'Заполните количество для всех выбранных товаров (больше 0)'
     return
@@ -417,6 +457,7 @@ const submit = async () => {
     const items = getItemsForSubmit()
     
     const payload = {
+      warehouse_id: selectedWarehouseId.value,
       items: items,
       note: note.value || null
     }
@@ -439,6 +480,7 @@ const submit = async () => {
 
 // Загрузка при монтировании
 onMounted(() => {
+  loadWarehouses()
   loadAllVariants()
 })
 </script>

@@ -22,7 +22,7 @@
                 <div v-if="selectedItems.length > 0" class="flex items-center gap-2">
                   <span class="text-sm text-gray-600 dark:text-gray-400">Выбрано: {{ selectedItems.length }}</span>
                   <button
-                    @click="handleIssueSelected"
+                    @click="openWarehouseModal"
                     class="inline-flex items-center rounded-md bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
                   >
                     Выдать выбранные
@@ -75,45 +75,17 @@
                       </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ item.price }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.quantity }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm" @click.stop>
-                        <div v-if="editingIssuedQuantity === item.id" class="flex items-center gap-2">
-                          <input
-                            ref="issuedQuantityInput"
-                            type="number"
-                            v-model.number="editingIssuedQuantityValue"
-                            :max="item.quantity"
-                            :min="0"
-                            @input="validateIssuedQuantity(item.quantity)"
-                            @keyup.enter="saveIssuedQuantity(item.id)"
-                            @keyup.esc="cancelEditIssuedQuantity"
-                            class="issued-quantity-input w-20 rounded-md border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#4a4a52] dark:border-gray-600 dark:text-white dark:focus:ring-white"
-                          />
-                          <button
-                            @click="saveIssuedQuantity(item.id)"
-                            class="inline-flex items-center rounded-md bg-green-600 px-2 py-1 text-xs text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
-                          >
-                            ✓
-                          </button>
-                          <button
-                            @click="cancelEditIssuedQuantity"
-                            class="inline-flex items-center rounded-md bg-gray-600 px-2 py-1 text-xs text-white hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-800"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                        <span v-else class="text-gray-900 dark:text-white">{{ item.issued_quantity || 0 }}</span>
-                      </td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.issued_quantity || 0 }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ (item.price * item.quantity).toFixed(2) }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm" @click.stop>
                         <button
-                          v-if="editingIssuedQuantity !== item.id && (item.issued_quantity || 0) < item.quantity"
-                          @click="handleIssueItem(item.id)"
+                          v-if="(item.issued_quantity || 0) < item.quantity"
+                          @click="handleIssueSingleItem(item.id)"
                           class="inline-flex items-center rounded-md bg-green-600 px-3 py-1.5 text-xs text-white hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800"
                         >
                           Выдать
                         </button>
-                        <span v-else-if="editingIssuedQuantity === item.id" class="text-xs text-gray-500 dark:text-gray-400">Редактирование...</span>
-                        <span v-else-if="(item.issued_quantity || 0) >= item.quantity" class="text-xs text-gray-500 dark:text-gray-400"></span>
+                        <span v-else class="text-xs text-gray-500 dark:text-gray-400"></span>
                       </td>
                     </tr>
                   </tbody>
@@ -151,15 +123,29 @@
         :order-id="orderDetail?.id"
         @close="detailsVisible = false"
       />
+      
+      <!-- Issue Items Modal -->
+      <IssueItemsModal
+        :visible="issueModalVisible"
+        :items="itemsToIssue"
+        :order-id="orderDetail?.id || 0"
+        :order-number="String(orderDetail?.id || '')"
+        :source-type="'mlm'"
+        :total-price="totalPriceForIssue"
+        @close="closeIssueModal"
+        @success="handleIssueSuccess"
+        @error="handleIssueError"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { api } from '@/api'
 import { store_api } from '@/api'
 import OrderDetailsModal from './OrderDetailsModal.vue'
+import IssueItemsModal from './IssueItemsModal.vue'
 
 const props = defineProps({
   visible: {
@@ -180,9 +166,36 @@ const variantsMap = ref({})
 const extraPayments = ref([])
 const detailsVisible = ref(false)
 const selectedItems = ref([]) // Массив ID выбранных товаров
-const editingIssuedQuantity = ref(null) // ID товара, который редактируется
-const editingIssuedQuantityValue = ref(0) // Временное значение выданного количества
-const issuedQuantityInput = ref(null) // Ref для input выданного количества
+
+// Issue modal state
+const issueModalVisible = ref(false)
+
+// Computed: items to issue
+const itemsToIssue = computed(() => {
+  if (!orderDetail.value || !selectedItems.value.length) return []
+  
+  return selectedItems.value.map(itemId => {
+    const item = orderDetail.value.items.find(i => i.id === itemId)
+    if (!item) return null
+    
+    const remainingQuantity = item.quantity - (item.issued_quantity || 0)
+    return {
+      variant_id: item.variant_id,
+      quantity: remainingQuantity,
+      itemId: item.id // Keep track for updating later
+    }
+  }).filter(item => item !== null && item.quantity > 0)
+})
+
+// Computed: total price for issue
+const totalPriceForIssue = computed(() => {
+  if (!orderDetail.value || !selectedItems.value.length) return 0
+  
+  return selectedItems.value.reduce((sum, itemId) => {
+    const item = orderDetail.value.items.find(i => i.id === itemId)
+    return sum + (item ? item.price * item.quantity : 0)
+  }, 0)
+})
 
 const totalExtraPaymentAmount = computed(() => {
   return extraPayments.value.reduce((sum, payment) => {
@@ -242,104 +255,86 @@ const toggleSelectAll = () => {
   }
 }
 
-// Выдача одного товара - начинаем редактирование
-const handleIssueItem = (itemId) => {
-  const item = orderDetail.value.items.find(i => i.id === itemId)
-  if (!item) return
-  
-  editingIssuedQuantity.value = itemId
-  editingIssuedQuantityValue.value = item.issued_quantity || 0
-}
-
-// Валидация выданного количества
-const validateIssuedQuantity = (maxQuantity) => {
-  if (editingIssuedQuantityValue.value > maxQuantity) {
-    editingIssuedQuantityValue.value = maxQuantity
-  }
-  if (editingIssuedQuantityValue.value < 0) {
-    editingIssuedQuantityValue.value = 0
-  }
-}
-
-// Сохранение выданного количества
-const saveIssuedQuantity = async (itemId) => {
-  const item = orderDetail.value.items.find(i => i.id === itemId)
-  if (!item || !orderDetail.value) return
-  
-  // Валидация перед сохранением
-  if (editingIssuedQuantityValue.value > item.quantity) {
-    editingIssuedQuantityValue.value = item.quantity
-  }
-  if (editingIssuedQuantityValue.value < 0) {
-    editingIssuedQuantityValue.value = 0
-  }
-  
-  const oldIssuedQuantity = item.issued_quantity || 0
-  const newIssuedQuantity = editingIssuedQuantityValue.value
-  const quantityToIssue = newIssuedQuantity - oldIssuedQuantity
-  
-  // Если количество не изменилось, просто закрываем редактирование
-  if (quantityToIssue === 0) {
-    editingIssuedQuantity.value = null
-    editingIssuedQuantityValue.value = 0
-    return
-  }
-  
-  // Нельзя выдавать отрицательное количество
-  if (quantityToIssue <= 0) {
-    alert('Невозможно уменьшить выданное количество')
-    return
-  }
-  
-  try {
-    // Первый запрос: PATCH на /api/orders/{item_id}/issue?order_id={order_id}
-    const orderId = orderDetail.value.id
-    const itemId = item.id
-    const issueResponse = await api.patch(
-      `orders/${itemId}/issue?order_id=${orderId}`,
-      { quantity: quantityToIssue }
-    )
-    
-    // Проверяем, что ответ успешен (200)
-    if (issueResponse.status === 200) {
-      // Второй запрос: POST на store_api /api/issued-items/
-      await store_api.post('issued-items/', {
-        order_id: orderId,
-        order_number: String(orderId),
-        variant_id: item.variant_id,
-        quantity: quantityToIssue,
-        source_type: 'mlm',
-        price: item.price
-      })
-      
-      // Обновляем значение в локальном состоянии только после успешных запросов
-      item.issued_quantity = newIssuedQuantity
-    }
-    
-    // Завершаем редактирование
-    editingIssuedQuantity.value = null
-    editingIssuedQuantityValue.value = 0
-  } catch (error) {
-    console.error('Ошибка при выдаче товара:', error)
-    alert(error.response?.data?.detail || 'Ошибка при выдаче товара. Попробуйте еще раз.')
-  }
-}
-
-// Отмена редактирования
-const cancelEditIssuedQuantity = () => {
-  editingIssuedQuantity.value = null
-  editingIssuedQuantityValue.value = 0
-}
-
-// Выдача выбранных товаров
-const handleIssueSelected = () => {
+// Open issue modal
+const openWarehouseModal = () => {
   if (selectedItems.value.length === 0) {
     alert('Выберите товары для выдачи')
     return
   }
-  console.log('Выдача выбранных товаров:', selectedItems.value)
-  // TODO: Реализовать выдачу выбранных товаров
-  alert(`Выдача товаров: ${selectedItems.value.join(', ')}`)
+  
+  if (itemsToIssue.value.length === 0) {
+    alert('Все выбранные товары уже выданы')
+    return
+  }
+  
+  issueModalVisible.value = true
+}
+
+// Close issue modal
+const closeIssueModal = () => {
+  issueModalVisible.value = false
+}
+
+// Handle successful issue
+const handleIssueSuccess = async (response) => {
+  console.log('Товары успешно выданы:', response)
+  
+  // Get issued items from response
+  const issuedItems = response.issued_items || []
+  
+  // Create a map of variant_id to issued quantity
+  const issuedQuantities = {}
+  issuedItems.forEach(issued => {
+    issuedQuantities[issued.variant_id] = issued.quantity
+  })
+  
+  // First request: Update issued quantities in MLM API
+  for (const itemId of selectedItems.value) {
+    const item = orderDetail.value.items.find(i => i.id === itemId)
+    if (!item) continue
+    
+    // Find the issued quantity for this variant
+    const issuedQty = issuedQuantities[item.variant_id] || 0
+    if (issuedQty <= 0) continue
+    
+    try {
+      await api.patch(
+        `orders/${itemId}/issue?order_id=${orderDetail.value.id}`,
+        { quantity: issuedQty }
+      )
+      
+      // Update local state with actual issued quantity
+      item.issued_quantity = (item.issued_quantity || 0) + issuedQty
+    } catch (error) {
+      console.error('Ошибка обновления выданного количества:', error)
+    }
+  }
+  
+  // Clear selection
+  selectedItems.value = []
+  
+  alert('Товары успешно выданы!')
+}
+
+// Handle issue error
+const handleIssueError = (error) => {
+  console.error('Ошибка при выдаче товаров:', error)
+}
+
+// Выдача одного товара - открываем модальное окно выбора склада
+const handleIssueSingleItem = (itemId) => {
+  // Выбираем только этот товар
+  selectedItems.value = [itemId]
+  
+  // Проверяем, что товар можно выдать
+  if (itemsToIssue.value.length === 0) {
+    alert('Товар уже полностью выдан')
+    selectedItems.value = []
+    return
+  }
+  
+  // Открываем модальное окно
+  issueModalVisible.value = true
 }
 
 const handleClose = () => {
@@ -404,40 +399,21 @@ watch(() => props.visible, (newVal) => {
     loadOrderDetail(props.orderId)
     detailsVisible.value = false
     selectedItems.value = []
-    editingIssuedQuantity.value = null
-    editingIssuedQuantityValue.value = 0
   } else if (!newVal) {
     orderDetail.value = null
     extraPayments.value = []
     variantsMap.value = {}
     detailsVisible.value = false
     selectedItems.value = []
-    editingIssuedQuantity.value = null
-    editingIssuedQuantityValue.value = 0
   }
 })
 
 watch(() => props.orderId, (newId) => {
   if (props.visible && newId) {
     selectedItems.value = []
-    editingIssuedQuantity.value = null
-    editingIssuedQuantityValue.value = 0
     loadOrderDetail(newId)
   }
 })
-
-// Автофокус на input при начале редактирования
-watch(editingIssuedQuantity, (newVal) => {
-  if (newVal) {
-    nextTick(() => {
-      // Используем querySelector для поиска активного input по классу
-      const input = document.querySelector('.issued-quantity-input')
-      if (input) {
-        input.focus()
-        input.select()
-      }
-    })
-  }
-})
 </script>
+
 

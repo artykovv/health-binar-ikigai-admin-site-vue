@@ -182,12 +182,26 @@
         </div>
       </div>
     </div>
+    <!-- Issue Items Modal -->
+    <IssueItemsModal
+      v-if="createdEkOrder"
+      :visible="showIssueModal"
+      :items="itemsToIssue"
+      :order-id="createdEkOrder._id"
+      :order-number="createdEkOrder._id"
+      source-type="ek"
+      :total-price="0"
+      @close="handleIssueError" 
+      @success="handleIssueSuccess"
+      @error="handleIssueError"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { health_store, store_api } from '@/api'
+import IssueItemsModal from '@/components/IssueItemsModal.vue'
 
 const loading = ref(false)
 const expenses = ref([])
@@ -198,6 +212,11 @@ const search = ref('')
 const cart = ref([])
 const comment = ref('')
 const submitting = ref(false)
+
+// Issuance State
+const showIssueModal = ref(false)
+const createdEkOrder = ref(null)
+const itemsToIssue = ref([])
 
 const filteredProducts = computed(() => {
   if (!search.value) return variants.value
@@ -252,14 +271,29 @@ const removeItem = (item) => {
 const submitEK = async () => {
   submitting.value = true
   try {
-    await health_store.post('/ek/', {
+    const res = await health_store.post('/ek/', {
       items: cart.value,
       total_amount: total.value,
       comment: comment.value
     })
+    
+    // Success - Prepare for issuance
+    createdEkOrder.value = res.data
+    itemsToIssue.value = cart.value.map(item => ({
+      variant_id: item.variant_id,
+      quantity: item.quantity,
+      maxQuantity: item.quantity
+    }))
+    
+    // Close Add Modal and Open Issue Modal
     showAddModal.value = false
+    showIssueModal.value = true
+    
+    // Clear form
+    // cart.value = [] // Keep cart for reference if needed, or clear. Clearing is safer.
     cart.value = []
     comment.value = ''
+    
     fetchExpenses()
   } catch (e) {
     alert('Ошибка при создании')
@@ -268,6 +302,45 @@ const submitEK = async () => {
     submitting.value = false
   }
 }
+
+const handleIssueSuccess = async (response) => {
+  const issuedItems = response.issued_items || []
+  const issuedQuantities = {} 
+  issuedItems.forEach(item => issuedQuantities[item.variant_id] = item.quantity)
+  
+  // Update issued_quantity in EK API
+  // Note: EK API doesn't have partial update for nested array easily exposed OR we might have added it?
+  // We added PATCH /{ek_id}/issue which updates ONE item at a time.
+  // We need to iterate.
+  
+  if (createdEkOrder.value) {
+     for (const item of itemsToIssue.value) {
+        const qty = issuedQuantities[item.variant_id]
+        if (qty) {
+           try {
+              await health_store.patch(`/ek/${createdEkOrder.value._id}/issue`, {
+                 variant_id: item.variant_id,
+                 quantity: qty
+              })
+           } catch(e) {
+              console.error('Failed to update EK issuance status', e)
+           }
+        }
+     }
+  }
+  
+  showIssueModal.value = false
+  createdEkOrder.value = null
+  fetchExpenses() // Refresh list to show potential status updates if any
+}
+
+const handleIssueError = () => {
+  // Even if issuance fails, the order was created.
+  showIssueModal.value = false
+  createdEkOrder.value = null
+  fetchExpenses()
+}
+
 
 const formatDate = (d) => new Date(d).toLocaleString('ru-RU')
 

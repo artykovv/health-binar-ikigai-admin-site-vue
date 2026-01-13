@@ -332,6 +332,18 @@ const routes = [
         name: 'StockReceiptNew',
         component: StockReceipt,
         meta: { title: 'Новый приход' }
+      },
+      {
+        path: 'warehouses',
+        name: 'Warehouses',
+        component: () => import('@/views/products/Warehouses.vue'),
+        meta: { title: 'Склады' }
+      },
+      {
+        path: 'inventory-movements',
+        name: 'InventoryMovements',
+        component: () => import('@/views/products/InventoryMovements.vue'),
+        meta: { title: 'Движение товаров' }
       }
     ]
   },
