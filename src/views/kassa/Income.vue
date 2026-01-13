@@ -107,8 +107,13 @@
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                   <div class="flex items-center gap-2">
-                    <div v-if="tx.images?.length > 0" class="flex-shrink-0 w-8 h-8 rounded overflow-hidden bg-gray-100">
-                      <img :src="tx.images[0].url" class="w-full h-full object-cover">
+                    <div v-if="tx.images?.length > 0" class="flex-shrink-0 w-8 h-8 rounded overflow-hidden bg-gray-100 flex items-center justify-center">
+                      <img v-if="!isPdf(tx.images[0].url)" :src="tx.images[0].url" class="w-full h-full object-cover">
+                      <a v-else :href="tx.images[0].url" target="_blank" class="text-red-500" @click.stop title="Открыть PDF">
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                          </svg>
+                      </a>
                     </div>
                     <span>{{ tx.description || 'Без описания' }}</span>
                   </div>
@@ -118,7 +123,7 @@
                     <span 
                       v-for="tag in tx.tags" 
                       :key="tag.id"
-                      class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                      class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
                     >
                       {{ tag.name }}
                     </span>
@@ -126,9 +131,9 @@
                   </div>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-green-600 dark:text-green-400">
-                  +{{ formatUSD(tx.amount) }}
+                  +{{ formatPrice(tx.amount) }}
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-green-600 dark:text-green-300">
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-green-600 dark:text-green-500">
                   {{ toSOM(tx.amount).toLocaleString() }}
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm">
@@ -327,19 +332,26 @@
 
             <!-- Images -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Изображения (подтверждения)</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Изображения (чеки)</label>
               <div class="flex flex-wrap gap-2 mb-2">
-                <div v-for="(img, idx) in form.images" :key="idx" class="relative w-20 h-20 group">
-                  <img :src="img.url" class="w-full h-full object-cover rounded-lg">
-                  <button 
-                    @click.prevent="removeImage(idx)" 
-                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                  >
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                  </button>
-                </div>
+                <template v-for="(img, idx) in form.images" :key="idx">
+                  <div class="relative w-20 h-20 group">
+                    <img v-if="!isPdf(img.url)" :src="img.url" class="w-full h-full object-cover rounded-lg">
+                    <a v-else :href="img.url" target="_blank" class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </a>
+                    <button 
+                      @click.prevent="removeImage(idx)" 
+                      class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    >
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </template>
                 <button 
                   @click.prevent="openImageUpload"
                   type="button"
@@ -417,14 +429,18 @@ const defaultForm = {
   description: '',
   date: new Date().toISOString().slice(0, 16),
   category_id: null,
-  category_id: null,
   payments: [],
   tag_ids: [],
+  payment_method_id: null,
   user_id: null,
   images: []
 }
 
 const form = ref({ ...defaultForm })
+
+const isPdf = (url) => {
+  return url?.toLowerCase().endsWith('.pdf')
+}
 
 // Methods
 const fetchData = async () => {

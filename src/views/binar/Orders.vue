@@ -263,14 +263,26 @@
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.payment_method?.name || '-' }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white" @click.stop>
                         <div v-if="order.images && order.images.length > 0" class="flex gap-1">
-                          <img 
-                            v-for="img in order.images.slice(0, 3)" 
-                            :key="img.url"
-                            :src="img.url" 
-                            :alt="img.alt"
-                            class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
-                            @click="openImagePreview(img.url)"
-                          >
+                          <template v-for="img in order.images.slice(0, 3)" :key="img.url">
+                            <img 
+                              v-if="!isPdf(img.url)"
+                              :src="img.url" 
+                              :alt="img.alt"
+                              class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
+                              @click="openImagePreview(img.url)"
+                            >
+                            <a 
+                              v-else 
+                              :href="img.url" 
+                              target="_blank" 
+                              class="w-8 h-8 rounded border-2 border-white dark:border-gray-700 bg-red-50 hover:bg-red-100 flex items-center justify-center hover:z-10 transition-colors"
+                              title="Открыть PDF"
+                            >
+                              <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                              </svg>
+                            </a>
+                          </template>
                           <span v-if="order.images.length > 3" class="text-xs text-gray-500 dark:text-gray-400 self-center">
                             +{{ order.images.length - 3 }}
                           </span>
@@ -420,6 +432,10 @@ const addContractModalVisible = ref(false)
 // Health Day Modal
 const addHealthDayModalVisible = ref(false)
 const previewImage = ref(null)
+
+const isPdf = (url) => {
+  return url?.toLowerCase().endsWith('.pdf')
+}
 
 // Установка вкладки с сохранением в URL
 const setTab = (tab) => {

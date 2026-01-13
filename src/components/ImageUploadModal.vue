@@ -23,18 +23,29 @@
         <div class="p-6">
           <div class="space-y-6">
             
-            <!-- Uploaded Image Preview (if exists) -->
+                <!-- Uploaded Image/File Preview (if exists) -->
             <div v-if="uploadedImage" class="space-y-4">
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Загруженное изображение
+                Загруженный файл
               </label>
               
               <div class="relative group max-w-md mx-auto">
+                <!-- Image Preview -->
                 <img 
+                  v-if="isImage(uploadedImage)"
                   :src="uploadedImage.url" 
                   :alt="uploadedImage.filename"
                   class="w-full h-64 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600"
                 />
+                
+                <!-- PDF Preview/Icon -->
+                <div v-else class="w-full h-64 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg border-2 border-gray-200 dark:border-gray-600">
+                  <svg class="w-16 h-16 text-red-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ uploadedImage.filename }}</p>
+                  <a :href="uploadedImage.url" target="_blank" class="text-xs text-blue-600 hover:underline mt-1">Открыть PDF</a>
+                </div>
                 
                 <!-- Delete button -->
                 <button
@@ -88,7 +99,7 @@
                 <input
                   ref="fileInput"
                   type="file"
-                  accept="image/*"
+                  accept="image/*,application/pdf"
                   @change="handleFileSelect"
                   class="hidden"
                 />
@@ -106,7 +117,7 @@
                     или перетащите его сюда
                   </p>
                   <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                    PNG, JPG, GIF до 10MB
+                    PNG, JPG, PDF до 10MB
                   </p>
                 </div>
                 
@@ -161,7 +172,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: 'Загрузка изображения'
+    default: 'Загрузка файла'
   },
   directory: {
     type: String,
@@ -213,10 +224,10 @@ const handleFileSelect = (event) => {
 const handleDrop = (event) => {
   isDragging.value = false
   const file = event.dataTransfer.files[0]
-  if (file && file.type.startsWith('image/')) {
+  if (file && (file.type.startsWith('image/') || file.type === 'application/pdf')) {
     uploadFile(file)
   } else {
-    errorMessage.value = 'Пожалуйста, выберите файл изображения'
+    errorMessage.value = 'Пожалуйста, выберите файл изображения или PDF'
   }
 }
 
@@ -228,8 +239,8 @@ const uploadFile = async (file) => {
   }
   
   // Validate file type
-  if (!file.type.startsWith('image/')) {
-    errorMessage.value = 'Пожалуйста, выберите файл изображения'
+  if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+    errorMessage.value = 'Пожалуйста, выберите файл изображения или PDF'
     return
   }
   
@@ -263,12 +274,12 @@ const uploadFile = async (file) => {
       url: response.data.url,
       filename: response.data.filename,
       size: response.data.size,
-      content_type: response.data.content_type
+      content_type: response.data.content_type || file.type
     }
     
   } catch (error) {
-    console.error('Ошибка загрузки изображения:', error)
-    errorMessage.value = error.response?.data?.detail || 'Ошибка загрузки изображения'
+    console.error('Ошибка загрузки файла:', error)
+    errorMessage.value = error.response?.data?.detail || 'Ошибка загрузки файла'
   } finally {
     uploading.value = false
   }
@@ -283,11 +294,18 @@ const confirmUpload = () => {
   if (uploadedImage.value) {
     emit('uploaded', {
       url: uploadedImage.value.url,
+      filename: uploadedImage.value.filename,
+      content_type: uploadedImage.value.content_type
       // We pass the URL back to the parent to fill the "src" field
     })
     resetState()
     emit('close')
   }
+}
+
+const isImage = (file) => {
+  return file.content_type?.startsWith('image/') || 
+         file.filename?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
 }
 
 const formatFileSize = (bytes) => {

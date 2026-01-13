@@ -71,14 +71,26 @@
                 </td>
                 <td class="px-4 py-3 text-sm">
                   <div v-if="contract.images?.length > 0" class="flex gap-1">
-                    <img 
-                      v-for="img in contract.images.slice(0, 3)" 
-                      :key="img.url"
-                      :src="img.url" 
-                      :alt="img.alt"
-                      class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
-                      @click="openImagePreview(img.url)"
-                    >
+                    <template v-for="img in contract.images.slice(0, 3)" :key="img.url">
+                      <img 
+                        v-if="!isPdf(img.url)"
+                        :src="img.url" 
+                        :alt="img.alt"
+                        class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
+                        @click="openImagePreview(img.url)"
+                      >
+                      <a 
+                        v-else 
+                        :href="img.url" 
+                        target="_blank" 
+                        class="w-8 h-8 rounded border-2 border-white dark:border-gray-700 bg-red-50 hover:bg-red-100 flex items-center justify-center hover:z-10 transition-colors"
+                        title="Открыть PDF"
+                      >
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                      </a>
+                    </template>
                     <span v-if="contract.images.length > 3" class="text-xs text-gray-500 dark:text-gray-400 self-center">
                       +{{ contract.images.length - 3 }}
                     </span>
@@ -256,17 +268,24 @@
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Изображения (чеки, подтверждения)</label>
               <div class="flex flex-wrap gap-2 mb-2">
-                <div v-for="(img, idx) in form.images" :key="idx" class="relative w-20 h-20 group">
-                  <img :src="img.url" class="w-full h-full object-cover rounded-lg">
-                  <button
-                    @click.prevent="removeImage(idx)"
-                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                  >
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                  </button>
-                </div>
+                <template v-for="(img, idx) in form.images" :key="idx">
+                  <div class="relative w-20 h-20 group">
+                    <img v-if="!isPdf(img.url)" :src="img.url" class="w-full h-full object-cover rounded-lg">
+                    <a v-else :href="img.url" target="_blank" class="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg">
+                        <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </a>
+                    <button 
+                      @click.prevent="removeImage(idx)" 
+                      class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    >
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                </template>
                 <button
                   @click.prevent="openImageUpload"
                   type="button"
@@ -347,13 +366,25 @@
                                 </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm">
                                     <div v-if="c.images?.length" class="flex gap-1">
+                                      <template v-for="img in c.images" :key="img.id">
                                         <img 
-                                          v-for="img in c.images" 
-                                          :key="img.id" 
+                                          v-if="!isPdf(img.url)"
                                           :src="img.url" 
                                           class="w-8 h-8 object-cover rounded cursor-pointer"
                                           @click="openImagePreview(img.url)"
                                         >
+                                        <a 
+                                            v-else 
+                                            :href="img.url" 
+                                            target="_blank" 
+                                            class="w-8 h-8 rounded border-2 border-white dark:border-gray-700 bg-red-50 hover:bg-red-100 flex items-center justify-center hover:z-10 transition-colors"
+                                            title="Открыть PDF"
+                                          >
+                                            <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                            </svg>
+                                          </a>
+                                      </template>
                                     </div>
                                     <span v-else>-</span>
                                 </td>
@@ -416,6 +447,10 @@ const searchQuery = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
 const somAmount = ref(0) // New ref for SOM amount
+
+const isPdf = (url) => {
+  return url?.toLowerCase().endsWith('.pdf')
+}
 
 // Participant search
 const participantSearchQuery = ref('')

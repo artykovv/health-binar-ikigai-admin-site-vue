@@ -39,14 +39,26 @@
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate" :title="payment.description">{{ payment.description || '-' }}</td>
                 <td class="px-4 py-3 text-sm">
                   <div v-if="payment.images && payment.images.length > 0" class="flex gap-1">
-                    <img 
-                      v-for="img in payment.images.slice(0, 3)" 
-                      :key="img.url"
-                      :src="img.url" 
-                      :alt="img.alt"
-                      class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
-                      @click="openImagePreview(img.url)"
-                    >
+                    <template v-for="img in payment.images.slice(0, 3)" :key="img.url">
+                      <img 
+                        v-if="!isPdf(img.url)"
+                        :src="img.url" 
+                        :alt="img.alt"
+                        class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
+                        @click="openImagePreview(img.url)"
+                      >
+                      <a 
+                        v-else 
+                        :href="img.url" 
+                        target="_blank" 
+                        class="w-8 h-8 rounded border-2 border-white dark:border-gray-700 bg-red-50 hover:bg-red-100 flex items-center justify-center hover:z-10 transition-colors"
+                        title="Открыть PDF"
+                      >
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                      </a>
+                    </template>
                     <span v-if="payment.images.length > 3" class="text-xs text-gray-500 dark:text-gray-400 self-center">
                       +{{ payment.images.length - 3 }}
                     </span>
@@ -84,14 +96,9 @@
       </div>
     </div>
 
-    <!-- Image Preview Modal -->
-    <div v-if="previewImage" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4" @click="previewImage = null">
-      <button class="absolute top-4 right-4 text-white hover:text-gray-300 z-10">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
-      </button>
-      <img :src="previewImage" class="max-w-full max-h-full object-contain" @click.stop>
+    <!-- Fullscreen Image -->
+    <div v-if="fullscreenImage" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 cursor-zoom-out" @click="fullscreenImage = null">
+      <img :src="fullscreenImage" class="max-w-full max-h-full object-contain">
     </div>
   </div>
 </template>
@@ -106,7 +113,11 @@ const payments = ref([])
 const loading = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(20)
-const previewImage = ref(null)
+const fullscreenImage = ref(null)
+
+const isPdf = (url) => {
+  return url?.toLowerCase().endsWith('.pdf')
+}
 
 const fetchPayments = async () => {
     loading.value = true

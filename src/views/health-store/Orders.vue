@@ -69,13 +69,28 @@
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm">
                   <div v-if="order.images && order.images.length > 0" class="flex -space-x-2">
-                    <img 
-                      v-for="(img, idx) in order.images.slice(0, 3)" 
-                      :key="img.id"
-                      :src="img.image_path" 
-                      @click.stop="openLightbox(img.image_path)"
-                      class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-700 object-cover cursor-zoom-in hover:z-10"
-                    />
+                    <template v-for="(img, idx) in order.images.slice(0, 3)" :key="img.id">
+                      <!-- Image -->
+                      <img 
+                        v-if="!isPdf(img.image_path)"
+                        :src="img.image_path" 
+                        @click.stop="openLightbox(img.image_path)"
+                        class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-700 object-cover cursor-zoom-in hover:z-10 bg-white"
+                      />
+                      <!-- PDF Icon -->
+                      <a 
+                        v-else
+                        :href="img.image_path"
+                        target="_blank"
+                        @click.stop
+                        class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-700 bg-red-50 hover:bg-red-100 flex items-center justify-center hover:z-10 transition-colors"
+                        title="Открыть PDF"
+                      >
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                      </a>
+                    </template>
                     <div v-if="order.images.length > 3" class="w-8 h-8 rounded-full border-2 border-white dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-[10px] font-bold text-gray-600 dark:text-gray-300">
                       +{{ order.images.length - 3 }}
                     </div>
@@ -186,13 +201,27 @@
             <div class="mt-4" v-if="selectedOrder.images && selectedOrder.images.length > 0">
               <h4 class="text-sm font-semibold mb-2 dark:text-white">Изображения:</h4>
               <div class="flex flex-wrap gap-2">
-                <img 
-                  v-for="img in selectedOrder.images" 
-                  :key="img.id"
-                  :src="img.image_path" 
-                  @click="openLightbox(img.image_path)"
-                  class="w-20 h-20 rounded-lg border border-gray-200 dark:border-gray-700 object-cover cursor-zoom-in hover:opacity-90 transition-opacity"
-                />
+                <template v-for="img in selectedOrder.images" :key="img.id">
+                  <!-- Image -->
+                  <img 
+                    v-if="!isPdf(img.image_path)"
+                    :src="img.image_path" 
+                    @click="openLightbox(img.image_path)"
+                    class="w-20 h-20 rounded-lg border border-gray-200 dark:border-gray-700 object-cover cursor-zoom-in hover:opacity-90 transition-opacity bg-white"
+                  />
+                  <!-- PDF -->
+                  <a 
+                    v-else
+                    :href="img.image_path"
+                    target="_blank"
+                    class="w-20 h-20 flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  >
+                    <svg class="w-8 h-8 text-red-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-[8px] text-gray-500 uppercase font-bold">PDF</span>
+                  </a>
+                </template>
               </div>
             </div>
           </div>
@@ -276,6 +305,10 @@ const totalPriceForIssue = computed(() => {
 
 const openLightbox = (url) => {
   lightboxImage.value = url
+}
+
+const isPdf = (url) => {
+  return url?.toLowerCase().endsWith('.pdf')
 }
 
 const fetchInitialData = async () => {

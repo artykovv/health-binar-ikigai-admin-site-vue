@@ -210,10 +210,29 @@
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Изображения (чеки, подтверждения)</label>
               <div class="flex flex-wrap gap-2 mb-2">
                 <div v-for="(img, idx) in images" :key="idx" class="relative w-20 h-20 group">
-                  <img :src="img.url" class="w-full h-full object-cover rounded-lg">
+                  <!-- Image Preview -->
+                  <img 
+                    v-if="isImage(img)"
+                    :src="img.url" 
+                    class="w-full h-full object-cover rounded-lg"
+                  >
+                  <!-- PDF Preview -->
+                  <a 
+                    v-else 
+                    :href="img.url" 
+                    target="_blank"
+                    class="w-full h-full flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    title="Открыть PDF"
+                  >
+                    <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-[8px] text-gray-500 mt-1 truncate w-16 text-center">{{ img.filename }}</span>
+                  </a>
+
                   <button
                     @click.prevent="removeImage(idx)"
-                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
                   >
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -534,8 +553,15 @@ const handleImageUploaded = (data) => {
   images.value.push({
     url: data.url,
     alt: data.filename || 'HealthDay order document',
-    order: images.value.length
+    order: images.value.length,
+    content_type: data.content_type,
+    filename: data.filename
   })
+}
+
+const isImage = (file) => {
+  return file.content_type?.startsWith('image/') || 
+         file.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)
 }
 
 const removeImage = (index) => {
