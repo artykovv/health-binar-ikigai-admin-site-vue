@@ -1,136 +1,141 @@
 <template>
-  <div class="container mx-auto px-4 py-6">
+  <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
       <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold dark:text-white">Бинарная система</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-2">Управление бинарной структурой и участниками</p>
+      <div class="mb-10">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">Бинарная система</h1>
+        <p class="text-gray-500 dark:text-gray-400">Управление бинарной структурой и участниками</p>
       </div>
 
-      <!-- Stats Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white dark:bg-[#3f3f47] rounded-lg shadow-sm border dark:border-gray-600 p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-              <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <!-- Participants -->
+        <div class="group bg-white dark:bg-[#3f3f47] p-6 rounded-[24px] shadow-sm border dark:border-gray-700 hover:shadow-md transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-3 bg-blue-50 dark:bg-blue-500/10 rounded-2xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Всего участников</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ counts.total_participants || 0 }}</p>
-            </div>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Участники</span>
+          </div>
+          <div>
+            <p class="text-3xl font-black text-gray-900 dark:text-white">{{ counts.total_participants || 0 }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Всего участников</p>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-[#3f3f47] rounded-lg shadow-sm border dark:border-gray-600 p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-              <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+        <!-- Registered -->
+        <div class="group bg-white dark:bg-[#3f3f47] p-6 rounded-[24px] shadow-sm border dark:border-gray-700 hover:shadow-md transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Зарегистрированы</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ counts.registered || 0 }}</p>
-            </div>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Зарегистрированы</span>
+          </div>
+          <div>
+            <p class="text-3xl font-black text-gray-900 dark:text-white">{{ counts.registered || 0 }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Активных пользователей</p>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-[#3f3f47] rounded-lg shadow-sm border dark:border-gray-600 p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
-              <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        <!-- Branches -->
+        <div class="group bg-white dark:bg-[#3f3f47] p-6 rounded-[24px] shadow-sm border dark:border-gray-700 hover:shadow-md transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-3 bg-amber-50 dark:bg-amber-500/10 rounded-2xl text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Филиалы</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ counts.branches_count || 0 }}</p>
-            </div>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Филиалы</span>
+          </div>
+          <div>
+            <p class="text-3xl font-black text-gray-900 dark:text-white">{{ counts.branches_count || 0 }}</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Активных филиалов</p>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-[#3f3f47] rounded-lg shadow-sm border dark:border-gray-600 p-6">
-          <div class="flex items-center">
-            <div class="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
-              <svg class="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+        <!-- Turnover -->
+        <div class="group bg-white dark:bg-[#3f3f47] p-6 rounded-[24px] shadow-sm border dark:border-gray-700 hover:shadow-md transition-all duration-300">
+          <div class="flex items-center justify-between mb-4">
+            <div class="p-3 bg-purple-50 dark:bg-purple-500/10 rounded-2xl text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
-            <div class="ml-4">
-              <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Общий оборот</p>
-              <p class="text-2xl font-semibold text-gray-500 dark:text-gray-300">—</p>
-            </div>
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Оборот</span>
+          </div>
+          <div>
+            <p class="text-3xl font-black text-gray-900 dark:text-white">—</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Общий оборот</p>
           </div>
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white dark:bg-[#3f3f47] rounded-lg shadow-sm border dark:border-gray-600 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Быстрые действия</h3>
-          <div class="space-y-3">
-            <router-link to="/binar/participants" class="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-[#4a4a52] transition-colors">
-              <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg mr-3">
-                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="font-medium text-gray-900 dark:text-white">Управление участниками</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Просмотр и редактирование участников</p>
-              </div>
-            </router-link>
-
-            <router-link to="/binar/structure" class="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-[#4a4a52] transition-colors">
-              <div class="p-2 bg-green-100 dark:bg-green-900 rounded-lg mr-3">
-                <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="font-medium text-gray-900 dark:text-white">Структура</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Просмотр бинарной структуры</p>
-              </div>
-            </router-link>
-
-            <router-link to="/binar/registration" class="flex items-center p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-[#4a4a52] transition-colors">
-              <div class="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg mr-3">
-                <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                </svg>
-              </div>
-              <div>
-                <p class="font-medium text-gray-900 dark:text-white">Регистрации</p>
-                <p class="text-sm text-gray-600 dark:text-gray-400">Управление регистрациями</p>
-              </div>
-            </router-link>
-          </div>
-        </div>
-
-        <div class="bg-white dark:bg-[#3f3f47] rounded-lg shadow-sm border dark:border-gray-600 p-6">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Последние бонусы</h3>
-          <div class="flex-1 overflow-y-auto">
-            <div v-if="bonusLogs.loading" class="flex items-center justify-center h-40">
-              <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
-            </div>
-            <div v-else-if="bonusLogs.logs.length === 0" class="flex items-center justify-center h-40 text-gray-400 dark:text-gray-500">
-              <span class="text-sm">Нет данных</span>
-            </div>
-            <div v-else class="space-y-3 max-h-64 overflow-y-auto">
-              <div v-for="log in bonusLogs.logs" :key="log.id" class="border-l-4 border-blue-500 pl-3 py-2">
-                <div class="flex justify-between items-start">
-                  <div class="flex-1">
-                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ log.participant }}</div>
-                    <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">{{ log.description }}</div>
-                  </div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400 ml-2 whitespace-nowrap">
-                    {{ formatLogTime(log.timestamp) }}
-                  </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        <!-- Quick Actions -->
+        <div class="lg:col-span-1 space-y-6">
+          <div class="bg-white dark:bg-[#3f3f47] p-6 rounded-[24px] shadow-sm border dark:border-gray-700">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Быстрые действия</h3>
+            <div class="space-y-3">
+              <router-link to="/binar/participants" class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all group">
+                <div class="p-2 bg-white dark:bg-gray-700 rounded-xl group-hover:bg-opacity-20">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
                 </div>
-                <div class="mt-1">
-                  <span :class="getBonusTypeClass(log.bonus_type)" class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium">
+                <div class="flex flex-col">
+                  <span class="font-bold">Участники</span>
+                  <span class="text-xs opacity-70">Управление структурой</span>
+                </div>
+              </router-link>
+
+              <router-link to="/binar/structure" class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all group">
+                <div class="p-2 bg-white dark:bg-gray-700 rounded-xl group-hover:bg-opacity-20">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-bold">Структура</span>
+                  <span class="text-xs opacity-70">Бинарное дерево</span>
+                </div>
+              </router-link>
+
+              <router-link to="/binar/registration" class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 dark:bg-gray-800 hover:bg-black dark:hover:bg-white hover:text-white dark:hover:text-black transition-all group">
+                <div class="p-2 bg-white dark:bg-gray-700 rounded-xl group-hover:bg-opacity-20">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                </div>
+                <div class="flex flex-col">
+                  <span class="font-bold">Регистрации</span>
+                  <span class="text-xs opacity-70">Новые пользователи</span>
+                </div>
+              </router-link>
+            </div>
+          </div>
+          
+          <!-- Last Bonuses (Moved to sidebar for layout balance) -->
+          <div class="bg-white dark:bg-[#3f3f47] p-6 rounded-[24px] shadow-sm border dark:border-gray-700 max-h-[400px] overflow-hidden flex flex-col">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Последние действия</h3>
+            <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+              <div v-if="bonusLogs.loading" class="flex items-center justify-center h-20">
+                <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+              </div>
+              <div v-else-if="bonusLogs.logs.length === 0" class="flex items-center justify-center h-20 text-gray-400 dark:text-gray-500">
+                <span class="text-sm">Нет данных</span>
+              </div>
+              <div v-else class="space-y-3">
+                <div v-for="log in bonusLogs.logs" :key="log.id" class="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                  <div class="flex justify-between items-start mb-1">
+                    <span class="text-xs font-bold text-gray-900 dark:text-white line-clamp-1">{{ log.participant }}</span>
+                    <span class="text-[10px] text-gray-400 whitespace-nowrap">{{ formatLogTime(log.timestamp).split(',')[0] }}</span>
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 line-clamp-2">{{ log.description }}</p>
+                  <span :class="getBonusTypeClass(log.bonus_type)" class="inline-flex items-center rounded-lg px-2 py-1 text-[10px] font-medium">
                     {{ getBonusTypeText(log.bonus_type) }}
                   </span>
                 </div>
@@ -138,19 +143,22 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Registrations by day (chart) -->
-      <div class="bg-white dark:bg-[#3f3f47] rounded-lg shadow-sm border dark:border-gray-600 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Активность за последние 7 дней</h3>
-        <div class="h-64 relative">
-          <div v-if="registrations.loading" class="flex items-center justify-center h-full">
-            <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+        <!-- Charts (expanded to 2 cols) -->
+        <div class="lg:col-span-2 space-y-6">
+           <!-- Activity Chart -->
+           <div class="bg-white dark:bg-[#3f3f47] p-6 rounded-[24px] shadow-sm border dark:border-gray-700 h-96">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-6">Активность регистраций</h3>
+            <div class="h-[calc(100%-3rem)] w-full relative">
+              <div v-if="registrations.loading" class="flex items-center justify-center h-full">
+                <span class="inline-block h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+              </div>
+              <div v-else-if="registrations.daily_registrations.length === 0" class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
+                <span class="text-sm">Нет данных по регистрациям</span>
+              </div>
+              <canvas v-else ref="chartCanvas" class="w-full h-full"></canvas>
+            </div>
           </div>
-          <div v-else-if="registrations.daily_registrations.length === 0" class="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">
-            <span class="text-sm">Нет данных</span>
-          </div>
-          <canvas v-else ref="chartCanvas" class="w-full h-full"></canvas>
         </div>
       </div>
     </div>
