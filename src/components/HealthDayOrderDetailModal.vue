@@ -54,8 +54,8 @@
               <p class="text-sm font-bold text-gray-900 dark:text-white">{{ formatDate(orderDetail.created_at) }}</p>
             </div>
             <div>
-              <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Общая сумма</p>
-              <p class="text-sm font-bold text-gray-900 dark:text-white">${{ orderDetail.total_amount }}</p>
+              <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Общая сумма (сом)</p>
+              <p class="text-sm font-bold text-gray-900 dark:text-white">{{ Math.round(orderDetail.total_amount * 88).toLocaleString() }} сом</p>
             </div>
 
           </div>
@@ -104,10 +104,10 @@
                       {{ getVariantName(item.variant_id) }}
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <span class="line-through text-gray-400 dark:text-gray-500">${{ item.original_price }}</span>
+                      <span class="line-through text-gray-400 dark:text-gray-500">{{ Math.round(item.original_price * 88).toLocaleString() }} сом</span>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <span class="font-semibold text-green-600 dark:text-green-400">${{ item.discounted_price }}</span>
+                      <span class="font-semibold text-green-600 dark:text-green-400">{{ Math.round(item.discounted_price * 88).toLocaleString() }} сом</span>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.quantity }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm">
@@ -122,7 +122,7 @@
                       </span>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <span class="font-semibold">${{ item.subtotal }}</span>
+                      <span class="font-semibold">{{ Math.round(item.subtotal * 88).toLocaleString() }} сом</span>
                     </td>
                   </tr>
                 </tbody>
@@ -148,13 +148,14 @@
       </div>
     </div>
       
-      <!-- Health Day Order Details Modal Component -->
+      <!-- TODO надо поработать -->
+      <!-- Health Day Order Details Modal Component
       <HealthDayOrderDetailsModal
         v-if="detailsVisible"
         :visible="detailsVisible"
         :order-id="props.orderId || orderDetail?.id"
         @close="detailsVisible = false"
-      />
+      /> -->
 
       <!-- Issue Items Modal -->
       <IssueItemsModal

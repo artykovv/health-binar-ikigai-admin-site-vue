@@ -40,9 +40,8 @@
                     {{ item.name }} x{{ item.quantity }}
                   </div>
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-blue-600 dark:text-blue-400">
-                  ${{ exp.total_amount.toFixed(2) }}
-                  <div class="text-[10px] text-emerald-600 font-medium">{{ (exp.total_amount * 88).toLocaleString() }} сом</div>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-emerald-600 dark:text-emerald-400">
+                  {{ Math.round(exp.total_amount).toLocaleString() }} сом
                 </td>
                 <td class="px-4 py-3 text-xs dark:text-gray-300 max-w-xs truncate">
                   {{ exp.comment || '-' }}
@@ -96,9 +95,8 @@
                     <div class="flex-1">
                       <div class="text-sm font-semibold dark:text-white">{{ variant.full_name }}</div>
                       <div class="flex items-center gap-4 mt-1">
-                        <div class="flex gap-2 text-sm font-bold">
-                          <span class="text-blue-600 dark:text-blue-400">${{ variant.price }}</span>
-                          <span class="text-emerald-600 dark:text-emerald-400">{{ (variant.price * 88).toLocaleString() }} сом</span>
+                        <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                          {{ Math.round(variant.price).toLocaleString() }} сом
                         </div>
                       </div>
                     </div>
@@ -128,9 +126,8 @@
                 >
                   <div class="flex-1 min-w-0 mr-3">
                     <div class="text-xs font-bold truncate dark:text-white">{{ item.name }}</div>
-                    <div class="flex gap-2 text-xs font-bold mt-1">
-                      <span class="text-blue-600 dark:text-blue-400">${{ item.price }}</span>
-                      <span class="text-emerald-600 dark:text-emerald-400">{{ (item.price * 88).toLocaleString() }} сом</span>
+                    <div class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+                      {{ Math.round(item.price).toLocaleString() }} сом
                     </div>
                   </div>
                   
@@ -160,12 +157,9 @@
                 </div>
 
                 <div class="space-y-1">
-                  <div class="flex justify-between items-center text-lg font-bold text-gray-900 dark:text-white">
+                    <div class="flex justify-between items-center text-lg font-bold text-gray-900 dark:text-white">
                     <span>Итоговая оценка:</span>
-                    <div class="flex flex-col items-end">
-                      <span class="text-blue-600 dark:text-blue-400">${{ total.toFixed(2) }}</span>
-                      <span class="text-sm text-emerald-600 dark:text-emerald-500">{{ (total * 88).toLocaleString() }} сом</span>
-                    </div>
+                    <span class="text-emerald-600 dark:text-emerald-500">{{ Math.round(total).toLocaleString() }} сом</span>
                   </div>
                 </div>
 
@@ -241,7 +235,7 @@ const fetchVariants = async () => {
     const res = await store_api.get('/products/variants', { 
       params: { skip: 0, limit: 100, sort_order: 'asc' } 
     })
-    variants.value = res.data
+    variants.value = res.data.data
   } catch (e) { console.error(e) }
   finally { loadingVariants.value = false }
 }

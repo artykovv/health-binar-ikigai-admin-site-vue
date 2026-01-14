@@ -59,7 +59,7 @@
                   </div>
                 </div>
                 <div v-if="participant.contract_status && parseFloat(participant.contract_status.total_remaining_amount) > 0" class="text-right">
-                  <p class="font-bold text-gray-900 dark:text-white">${{ participant.contract_status.total_remaining_amount }}</p>
+                  <p class="font-bold text-gray-900 dark:text-white">{{ Math.round(parseFloat(participant.contract_status.total_remaining_amount)).toLocaleString() }} сом</p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">Остаток</p>
                 </div>
                 <div v-else class="text-right">
@@ -80,32 +80,12 @@
                   Количество участников: {{ selectedContracts.length }}
                 </p>
                 <p class="text-sm text-blue-700 dark:text-blue-300 font-semibold">
-                  Общая сумма: ${{ totalRemainingAmount.toFixed(2) }}
-                </p>
-              </div>
-              <div v-if="exchangeRate">
-                 <p class="text-sm text-blue-700 dark:text-blue-300 font-semibold">
-                  &nbsp;
-                </p>
-                <p class="text-sm text-blue-600 dark:text-blue-400 font-semibold">
-                  {{ Math.round(totalRemainingAmount * exchangeRate).toLocaleString() }} сом
+                  Общая сумма: {{ Math.round(totalRemainingAmount).toLocaleString() }} сом
                 </p>
               </div>
             </div>
           </div>
 
-          <!-- Exchange Rate Input -->
-          <div class="mb-4 p-3 bg-gray-50 dark:bg-[#4a4a52] border border-gray-200 dark:border-gray-600 rounded-lg">
-            <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Курс валюты (1$ = X сом)</label>
-            <input
-              v-model.number="exchangeRate"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="Введите курс (например, 88)"
-              class="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
-            />
-          </div>
 
           <div v-if="loadingProducts" class="text-center py-8">
             <span class="inline-block h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
@@ -118,7 +98,7 @@
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Название</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена</th>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена (сом)</th>
+
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Кол-во</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Остаток</th>
                 </tr>
@@ -142,10 +122,10 @@
                   </td>
                   <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ product.id }}</td>
                   <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ product.full_name }}</td>
-                  <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ product.price }}</td>
-                  <td class="px-4 py-2 whitespace-nowrap text-sm text-blue-600 dark:text-blue-400">
-                    {{ exchangeRate ? Math.round(product.price * exchangeRate).toLocaleString() : '-' }} сом
+                  <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    {{ Math.round(product.price).toLocaleString() }} сом
                   </td>
+
                   <td class="px-4 py-2 whitespace-nowrap" @click.stop>
                     <input
                       v-if="isProductSelected(product.id)"
@@ -228,8 +208,7 @@
             <div v-if="remainingAmount < 0" class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
               <p class="text-sm font-medium text-red-900 dark:text-red-200 mb-3">Доплата требуется</p>
               <p class="text-xs text-red-700 dark:text-red-300 mb-4">
-                Превышение бюджета: ${{ Math.abs(remainingAmount).toFixed(2) }} 
-                <span v-if="exchangeRate" class="font-bold ml-1">({{ Math.round(Math.abs(remainingAmount) * exchangeRate).toLocaleString() }} сом)</span>
+                Превышение бюджета: {{ Math.round(Math.abs(remainingAmount)).toLocaleString() }} сом
               </p>
               
               <div class="space-y-3">
@@ -242,10 +221,10 @@
                     min="0"
                     required
                     class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
-                    :placeholder="`Максимум: $${Math.abs(remainingAmount).toFixed(2)}`"
+                    :placeholder="`Максимум: ${Math.round(Math.abs(remainingAmount)).toLocaleString()}`"
                   />
-                  <p v-if="extraPaymentForm.amount && exchangeRate" class="mt-1 text-xs text-blue-600 dark:text-blue-400">
-                    {{ Math.round(extraPaymentForm.amount * exchangeRate).toLocaleString() }} сом
+                  <p class="mt-1 text-xs text-gray-500">
+                    Сумма в сомах
                   </p>
                 </div>
                 <div>
@@ -313,7 +292,8 @@
                 Количество участников: {{ selectedContracts.length }}
               </p>
               <p class="text-sm text-blue-700 dark:text-blue-300 font-semibold">
-                Общая сумма: ${{ totalRemainingAmount.toFixed(2) }}
+
+                Общая сумма: {{ Math.round(totalRemainingAmount).toLocaleString() }} сом
               </p>
             </div>
 
@@ -338,7 +318,7 @@
                       {{ getProductById(productId)?.full_name || '-' }}
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      ${{ getProductById(productId)?.price || 0 }}
+                      {{ Math.round(getProductById(productId)?.price).toLocaleString() }} сом
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       {{ getProductQuantity(productId) }}
@@ -352,27 +332,23 @@
             <div class="grid grid-cols-4 gap-4 p-3 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
               <div>
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Товары</p>
-                <p class="text-sm font-bold text-gray-900 dark:text-white">${{ selectedProductsTotal.toFixed(2) }}</p>
-                <p v-if="exchangeRate" class="text-xs text-blue-600 dark:text-blue-400">{{ Math.round(selectedProductsTotal * exchangeRate).toLocaleString() }} сом</p>
+                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ Math.round(selectedProductsTotal).toLocaleString() }} сом</p>
               </div>
               <div>
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Доступно</p>
-                <p class="text-sm font-bold text-gray-900 dark:text-white">${{ totalRemainingAmount.toFixed(2) }}</p>
-                <p v-if="exchangeRate" class="text-xs text-blue-600 dark:text-blue-400">{{ Math.round(totalRemainingAmount * exchangeRate).toLocaleString() }} сом</p>
+                <p class="text-sm font-bold text-gray-900 dark:text-white">{{ Math.round(totalRemainingAmount).toLocaleString() }} сом</p>
               </div>
               <div>
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Остаток</p>
                 <p class="text-sm font-bold" :class="remainingAmount >= 0 ? 'text-green-600' : 'text-red-600'">
-                  ${{ remainingAmount.toFixed(2) }}
+                  {{ Math.round(remainingAmount).toLocaleString() }} сом
                 </p>
-                <p v-if="exchangeRate" class="text-xs font-bold" :class="remainingAmount >= 0 ? 'text-green-600' : 'text-red-600'">{{ Math.round(remainingAmount * exchangeRate).toLocaleString() }} сом</p>
               </div>
               <div v-if="remainingAmount < 0">
                 <p class="text-xs text-red-600 dark:text-red-400 mb-1">Превышение</p>
                 <p class="text-sm font-bold text-red-600">
-                  ${{ Math.abs(remainingAmount).toFixed(2) }}
+                  {{ Math.round(Math.abs(remainingAmount)).toLocaleString() }} сом
                 </p>
-                <p v-if="exchangeRate" class="text-xs font-bold text-red-600">{{ Math.round(Math.abs(remainingAmount) * exchangeRate).toLocaleString() }} сом</p>
               </div>
             </div>
           </div>
@@ -384,25 +360,23 @@
           <div class="grid grid-cols-4 gap-4 p-3 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
             <div>
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Товары</p>
-              <p class="text-sm font-bold text-gray-900 dark:text-white">${{ selectedProductsTotal.toFixed(2) }}</p>
+              <p class="text-sm font-bold text-gray-900 dark:text-white">{{ Math.round(selectedProductsTotal).toLocaleString() }} сом</p>
             </div>
             <div>
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Доступно</p>
-              <p class="text-sm font-bold text-gray-900 dark:text-white">${{ totalRemainingAmount.toFixed(2) }}</p>
+              <p class="text-sm font-bold text-gray-900 dark:text-white">{{ Math.round(totalRemainingAmount).toLocaleString() }} сом</p>
             </div>
             <div>
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Остаток</p>
               <p class="text-sm font-bold" :class="remainingAmount >= 0 ? 'text-green-600' : 'text-red-600'">
-                ${{ remainingAmount.toFixed(2) }}
+                {{ Math.round(remainingAmount).toLocaleString() }} сом
               </p>
-              <p v-if="exchangeRate" class="text-xs font-bold" :class="remainingAmount >= 0 ? 'text-green-600' : 'text-red-600'">{{ Math.round(remainingAmount * exchangeRate).toLocaleString() }} сом</p>
             </div>
             <div v-if="remainingAmount < 0">
               <p class="text-xs text-red-600 dark:text-red-400 mb-1">Превышение</p>
               <p class="text-sm font-bold text-red-600">
-                ${{ Math.abs(remainingAmount).toFixed(2) }}
+                {{ Math.round(Math.abs(remainingAmount)).toLocaleString() }} сом
               </p>
-              <p v-if="exchangeRate" class="text-xs font-bold text-red-600">{{ Math.round(Math.abs(remainingAmount) * exchangeRate).toLocaleString() }} сом</p>
             </div>
           </div>
         </div>
@@ -530,6 +504,7 @@ const selectedProductsTotal = computed(() => {
     const product = availableProducts.value.find(p => p.id === productId)
     const quantity = productQuantities.value[productId] || 1
     if (product) {
+      // Price already in SOM
       return sum + (parseFloat(product.price || 0) * quantity)
     }
     return sum
@@ -648,7 +623,7 @@ const loadProducts = async () => {
   loadingProducts.value = true
   try {
     const response = await store_api.get('products/variants?skip=0&limit=100&is_binar=true&sort_order=asc')
-    availableProducts.value = response.data
+    availableProducts.value = response.data.data
   } catch (error) {
     console.error('Ошибка загрузки товаров:', error)
   } finally {
@@ -769,7 +744,7 @@ const createOrder = async () => {
         return {
           variant_id: productId,
           quantity: quantity,
-          price: product?.price || 0
+          price: Math.round(product?.price || 0) // Send SOM integer
         }
       }),
       contributions: selectedContracts.value.map(c => ({

@@ -119,8 +119,7 @@
                         </div>
                       </th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
-                      <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">USD</th>
-                      <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">СОМ</th>
+                      <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
                       <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Ответственный</th>
@@ -140,8 +139,7 @@
                     >
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.id }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch || '-' }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-blue-600 dark:text-blue-400">{{ formatUSD(order.total_amount) }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(order.total_amount).toLocaleString() }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ Math.round(order.total_amount).toLocaleString() }} сом</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
@@ -229,8 +227,7 @@
                     </th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Участник</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
-                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">USD</th>
-                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">СОМ</th>
+                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Способ оплаты</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Изображения</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
@@ -258,8 +255,7 @@
                         <span v-else class="text-gray-500 dark:text-gray-400">-</span>
                       </td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch?.name || '-' }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-blue-600 dark:text-blue-400">{{ formatUSD(order.total_amount) }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(order.total_amount).toLocaleString() }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ Math.round(parseFloat(order.total_amount)).toLocaleString() }} сом</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.payment_method?.name || '-' }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white" @click.stop>
                         <div v-if="order.images && order.images.length > 0" class="flex gap-1">
@@ -378,7 +374,7 @@
 import { ref, onMounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/api'
-import { formatUSD, toSOM } from '@/utils/currency'
+import { formatUSD } from '@/utils/currency'
 import OrderDetailModal from '@/components/OrderDetailModal.vue'
 import AddContractModal from '@/components/AddContractModal.vue'
 import AddHealthDayModal from '@/components/AddHealthDayModal.vue'

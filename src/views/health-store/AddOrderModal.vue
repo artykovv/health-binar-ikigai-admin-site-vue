@@ -38,8 +38,7 @@
                     <div class="text-sm font-semibold dark:text-white">{{ variant.full_name }}</div>
                     <div class="flex items-center gap-4 mt-1">
                       <div class="flex gap-2 text-sm font-bold">
-                        <span class="text-blue-600 dark:text-blue-400">{{ formatUSD(variant.price) }}</span>
-                        <span class="text-emerald-600 dark:text-emerald-400">{{ toSOM(variant.price).toLocaleString() }} сом</span>
+                        <span class="text-emerald-600 dark:text-emerald-400">{{ Math.round(variant.price).toLocaleString() }} сом</span>
                       </div>
                       <div class="text-[10px] px-2 py-0.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400">
                         Склад: {{ variant.stock }} шт
@@ -74,12 +73,10 @@
                   <div class="text-xs font-bold truncate dark:text-white">{{ item.full_name }}</div>
                   <div class="flex flex-col mt-0.5">
                     <div class="flex gap-2 text-[10px] text-gray-400 line-through" v-if="totalDiscountPercent > 0">
-                      <span>{{ formatUSD(item.price) }}</span>
-                      <span>{{ toSOM(item.price).toLocaleString() }}</span>
+                      <span>{{ Math.round(item.price).toLocaleString() }} сом</span>
                     </div>
                     <div class="flex gap-2 text-xs font-bold">
-                      <span class="text-blue-600 dark:text-blue-400">{{ formatUSD(calculateDiscountedPrice(item.price)) }}</span>
-                      <span class="text-emerald-600 dark:text-emerald-400">{{ toSOM(calculateDiscountedPrice(item.price)).toLocaleString() }}</span>
+                      <span class="text-emerald-600 dark:text-emerald-400">{{ Math.round(calculateDiscountedPrice(item.price)).toLocaleString() }} сом</span>
                     </div>
                   </div>
                 </div>
@@ -119,6 +116,14 @@
                   </select>
                 </div>
                 <div>
+                  <label class="block text-xs font-bold text-gray-400 uppercase mb-2 tracking-wider">Дата и время заказа</label>
+                  <input 
+                    v-model="orderDateTime" 
+                    type="datetime-local" 
+                    class="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                  >
+                </div>
+                <div>
                   <label class="block text-xs font-bold text-gray-400 uppercase mb-2 tracking-wider">Способы оплаты</label>
                   
                   <!-- Added Payments List -->
@@ -126,8 +131,7 @@
                     <div v-for="(payment, index) in payments" :key="index" class="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600">
                       <span class="text-xs font-bold dark:text-white flex-1">{{ payment.payment_method }}</span>
                       <div class="flex gap-1 text-[10px] font-bold">
-                        <span class="text-blue-600">{{ formatUSD(payment.amount) }}</span>
-                        <span class="text-emerald-600">{{ toSOM(payment.amount).toLocaleString() }}</span>
+                        <span class="text-emerald-600">{{ Math.round(payment.amount).toLocaleString() }} сом</span>
                       </div>
                       <button @click="removePayment(index)" class="text-red-500 hover:text-red-700">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -163,22 +167,9 @@
                     </select>
                     <div class="flex gap-2">
                       <div class="flex-1">
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">USD</label>
-                        <input 
-                          v-model.number="newPaymentAmountUSD" 
-                          @input="syncFromUSD"
-                          type="number" 
-                          step="0.01" 
-                          min="0"
-                          placeholder="0.00"
-                          class="w-full py-2 px-3 rounded-lg border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                        />
-                      </div>
-                      <div class="flex-1">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">СОМ</label>
                         <input 
                           v-model.number="newPaymentAmountSOM" 
-                          @input="syncFromSOM"
                           type="number" 
                           step="1" 
                           min="0"
@@ -188,7 +179,7 @@
                       </div>
                       <button 
                         @click="addPayment" 
-                        :disabled="!newPaymentMethod || !newPaymentAmountUSD || newPaymentAmountUSD <= 0"
+                        :disabled="!newPaymentMethod || !newPaymentAmountSOM || newPaymentAmountSOM <= 0"
                         class="self-end px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,14 +193,14 @@
                   <div v-if="payments.length > 0" class="mt-2 text-xs">
                     <div class="flex justify-between" :class="paymentDifference === 0 ? 'text-green-600' : 'text-red-600'">
                       <span>Оплачено:</span>
-                      <span class="font-bold">{{ formatUSD(totalPaid) }} / {{ formatUSD(total) }}</span>
+                      <span class="font-bold">{{ Math.round(totalPaid).toLocaleString() }} / {{ Math.round(total).toLocaleString() }} сом</span>
                     </div>
                     <div v-if="paymentDifference !== 0" class="text-red-600 font-bold">
-                      {{ paymentDifference > 0 ? 'Недостаточно:' : 'Переплата:' }} {{ formatUSD(Math.abs(paymentDifference)) }}
+                      {{ paymentDifference > 0 ? 'Недостаточно:' : 'Переплата:' }} {{ Math.round(Math.abs(paymentDifference)).toLocaleString() }} сом
                     </div>
                   </div>
                 </div>
-              </div>
+
               
               <!-- Description Input -->
               <div class="space-y-2">
@@ -227,22 +218,19 @@
                 <div class="flex justify-between items-center text-sm text-gray-600 dark:text-gray-400">
                   <span>Подытог:</span>
                   <div class="flex gap-2 font-bold">
-                    <span class="text-blue-600 dark:text-blue-400">{{ formatUSD(subtotal) }}</span>
-                    <span class="text-emerald-600 dark:text-emerald-400">{{ toSOM(subtotal).toLocaleString() }}</span>
+                    <span class="text-emerald-600 dark:text-emerald-400">{{ Math.round(subtotal).toLocaleString() }} сом</span>
                   </div>
                 </div>
                 <div v-if="discountAmount > 0" class="flex justify-between items-center text-sm text-green-600 dark:text-green-400">
                   <span>Скидка ({{ totalDiscountPercent }}%):</span>
                   <div class="flex gap-2 font-bold text-red-500">
-                    <span>-{{ formatUSD(discountAmount) }}</span>
-                    <span>-{{ toSOM(discountAmount).toLocaleString() }}</span>
+                    <span>-{{ Math.round(discountAmount).toLocaleString() }} сом</span>
                   </div>
                 </div>
                 <div class="flex justify-between items-center text-lg font-bold text-gray-900 dark:text-white pt-2 border-t border-gray-200 dark:border-gray-700">
                   <span>Итого:</span>
                   <div class="flex gap-3">
-                    <span class="text-blue-600 dark:text-blue-400">{{ formatUSD(total) }}</span>
-                    <span class="text-emerald-600 dark:text-emerald-400">{{ toSOM(total).toLocaleString() }}</span>
+                    <span class="text-emerald-600 dark:text-emerald-400">{{ Math.round(total).toLocaleString() }} сом</span>
                   </div>
                 </div>
               </div>
@@ -254,6 +242,7 @@
               >
                 {{ submitting ? 'Оформление...' : 'Создать заказ' }}
               </button>
+              </div>
             </div>
           </div>
         </div>
@@ -277,7 +266,6 @@
 import { ref, computed, onMounted, watch } from 'vue'
 
 import { health_store, store_api, kassa_api } from '@/api'
-import { formatUSD, toSOM, toUSD } from '@/utils/currency'
 import ImageUploadModal from '@/components/ImageUploadModal.vue'
 
 const props = defineProps({
@@ -304,10 +292,22 @@ const newPaymentAmountUSD = ref(null)
 const newPaymentAmountSOM = ref(null)
 
 const description = ref('')
+const orderDateTime = ref(getCurrentDateTime())
 
 const isUpdatingPayment = ref(false) // Flag to prevent circular updates
 const images = ref([])
 const imageModalOpen = ref(false)
+
+// Helper function to get current datetime in local format for datetime-local input
+function getCurrentDateTime() {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, '0')
+  const day = String(now.getDate()).padStart(2, '0')
+  const hours = String(now.getHours()).padStart(2, '0')
+  const minutes = String(now.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
 
 // Computed
 const filteredVariants = computed(() => {
@@ -352,7 +352,7 @@ const fetchInitialData = async () => {
       health_store.get('/employees/'),
       kassa_api.get('/payment-methods/', { params: { only_active: true } })
     ])
-    variants.value = prodRes.data
+    variants.value = prodRes.data.data
     sales.value = saleRes.data.filter(s => s.active)
     employees.value = empRes.data
     paymentMethods.value = kassaRes.data
@@ -389,39 +389,18 @@ const calculateItemPrice = (item) => {
 }
 
 const addPayment = () => {
-  if (!newPaymentMethod.value || !newPaymentAmountUSD.value || newPaymentAmountUSD.value <= 0) return
+  if (!newPaymentMethod.value || !newPaymentAmountSOM.value || newPaymentAmountSOM.value <= 0) return
   
   payments.value.push({
     payment_method: newPaymentMethod.value,
-    amount: newPaymentAmountUSD.value
+    amount: newPaymentAmountSOM.value // Store SOM directly
   })
   
   newPaymentMethod.value = ''
-  newPaymentAmountUSD.value = null
   newPaymentAmountSOM.value = null
 }
 
-const syncFromUSD = () => {
-  if (isUpdatingPayment.value) return
-  isUpdatingPayment.value = true
-  if (newPaymentAmountUSD.value !== null && newPaymentAmountUSD.value !== '') {
-    newPaymentAmountSOM.value = toSOM(newPaymentAmountUSD.value)
-  } else {
-    newPaymentAmountSOM.value = null
-  }
-  isUpdatingPayment.value = false
-}
 
-const syncFromSOM = () => {
-  if (isUpdatingPayment.value) return
-  isUpdatingPayment.value = true
-  if (newPaymentAmountSOM.value !== null && newPaymentAmountSOM.value !== '') {
-    newPaymentAmountUSD.value = toUSD(newPaymentAmountSOM.value)
-  } else {
-    newPaymentAmountUSD.value = null
-  }
-  isUpdatingPayment.value = false
-}
 
 const removePayment = (index) => {
   payments.value.splice(index, 1)
@@ -457,22 +436,26 @@ const submitOrder = async () => {
   
   submitting.value = true
   try {
-    const orderData = {
-      total_amount: total.value,
-      sale_id: selectedSaleId.value,
-      employee_id: selectedEmployeeId.value,
-      sale_percent: totalDiscountPercent.value,
-      payment_method: null, // Deprecated field
-      payments: payments.value,
-      images: images.value.map(img => ({ image_path: img.url })),
-      description: description.value,
-      items: cart.value.map(item => ({
-        variant_id: item.id,
-        quantity: item.quantity,
-        price: calculateDiscountedPrice(item.price),
-        issued_quantity: item.quantity
-      }))
-    }
+      const orderData = {
+        total_amount: Math.round(total.value), // Send SOM directly
+        sale_id: selectedSaleId.value,
+        employee_id: selectedEmployeeId.value,
+        sale_percent: totalDiscountPercent.value,
+        payment_method: null,
+        payments: payments.value.map(p => ({
+          payment_method: p.payment_method,
+          amount: Math.round(p.amount) // Send SOM directly
+        })),
+        images: images.value.map(img => ({ image_path: img.url })),
+        description: description.value,
+        created_at: new Date(orderDateTime.value).toISOString(),
+        items: cart.value.map(item => ({
+          variant_id: item.id,
+          quantity: item.quantity,
+          price: Math.round(calculateDiscountedPrice(item.price)), // Send SOM directly
+          issued_quantity: item.quantity
+        }))
+      }
     
     await health_store.post('/orders/', orderData)
     emit('created')
@@ -483,6 +466,7 @@ const submitOrder = async () => {
     payments.value = []
     images.value = []
     description.value = ''
+    orderDateTime.value = getCurrentDateTime()
     newPaymentMethod.value = ''
     newPaymentAmountUSD.value = null
     newPaymentAmountSOM.value = null

@@ -31,7 +31,8 @@
           <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead class="bg-gray-50 dark:bg-[#3f3f47]">
               <tr>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Участник</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ФИО</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Персональный номер</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Остаток</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Метод оплаты</th>
@@ -42,26 +43,23 @@
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
               <tr v-if="loading" class="animate-pulse">
-                <td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Загрузка...</td>
+                <td colspan="8" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Загрузка...</td>
               </tr>
               <tr v-else-if="contracts.length === 0">
-                <td colspan="7" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Нет контрактов</td>
+                <td colspan="8" class="px-4 py-8 text-center text-gray-500 dark:text-gray-400">Нет контрактов</td>
               </tr>
               <tr v-for="contract in contracts" :key="contract.participant?.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  <div>
-                    <div class="font-medium">{{ contract.participant?.lastname }} {{ contract.participant?.name }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">{{ contract.participant?.patronymic }}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">№ {{ contract.participant?.personal_number }}</div>
-                  </div>
+                  <div class="font-medium">{{ contract.participant?.lastname }} {{ contract.participant?.name }} {{ contract.participant?.patronymic }}</div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <div class="font-medium">{{ contract.participant?.personal_number }}</div>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm">
-                  <div class="font-bold text-blue-600 dark:text-blue-400">${{ formatUSD(contract.total_initial_amount) }}</div>
-                  <div class="font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(contract.total_initial_amount).toLocaleString() }} сом</div>
+                  <div class="font-bold text-gray-900 dark:text-white">{{ Math.round(contract.total_initial_amount).toLocaleString() }} сом</div>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm">
-                  <div class="font-bold text-blue-600 dark:text-blue-400">${{ formatUSD(contract.total_remaining_amount) }}</div>
-                  <div class="font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(contract.total_remaining_amount).toLocaleString() }} сом</div>
+                  <div class="font-bold text-gray-900 dark:text-white">{{ Math.round(contract.total_remaining_amount).toLocaleString() }} сом</div>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <div v-for="pm in contract.payment_methods" :key="pm.id">
@@ -205,38 +203,21 @@
             </div>
 
             <!-- Amount -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Сумма (USD) *</label>
-                <div class="relative rounded-md shadow-sm">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span class="text-gray-500 sm:text-sm">$</span>
-                  </div>
-                  <input
-                    v-model.number="form.initial_amount"
-                    @input="syncSom"
-                    type="number"
-                    step="0.01"
-                    required
-                    class="block w-full pl-7 rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                  >
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Сумма (СОМ) *</label>
+              <div class="relative rounded-md shadow-sm">
+                <input
+                  v-model.number="form.initial_amount"
+                  type="number"
+                  step="0.01"
+                  required
+                  class="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                >
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <span class="text-gray-500 sm:text-sm">сом</span>
                 </div>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Сумма (СОМ)</label>
-                <div class="relative rounded-md shadow-sm">
-                  <input
-                    v-model.number="somAmount"
-                    @input="syncUsd"
-                    type="number"
-                    step="0.01"
-                    class="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                  >
-                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span class="text-gray-500 sm:text-sm">сом</span>
-                  </div>
-                </div>
-              </div>
+
             </div>
 
 
@@ -339,7 +320,7 @@
                         <thead>
                             <tr>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата</th>
-                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма (USD)</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма (СОМ)</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Остаток</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Метод</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Описание</th>
@@ -352,11 +333,10 @@
                                     {{ formatDate(c.paid_at) }}
                                 </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm">
-                                    <span class="font-bold text-blue-600 dark:text-blue-400">${{ formatUSD(c.initial_amount) }}</span>
-                                    <div class="font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(c.initial_amount).toLocaleString() }} сом</div>
+                                    <div class="font-bold text-gray-900 dark:text-white">{{ Math.round(c.initial_amount).toLocaleString() }} сом</div>
                                 </td>
-                                <td class="px-3 py-2 whitespace-nowrap text-sm font-bold text-blue-600 dark:text-blue-400">
-                                    ${{ formatUSD(c.remaining_amount) }}
+                                <td class="px-3 py-2 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-white">
+                                    {{ Math.round(c.remaining_amount).toLocaleString() }} сом
                                 </td>
                                 <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
                                     {{ c.payment_method?.name }}
@@ -446,7 +426,7 @@ const previewImage = ref(null)
 const searchQuery = ref('')
 const currentPage = ref(1)
 const pageSize = ref(20)
-const somAmount = ref(0) // New ref for SOM amount
+
 
 const isPdf = (url) => {
   return url?.toLowerCase().endsWith('.pdf')
@@ -464,7 +444,7 @@ const paymentMethods = ref([])
 
 const defaultForm = {
   participant_id: null,
-  initial_amount: 230,
+  initial_amount: 20240,
   payment_method_id: null,
   description: '',
   images: []
@@ -472,14 +452,7 @@ const defaultForm = {
 
 const form = ref({ ...defaultForm })
 
-// Sync functions
-const syncSom = () => {
-  somAmount.value = toSOM(form.value.initial_amount)
-}
 
-const syncUsd = () => {
-  form.value.initial_amount = toUSD(somAmount.value)
-}
 
 // Fetch contracts
 const fetchContracts = async () => {
@@ -567,7 +540,6 @@ const openDetails = async (participant) => {
 
 const openAddModal = () => {
   form.value = { ...defaultForm, images: [] }
-  somAmount.value = toSOM(form.value.initial_amount)
   participantSearchQuery.value = ''
   participantResults.value = []
   showModal.value = true

@@ -60,7 +60,7 @@
                 :key="payment.id"
                 class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]"
               >
-                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ payment.amount }}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ Math.round(payment.amount).toLocaleString() }} сом</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ payment.payment_method?.name || '-' }}</td>
                 <td class="px-4 py-2 text-sm text-gray-900 dark:text-white">{{ payment.description || '-' }}</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(payment.created_at) }}</td>
@@ -129,7 +129,7 @@
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                   {{ contract.participant?.personal_number || '-' }}
                 </td>
-                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ contract.amount_used }}</td>
+                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ Math.round(contract.amount_used).toLocaleString() }} сом</td>
                 <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(contract.created_at) }}</td>
               </tr>
             </tbody>

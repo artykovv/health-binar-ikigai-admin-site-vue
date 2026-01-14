@@ -73,10 +73,10 @@
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {{ getVariantName(item.variant_id) }}
                       </td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ item.price }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ Math.round(item.price).toLocaleString() }} сом</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.quantity }}</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ item.issued_quantity || 0 }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ (item.price * item.quantity).toFixed(2) }}</td>
+                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ Math.round(item.price * item.quantity).toLocaleString() }} сом</td>
                       <td class="px-4 py-2 whitespace-nowrap text-sm" @click.stop>
                         <button
                           v-if="(item.issued_quantity || 0) < item.quantity"
@@ -101,11 +101,11 @@
               </div>
               <div class="text-sm dark:text-white">
                 <span class="text-gray-600 dark:text-gray-400">Общая сумма:</span>
-                <span class="font-semibold ml-2">${{ orderDetail.total_amount }}</span>
+                <span class="font-semibold ml-2">{{ Math.round(orderDetail.total_amount).toLocaleString() }} сом</span>
               </div>
               <div v-if="totalExtraPaymentAmount > 0" class="text-sm dark:text-white">
                 <span class="text-gray-600 dark:text-gray-400">Доплата:</span>
-                <span class="font-semibold ml-2">${{ totalExtraPaymentAmount.toFixed(2) }}</span>
+                <span class="font-semibold ml-2">{{ Math.round(totalExtraPaymentAmount).toLocaleString() }} сом</span>
               </div>
             </div>
           </div>

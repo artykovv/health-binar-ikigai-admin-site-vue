@@ -21,8 +21,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">Расходы сегодня</p>
-              <p class="text-xl font-bold text-red-600 dark:text-red-400 mt-1">${{ formatPrice(stats.today_amount) }}</p>
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ toSOM(stats.today_amount).toLocaleString() }} сом</p>
+              <p class="text-xl font-bold text-red-600 dark:text-red-400 mt-1">{{ formatPrice(stats.today_amount) }}</p>
             </div>
             <div class="p-2 bg-red-100 dark:bg-red-900/20 rounded-full">
               <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,8 +36,7 @@
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">За месяц</p>
-              <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">${{ formatPrice(stats.month_amount) }}</p>
-              <p class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ toSOM(stats.month_amount).toLocaleString() }} сом</p>
+              <p class="text-xl font-bold text-gray-900 dark:text-white mt-1">{{ formatPrice(stats.month_amount) }}</p>
             </div>
             <div class="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-full">
               <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,8 +76,7 @@
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Метод</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Описание</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Теги</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма ($)</th>
-                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма (сом)</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
               </tr>
             </thead>
@@ -100,7 +97,7 @@
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                   <div v-if="tx.payments && tx.payments.length">
                       <div v-for="p in tx.payments" :key="p.id" class="text-xs">
-                          {{ p.payment_method?.name }}: ${{ formatUSD(p.amount) }} / {{ toSOM(p.amount).toLocaleString() }} сом
+                          {{ p.payment_method?.name }}: {{ formatUSD(p.amount) }}
                       </div>
                   </div>
                   <span v-else>{{ tx.payment_method?.name || '-' }}</span>
@@ -132,9 +129,6 @@
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-red-600 dark:text-red-400">
                   -{{ formatPrice(tx.amount) }}
-                </td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-red-500 dark:text-red-300">
-                  {{ toSOM(tx.amount).toLocaleString() }}
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm">
                   <button @click="editExpense(tx)" class="inline-flex items-center rounded-md bg-orange-600 px-3 py-1.5 text-white text-xs hover:bg-orange-700">Изменить</button>
@@ -175,39 +169,16 @@
           </div>
           
           <form @submit.prevent="saveExpense" class="space-y-4">
-            <!-- Amount (Dual Currency) -->
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Сумма (USD) *</label>
-                <div class="mt-1 relative rounded-md shadow-sm">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span class="text-gray-500 sm:text-sm">$</span>
-                  </div>
-                  <input 
-                    v-model.number="form.amount" 
-                    @input="syncSom"
-                    type="number" 
-                    step="0.01" 
-                    required
-                    class="block w-full pl-7 rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                  >
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Сумма (СОМ)</label>
-                <div class="mt-1 relative rounded-md shadow-sm">
-                  <input 
-                    v-model.number="somAmount" 
-                    @input="syncUsd"
-                    type="number" 
-                    step="0.01"
-                    class="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                  >
-                  <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span class="text-gray-500 sm:text-sm">сом</span>
-                  </div>
-                </div>
-              </div>
+            <!-- Amount -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Сумма *</label>
+              <input 
+                v-model.number="form.amount" 
+                type="number" 
+                step="0.01" 
+                required
+                class="mt-1 block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+              >
             </div>
 
             <!-- Date -->
@@ -256,34 +227,13 @@
                                 </svg>
                             </button>
                         </div>
-                        <div class="grid grid-cols-2 gap-2">
-                             <div class="relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 sm:text-xs">$</span>
-                                </div>
-                                <input 
-                                    v-model.number="payment.amount"
-                                    @input="syncSomRow(payment)"
-                                    type="number"
-                                    placeholder="USD"
-                                    step="0.01"
-                                    class="block w-full pl-6 rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                                >
-                            </div>
-                            <div class="relative rounded-md shadow-sm">
-                                <input 
-                                    v-model.number="payment.somAmount"
-                                    @input="syncUsdRow(payment)"
-                                    type="number"
-                                    placeholder="SOM"
-                                    step="0.01"
-                                    class="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
-                                >
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 sm:text-xs">сом</span>
-                                </div>
-                            </div>
-                        </div>
+                        <input 
+                            v-model.number="payment.amount"
+                            type="number"
+                            placeholder="Сумма"
+                            step="0.01"
+                            class="block w-full rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                        >
                     </div>
                 </div>
                  <button 
@@ -416,7 +366,7 @@ const imageModalOpen = ref(false)
 const fullscreenImage = ref(null)
 const isEditing = ref(false)
 const editingId = ref(null)
-const somAmount = ref(0)
+
 
 const stats = ref({
   today_amount: 0,
@@ -504,9 +454,9 @@ const openAddModal = () => {
     date: new Date().toISOString().slice(0, 16),
     images: [],
     tag_ids: [],
-    payments: [{ payment_method_id: null, amount: 0, somAmount: 0 }] 
+    payments: [{ payment_method_id: null, amount: 0 }] 
   }
-  somAmount.value = 0
+
   showModal.value = true
 }
 
@@ -518,39 +468,24 @@ const editExpense = (tx) => {
     payments: tx.payments && tx.payments.length > 0 
       ? tx.payments.map(p => ({ 
           payment_method_id: p.payment_method_id || (p.payment_method ? p.payment_method.id : null), 
-          amount: parseFloat(p.amount),
-          somAmount: toSOM(parseFloat(p.amount))
+          amount: parseFloat(p.amount)
         }))
-      : (tx.payment_method_id ? [{ payment_method_id: tx.payment_method_id, amount: parseFloat(tx.amount), somAmount: toSOM(parseFloat(tx.amount)) }] : []),
+      : (tx.payment_method_id ? [{ payment_method_id: tx.payment_method_id, amount: parseFloat(tx.amount) }] : []),
     date: tx.date ? new Date(tx.date).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
     tag_ids: tx.tags ? tx.tags.map(t => t.id) : (tx.tag_ids || [])
   }
-  somAmount.value = toSOM(form.value.amount)
+
   
   // Если при редактировании массив платежей пустой (старая запись или баг), добавим строку
   if (form.value.payments.length === 0) {
-      form.value.payments.push({ payment_method_id: null, amount: parseFloat(form.value.amount) || 0, somAmount: toSOM(parseFloat(form.value.amount) || 0) })
+      form.value.payments.push({ payment_method_id: null, amount: parseFloat(form.value.amount) || 0 })
   }
   
   showModal.value = true
 }
 
 
-const syncSom = () => {
-  somAmount.value = toSOM(form.value.amount)
-}
 
-const syncUsd = () => {
-  form.value.amount = toUSD(somAmount.value)
-}
-
-const syncSomRow = (payment) => {
-    payment.somAmount = toSOM(payment.amount)
-}
-
-const syncUsdRow = (payment) => {
-    payment.amount = toUSD(payment.somAmount)
-}
 
 const closeModal = () => {
   showModal.value = false
@@ -621,7 +556,7 @@ const removeImage = (index) => {
 }
 
 const addPaymentMethod = () => {
-    form.value.payments.push({ payment_method_id: null, amount: 0, somAmount: 0 })
+    form.value.payments.push({ payment_method_id: null, amount: 0 })
 }
 
 const removePaymentMethod = (index) => {

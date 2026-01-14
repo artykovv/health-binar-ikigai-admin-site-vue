@@ -74,18 +74,7 @@
             <p class="text-sm text-blue-700 dark:text-blue-300">{{ selectedParticipant.personal_number }}</p>
           </div>
 
-          <!-- Exchange Rate Input -->
-          <div class="mb-4 p-3 bg-gray-50 dark:bg-[#4a4a52] border border-gray-200 dark:border-gray-600 rounded-lg">
-            <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Курс валюты (1$ = X сом)</label>
-            <input
-              v-model.number="exchangeRate"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="Введите курс (например, 88)"
-              class="block w-full max-w-xs rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
-            />
-          </div>
+
 
           <div v-if="loadingProducts" class="text-center py-8">
             <span class="inline-block h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
@@ -98,8 +87,8 @@
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Название</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена</th>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена со скидкой</th>
-                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена в сомах</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Скидка</th>
+                  <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">%</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Кол-во</th>
                   <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Остаток</th>
                 </tr>
@@ -124,15 +113,13 @@
                   <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ product.id }}</td>
                   <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ product.full_name }}</td>
                   <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    <span class="line-through text-gray-400 dark:text-gray-500">${{ product.price }}</span>
+                    <span class="line-through text-gray-400 dark:text-gray-500">{{ Math.round(parseFloat(product.price)).toLocaleString() }} сом</span>
                   </td>
-                  <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    <span class="font-semibold text-green-600 dark:text-green-400">${{ getDiscountedPrice(product.price) }}</span>
+                  <td class="px-4 py-2 whitespace-nowrap text-sm">
+                    <span class="text-xs font-semibold text-red-500">-50%</span>
                   </td>
-                  <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    <span class="font-semibold text-blue-600 dark:text-blue-400">
-                      {{ exchangeRate ? Math.round(parseFloat(getDiscountedPrice(product.price)) * exchangeRate) : '-' }} сом
-                    </span>
+                  <td class="px-4 py-2 whitespace-nowrap text-sm">
+                    <span class="font-semibold text-green-600 dark:text-green-400">{{ Math.round(parseFloat(getDiscountedPrice(product.price))).toLocaleString() }} сом</span>
                   </td>
                   <td class="px-4 py-2 whitespace-nowrap" @click.stop>
                     <input
@@ -172,8 +159,7 @@
                   <tr>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Название</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Оригинальная цена</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена со скидкой</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Цена</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Кол-во</th>
                     <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                   </tr>
@@ -189,16 +175,16 @@
                       {{ getProductById(productId)?.full_name || '-' }}
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <span class="line-through text-gray-400 dark:text-gray-500">${{ getProductById(productId)?.price || 0 }}</span>
-                    </td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <span class="font-semibold text-green-600 dark:text-green-400">${{ getDiscountedPrice(getProductById(productId)?.price || 0) }}</span>
+                      <div class="flex flex-col">
+                        <span class="line-through text-gray-400 dark:text-gray-500">{{ Math.round(parseFloat(getProductById(productId)?.price || 0)).toLocaleString() }} сом</span>
+                        <span class="font-semibold text-green-600 dark:text-green-400">{{ Math.round(parseFloat(getDiscountedPrice(getProductById(productId)?.price || 0))).toLocaleString() }} сом</span>
+                      </div>
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       {{ getProductQuantity(productId) }}
                     </td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      <span class="font-semibold">${{ (parseFloat(getDiscountedPrice(getProductById(productId)?.price || 0)) * getProductQuantity(productId)).toFixed(2) }}</span>
+                      <span class="font-semibold">{{ Math.round(parseFloat(getDiscountedPrice(getProductById(productId)?.price || 0)) * getProductQuantity(productId)).toLocaleString() }} сом</span>
                     </td>
                   </tr>
                 </tbody>
@@ -275,12 +261,8 @@
             <!-- Summary -->
             <div class="grid grid-cols-3 gap-4 p-3 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
               <div>
-                <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Общая сумма</p>
-                <p class="text-sm font-bold text-gray-900 dark:text-white">${{ selectedProductsTotal.toFixed(2) }}</p>
-              </div>
-              <div v-if="exchangeRate">
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Общая сумма (сом)</p>
-                <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ Math.round(selectedProductsTotal * exchangeRate).toLocaleString() }} сом</p>
+                <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ Math.round(selectedProductsTotal).toLocaleString() }} сом</p>
               </div>
               <div>
                 <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Выбрано товаров</p>
@@ -295,12 +277,8 @@
         <div v-if="step === 2" class="mb-4">
           <div class="grid grid-cols-3 gap-4 p-3 bg-gray-50 dark:bg-[#4a4a52] rounded-lg border border-gray-200 dark:border-gray-600">
             <div>
-              <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Товары</p>
-              <p class="text-sm font-bold text-gray-900 dark:text-white">${{ selectedProductsTotal.toFixed(2) }}</p>
-            </div>
-            <div v-if="exchangeRate">
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Товары (сом)</p>
-              <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ Math.round(selectedProductsTotal * exchangeRate) }} сом</p>
+              <p class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ Math.round(selectedProductsTotal).toLocaleString() }} сом</p>
             </div>
             <div>
               <p class="text-xs text-gray-600 dark:text-gray-400 mb-1">Выбрано товаров</p>
@@ -411,6 +389,7 @@ const DISCOUNT_RATE = 0.5
 
 // Helper function to calculate discounted price
 const getDiscountedPrice = (price) => {
+  // Price already in SOM, just apply discount
   return (parseFloat(price || 0) * DISCOUNT_RATE).toFixed(2)
 }
 
@@ -482,7 +461,7 @@ const loadProducts = async () => {
   loadingProducts.value = true
   try {
     const response = await store_api.get('products/variants?skip=0&limit=100')
-    products.value = response.data
+    products.value = response.data.data
   } catch (error) {
     console.error('Ошибка загрузки товаров:', error)
   } finally {
@@ -582,7 +561,7 @@ const createOrder = async () => {
         return {
           variant_id: productId,
           quantity: quantity,
-          original_price: parseFloat(product?.price || 0)
+          original_price: Math.round(parseFloat(product?.price || 0))
         }
       }),
       images: images.value.map(img => ({

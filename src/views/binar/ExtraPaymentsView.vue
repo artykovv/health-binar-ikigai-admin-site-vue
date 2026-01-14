@@ -13,8 +13,7 @@
               <tr>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID Заказа</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">USD</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">СОМ</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Метод оплаты</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Описание</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Изображения</th>
@@ -33,8 +32,7 @@
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                   <span class="font-medium">#{{ payment.order_id }}</span>
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold text-blue-600 dark:text-blue-400">{{ formatUSD(payment.amount) }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(payment.amount).toLocaleString() }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ Math.round(payment.amount).toLocaleString() }} сом</td>
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ payment.payment_method?.name || '-' }}</td>
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate" :title="payment.description">{{ payment.description || '-' }}</td>
                 <td class="px-4 py-3 text-sm">
@@ -107,7 +105,6 @@
 import { ref, onMounted } from 'vue'
 
 import { binar_api } from '@/api' // Using binar_api as context suggests
-import { formatUSD, toSOM } from '@/utils/currency'
 
 const payments = ref([])
 const loading = ref(false)

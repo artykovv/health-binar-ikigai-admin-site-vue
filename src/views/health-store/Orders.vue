@@ -17,8 +17,7 @@
             <thead class="bg-gray-50 dark:bg-[#3f3f47]">
               <tr>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">USD</th>
-                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">СОМ</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Оплата</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Акция</th>
                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сотрудник</th>
@@ -37,8 +36,7 @@
               </tr>
               <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
                 <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-white font-bold">#{{ order.id }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-blue-600 dark:text-blue-400">{{ formatUSD(order.total_amount) }}</td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-emerald-600 dark:text-emerald-400">{{ toSOM(order.total_amount).toLocaleString() }}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-emerald-600 dark:text-emerald-400">{{ Math.round(order.total_amount).toLocaleString() }} сом</td>
                 <td class="px-4 py-3 text-sm">
                   <!-- Single payment method (legacy or single payment) -->
                   <span v-if="!order.payments || order.payments.length === 0" class="px-2 py-1 rounded bg-gray-100 dark:bg-gray-800 text-[10px] uppercase font-bold text-gray-600 dark:text-gray-400">
@@ -137,10 +135,7 @@
             </div>
             <div class="flex justify-between items-center text-sm font-bold border-t pt-2 mt-2">
               <span class="text-gray-500">Итого:</span>
-              <div class="flex gap-3">
-                <span class="text-blue-600 dark:text-blue-400 font-bold">{{ formatUSD(selectedOrder.total_amount) }}</span>
-                <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{ toSOM(selectedOrder.total_amount).toLocaleString() }}</span>
-              </div>
+              <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{ Math.round(selectedOrder.total_amount).toLocaleString() }} сом</span>
             </div>
 
             <div v-if="selectedOrder.payments?.length > 0 || selectedOrder.sale || selectedOrder.employee || selectedOrder.payment_method" class="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 space-y-2">
@@ -150,10 +145,7 @@
                 <div class="space-y-1">
                   <div v-for="payment in selectedOrder.payments" :key="payment.id" class="flex justify-between text-xs">
                     <span class="font-bold uppercase text-gray-700 dark:text-gray-300">{{ payment.payment_method }}:</span>
-                    <div class="flex gap-2 font-bold">
-                      <span class="text-blue-600 dark:text-blue-400">{{ formatUSD(payment.amount) }}</span>
-                      <span class="text-emerald-600 dark:text-emerald-400">{{ toSOM(payment.amount).toLocaleString() }}</span>
-                    </div>
+                    <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{ Math.round(payment.amount).toLocaleString() }} сом</span>
                   </div>
                 </div>
               </div>
@@ -205,10 +197,7 @@
                         </span>
                       </td>
                       <td class="px-3 py-2 text-sm text-right">
-                        <div class="flex flex-col">
-                          <span class="text-blue-600 dark:text-blue-400 font-bold text-xs">{{ formatUSD(item.price) }}</span>
-                          <span class="text-emerald-600 dark:text-emerald-400 text-[10px]">{{ toSOM(item.price).toLocaleString() }}</span>
-                        </div>
+                        <span class="text-emerald-600 dark:text-emerald-400 font-bold">{{ Math.round(item.price).toLocaleString() }} сом</span>
                       </td>
                     </tr>
                   </tbody>
