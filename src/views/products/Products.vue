@@ -31,6 +31,17 @@
           </div>
         </div>
         
+        <!-- Search input (only for variants view) -->
+        <div v-if="currentView === 'variants'" class="mb-3">
+          <input 
+            v-model="searchQuery"
+            @input="handleSearch"
+            type="text"
+            placeholder="Поиск по названию..."
+            class="w-full md:w-96 px-4 py-2 rounded-lg border border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+        </div>
+        
         <!-- Filters and Sorting (only for variants view) -->
 
         
@@ -247,6 +258,46 @@
         <div v-if="(currentView === 'variants' && variants.length === 0) || (currentView === 'products' && products.length === 0)" class="text-center py-8 text-gray-500 dark:text-gray-400">
           {{ currentView === 'variants' ? 'Варианты товаров не найдены' : 'Товары не найдены' }}
         </div>
+        
+        <!-- Pagination (only for variants view) -->
+        <div v-if="currentView === 'variants' && totalPages > 1" class="mt-4 flex items-center justify-between px-4 py-3 bg-white dark:bg-[#3f3f47] border-t border-gray-200 dark:border-gray-700">
+          <div class="text-sm text-gray-700 dark:text-gray-300">
+            Показано {{ ((currentPage - 1) * itemsPerPage) + 1 }} - {{ Math.min(currentPage * itemsPerPage, totalItems) }} из {{ totalItems }}
+          </div>
+          <div class="flex items-center gap-2">
+            <button 
+              @click="goToPage(currentPage - 1)"
+              :disabled="currentPage === 1"
+              class="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Назад
+            </button>
+            
+            <div class="flex items-center gap-1">
+              <button 
+                v-for="page in visiblePages" 
+                :key="page"
+                @click="goToPage(page)"
+                :class="[
+                  'px-3 py-1 rounded-md',
+                  page === currentPage 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ]"
+              >
+                {{ page }}
+              </button>
+            </div>
+            
+            <button 
+              @click="goToPage(currentPage + 1)"
+              :disabled="currentPage === totalPages"
+              class="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Вперед
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -432,6 +483,13 @@ const products = ref([])
 const loading = ref(false)
 const submitting = ref(false)
 
+// Pagination state
+const currentPage = ref(1)
+const itemsPerPage = ref(50)
+const totalItems = ref(0)
+const searchQuery = ref('')
+let searchTimeout = null
+
 // Текущий вид (товары с вариантами или без) - инициализируем из URL
 const currentView = ref(route.query.view || 'variants')
 
@@ -471,6 +529,26 @@ const hasActiveFilters = computed(() => {
          filters.value.sort_by !== ''
 })
 
+// Computed: total pages
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value))
+
+// Computed: visible page numbers
+const visiblePages = computed(() => {
+  const pages = []
+  const maxVisible = 5
+  let start = Math.max(1, currentPage.value - Math.floor(maxVisible / 2))
+  let end = Math.min(totalPages.value, start + maxVisible - 1)
+  
+  if (end - start + 1 < maxVisible) {
+    start = Math.max(1, end - maxVisible + 1)
+  }
+  
+  for (let i = start; i <= end; i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
 // Handle Sort Click
 const handleSort = (field) => {
   if (filters.value.sort_by === field) {
@@ -486,13 +564,32 @@ const handleSort = (field) => {
     filters.value.sort_by = field
     filters.value.sort_order = 'asc'
   }
+  currentPage.value = 1 // Reset to first page
   loadVariants()
 }
 
 // Handle Filter Click
 const handleFilter = (field) => {
   filters.value[field] = !filters.value[field]
+  currentPage.value = 1 // Reset to first page
   loadVariants()
+}
+
+// Handle Search
+const handleSearch = () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    currentPage.value = 1 // Reset to first page
+    loadVariants()
+  }, 300) // Debounce 300ms
+}
+
+// Pagination navigation
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    loadVariants()
+  }
 }
 
 // Модальное окно просмотра товара
@@ -581,9 +678,14 @@ const loadVariants = async () => {
   try {
     // Build query parameters
     const params = new URLSearchParams({
-      skip: '0',
-      limit: '100'
+      skip: String((currentPage.value - 1) * itemsPerPage.value),
+      limit: String(itemsPerPage.value)
     })
+    
+    // Add search parameter
+    if (searchQuery.value) {
+      params.append('search', searchQuery.value)
+    }
     
     // Add boolean filters (only if checked)
     if (filters.value.is_binar) {
@@ -606,7 +708,8 @@ const loadVariants = async () => {
     }
     
     const response = await store_api.get(`products/variants?${params.toString()}`)
-    variants.value = response.data
+    variants.value = response.data.data
+    totalItems.value = response.data.total
   } catch (error) {
     console.error('Ошибка загрузки вариантов:', error)
   } finally {
@@ -636,6 +739,8 @@ const resetFilters = () => {
     sort_by: '',
     sort_order: 'asc'
   }
+  searchQuery.value = ''
+  currentPage.value = 1
   loadVariants()
 }
 
