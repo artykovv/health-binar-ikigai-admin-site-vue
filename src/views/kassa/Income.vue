@@ -105,7 +105,7 @@
                 <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                   <div class="flex items-center gap-2">
                     <div v-if="tx.images?.length > 0" class="flex-shrink-0 w-8 h-8 rounded overflow-hidden bg-gray-100 flex items-center justify-center">
-                      <img v-if="!isPdf(tx.images[0].url)" :src="tx.images[0].url" class="w-full h-full object-cover">
+                      <img v-if="!isPdf(tx.images[0].url)" :src="tx.images[0].url" class="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity" @click.stop="fullscreenImage = tx.images[0].url">
                       <a v-else :href="tx.images[0].url" target="_blank" class="text-red-500" @click.stop title="Открыть PDF">
                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>

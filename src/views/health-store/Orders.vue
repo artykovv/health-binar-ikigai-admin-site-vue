@@ -321,11 +321,12 @@ const isPdf = (url) => {
 const fetchInitialData = async () => {
   try {
     const res = await store_api.get('/products/variants', { params: { is_healthstore: true, limit: 100 } })
-    productVariants.value = res.data
+    productVariants.value = res.data.data || []
   } catch (e) { console.error(e) }
 }
 
 const getVariantName = (id) => {
+  if (!Array.isArray(productVariants.value)) return `ID: ${id}`
   const v = productVariants.value.find(v => v.id === id)
   return v ? v.full_name : `ID: ${id}`
 }
