@@ -282,9 +282,14 @@ const loadWarehouses = async () => {
 const loadVariants = async () => {
   try {
     const response = await store_api.get('products/variants?skip=0&limit=1000')
-    allVariants.value = response.data
+    if (response.data && response.data.data) {
+      allVariants.value = response.data.data
+    } else {
+      allVariants.value = response.data || []
+    }
   } catch (error) {
     console.error('Ошибка загрузки товаров:', error)
+    allVariants.value = []
   }
 }
 

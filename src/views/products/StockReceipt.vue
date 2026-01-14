@@ -302,7 +302,7 @@ const loadAllVariants = async () => {
   searching.value = true
   try {
     const response = await store_api.get('products/variants?skip=0&limit=1000')
-    allVariants.value = response.data
+    allVariants.value = response.data.data || []
   } catch (error) {
     console.error('Ошибка загрузки вариантов:', error)
     errorMessage.value = 'Ошибка загрузки вариантов товаров'

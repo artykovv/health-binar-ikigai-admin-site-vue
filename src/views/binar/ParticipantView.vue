@@ -646,66 +646,86 @@
             </div>
 
             <div class="bg-white rounded-lg ring-1 ring-gray-200 mt-3 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
-              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
-                <h5 class="m-0 dark:text-white">Контракт</h5>
+              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700 flex justify-between items-center">
+                <h5 class="m-0 dark:text-white">Заказы</h5>
               </div>
-              <div class="p-4">
-                <div v-if="contractLoading" class="text-center py-4">
-                  <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
-                </div>
-                <div v-else-if="contract" class="text-sm text-gray-900 dark:text-white space-y-4">
-                  <div class="space-y-2">
-                    <div>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">Остаток:</span>
-                      <p class="font-semibold mt-1">${{ contract.remaining_amount }}</p>
-                    </div>
-                    <div>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">Создан:</span>
-                      <p class="font-semibold mt-1">{{ formatDate(contract.created_at) }}</p>
-                    </div>
-                  </div>
-                  
-                  <!-- Таблица использования контракта -->
-                  <div v-if="contractUsagesLoading" class="text-center py-4">
-                    <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
-                  </div>
-                  <div v-else-if="contractUsages && contractUsages.length > 0" class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-xs">
-                      <thead class="bg-gray-50 dark:bg-[#3f3f47]">
-                        <tr>
-                          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">#Заказ</th>
-                          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Использованная сумма</th>
-                          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
-                        </tr>
-                      </thead>
-                      <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
-                        <tr v-for="usage in contractUsages" :key="usage.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
-                          <td class="px-3 py-2 whitespace-nowrap text-sm">
-                            <button 
-                              @click="openOrderModal(usage.order_id)"
-                              class="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-300 dark:hover:text-blue-400 font-medium"
-                            >
-                              #{{ usage.order_id }}
-                            </button>
-                          </td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ usage.amount_used }}</td>
-                          <td class="px-3 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(usage.created_at) }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div v-else class="text-center py-2 text-xs text-gray-500 dark:text-gray-400">
-                    Нет данных об использовании
-                  </div>
-                </div>
-                <div v-else class="flex items-center justify-center py-4">
+              
+              <!-- Tabs -->
+              <div class="border-b border-gray-200 dark:border-gray-700 px-4">
+                <nav class="-mb-px flex space-x-6" aria-label="Tabs">
                   <button 
-                    class="w-full flex items-center justify-center p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
+                    @click="activeOrdersTab = 'contracts'"
+                    :class="[
+                      activeOrdersTab === 'contracts'
+                        ? 'border-black text-black dark:text-white dark:border-white'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200',
+                      'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm'
+                    ]"
                   >
-                    <svg class="w-12 h-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                    </svg>
+                    Контракт
                   </button>
+                  <button 
+                    @click="activeOrdersTab = 'health_day'"
+                    :class="[
+                      activeOrdersTab === 'health_day'
+                        ? 'border-black text-black dark:text-white dark:border-white'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-200',
+                      'whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm'
+                    ]"
+                  >
+                    Health Day
+                  </button>
+                </nav>
+              </div>
+
+              <div class="p-4">
+                <!-- Orders List -->
+                <div v-if="ordersLoading" class="text-center py-4">
+                  <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+                </div>
+                
+                <div v-else-if="currentOrdersList.length > 0" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white"># Заказа</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                            <tr v-for="order in currentOrdersList" :key="order.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                                <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                                    #{{ order.id }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                    {{ order.total_amount }} {{ activeOrdersTab === 'contracts' ? '$' : 'сом' }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm">
+                                    <span :class="['inline-flex items-center rounded-full px-2 py-1 text-xs font-medium', getOrderStatusBadgeClass(order.status)]">
+                                        {{ getOrderStatusText(order.status) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                    {{ formatDate(order.created_at) }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                    <button 
+                                        @click="activeOrdersTab === 'contracts' ? openOrderModal(order.id) : openHealthDayModal(order.id)" 
+                                        class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                                    >
+                                        Детали
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div v-else class="text-center py-6 text-gray-500 dark:text-gray-400">
+                    Заказы не найдены
                 </div>
               </div>
             </div>
@@ -726,15 +746,22 @@
       :order-id="selectedOrderId"
       @close="closeOrderModal"
     />
+    
+    <HealthDayOrderDetailModal
+      :visible="healthDayModalVisible"
+      :order-id="selectedHealthDayId"
+      @close="closeHealthDayModal"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
+import { ref, onMounted, onBeforeUnmount, reactive, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/api'
 import { store_api } from '@/api'
 import OrderDetailModal from '@/components/OrderDetailModal.vue'
+import HealthDayOrderDetailModal from '@/components/HealthDayOrderDetailModal.vue'
 
 const router = useRouter()
 
@@ -744,10 +771,16 @@ const loading = ref(false)
 const bonusData = ref(null)
 const structureData = ref(null)
 const stageHistory = ref([])
-const contract = ref(null)
-const contractLoading = ref(false)
-const contractUsages = ref([])
-const contractUsagesLoading = ref(false)
+// New Orders Logic
+const activeOrdersTab = ref('contracts')
+const ordersFilter = ref('active')
+const participantOrders = ref([])
+const participantHealthDayOrders = ref([])
+const ordersLoading = ref(false)
+
+// Health Day Modal
+const healthDayModalVisible = ref(false)
+const selectedHealthDayId = ref(null)
 
 // Модальное окно заказа
 const orderDetailModalVisible = ref(false)
@@ -1156,45 +1189,87 @@ const closeOrderModal = () => {
   selectedOrderId.value = null
 }
 
-// Загрузка контракта
-const loadContract = async () => {
-  contractLoading.value = true
-  try {
-    const response = await api.get(`contracts/${participantId}`)
-    contract.value = response.data
-    // Загружаем использование контракта, если контракт существует
-    if (contract.value) {
-      await loadContractUsages()
+// --- ORDERS LOGIC ---
+
+const loadParticipantOrders = async () => {
+    ordersLoading.value = true
+    try {
+        const response = await api.get('orders', { 
+            params: { 
+                participant_id: participantId,
+                limit: 100 
+            } 
+        })
+        participantOrders.value = response.data.items || []
+    } catch (e) {
+        console.error('Failed to load orders', e)
+    } finally {
+        ordersLoading.value = false
     }
-  } catch (error) {
-    if (error.response?.status === 404) {
-      contract.value = null
-    } else {
-      console.error('Ошибка загрузки контракта:', error)
-      contract.value = null
-    }
-  } finally {
-    contractLoading.value = false
-  }
 }
 
-// Загрузка использования контракта
-const loadContractUsages = async () => {
-  contractUsagesLoading.value = true
-  try {
-    const response = await api.get(`contracts/usages/${participantId}/contract-usage`)
-    contractUsages.value = Array.isArray(response.data) ? response.data : []
-  } catch (error) {
-    if (error.response?.status === 404) {
-      contractUsages.value = []
-    } else {
-      console.error('Ошибка загрузки использования контракта:', error)
-      contractUsages.value = []
+const loadParticipantHealthDayOrders = async () => {
+    ordersLoading.value = true
+    try {
+        const response = await api.get('health-day/orders', { 
+            params: { 
+                participant_id: participantId,
+                limit: 100 
+            } 
+        })
+        participantHealthDayOrders.value = response.data.items || []
+    } catch (e) {
+        console.error('Failed to load health day orders', e)
+    } finally {
+        ordersLoading.value = false
     }
-  } finally {
-    contractUsagesLoading.value = false
-  }
 }
+
+const currentOrdersList = computed(() => {
+    return activeOrdersTab.value === 'contracts' ? participantOrders.value : participantHealthDayOrders.value
+})
+
+const openHealthDayModal = (id) => {
+    selectedHealthDayId.value = id
+    healthDayModalVisible.value = true
+}
+
+const closeHealthDayModal = () => {
+    healthDayModalVisible.value = false
+    selectedHealthDayId.value = null
+}
+
+const getOrderStatusText = (status) => {
+    const map = {
+        'pending': 'Ожидает',
+        'paid': 'Оплачено',
+        'issued': 'Выдано',
+        'partially_issued': 'Частично',
+        'cancelled': 'Отменено',
+        'delivered': 'Выдано'
+    }
+    return map[status] || status
+}
+
+const getOrderStatusBadgeClass = (status) => {
+    const map = {
+        'pending': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
+        'paid': 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
+        'issued': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300',
+        'delivered': 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300', 
+        'partially_issued': 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+        'cancelled': 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300'
+    }
+    return map[status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+}
+
+watch(activeOrdersTab, (newTab) => {
+    if (newTab === 'contracts' && participantOrders.value.length === 0) {
+        loadParticipantOrders()
+    } else if (newTab === 'health_day' && participantHealthDayOrders.value.length === 0) {
+        loadParticipantHealthDayOrders()
+    }
+})
 
 
 const getContractStatusColor = (statusObj) => {
@@ -1226,7 +1301,7 @@ onMounted(async () => {
     loadBonusData(),
     loadStructureData(),
     loadStageHistory(),
-    loadContract()
+    loadParticipantOrders()
   ])
 })
 

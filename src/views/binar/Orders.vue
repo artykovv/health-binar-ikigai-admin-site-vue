@@ -37,20 +37,8 @@
           <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
         </div>
 
-        <!-- Contracts Tab -->
-        <div v-else-if="activeTab === 'contracts'">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-lg font-semibold dark:text-white">Контракты</h2>
-            <button 
-              @click="openAddContractModal" 
-              class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
-            >
-              Добавить заказ
-            </button>
-          </div>
-          
-          <!-- Filters -->
-          <div class="mb-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Filters (Shared for both tabs) -->
+          <div class="mb-4 grid grid-cols-1 md:grid-cols-4 gap-4">
             <!-- Filter by Branch -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Филиал</label>
@@ -93,240 +81,267 @@
                 class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white dark:placeholder-gray-400"
               >
             </div>
+
+            <!-- Filter by Status -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2 dark:text-white">Статус</label>
+              <select
+                v-model="selectedStatus"
+                @change="handleStatusChange"
+                class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 dark:bg-[#3f3f47] dark:border-white dark:text-white dark:focus:ring-white dark:focus:border-white"
+              >
+                <option :value="null">Все статусы</option>
+                <option value="Выдано">Выдано</option>
+                <option value="Частично выдано">Частично выдано</option>
+                <option value="Не выдано">Не выдано</option>
+              </select>
+            </div>
           </div>
-          
-          <!-- Loading Orders -->
-          <div v-if="loadingOrders" class="py-6 text-center">
-            <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
-          </div>
-          
-          <!-- Orders Table -->
-          <div v-else class="overflow-x-auto">
-            <div class="inline-block min-w-full align-middle">
-              <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                  <thead class="bg-gray-50 dark:bg-[#3f3f47]">
-                    <tr>
-                      <th 
-                        class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
-                        @click="toggleContractsSort('id')"
-                      >
-                        <div class="flex items-center gap-1">
-                          ID
-                          <span v-if="contractsSortBy === 'id'">
-                            {{ contractsSortOrder === 'asc' ? '↑' : '↓' }}
-                          </span>
-                        </div>
-                      </th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
-                      <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
-                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Ответственный</th>
-                    </tr>
-                  </thead>
-                  <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
-                    <tr v-if="orders.length === 0">
-                      <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                        Нет заказов
-                      </td>
-                    </tr>
-                    <tr 
-                      v-for="order in orders" 
-                      :key="order.id" 
-                      class="hover:bg-gray-50 dark:hover:bg-[#4a4a52] cursor-pointer"
-                      @click="openOrderDetailModal(order.id)"
-                    >
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.id }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch || '-' }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ Math.round(order.total_amount).toLocaleString() }} сом</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                          :class="{
-                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300': order.status === 'paid',
-                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300': order.status === 'pending',
-                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300': order.status === 'cancelled'
-                          }"
-                        >
-                          {{ getStatusName(order.status) }}
-                        </span>
-                      </td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        <div v-if="order.responsible_participant">
-                          {{ order.responsible_participant.name }} {{ order.responsible_participant.lastname }}
-                          <span class="text-gray-500 dark:text-gray-400">({{ order.responsible_participant.personal_number }})</span>
-                        </div>
-                        <span v-else class="text-gray-500 dark:text-gray-400">-</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+
+          <!-- Contracts Tab -->
+          <div v-if="activeTab === 'contracts'">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-lg font-semibold dark:text-white">Контракты</h2>
+              <button 
+                @click="openAddContractModal" 
+                class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
+              >
+                Добавить заказ
+              </button>
             </div>
             
-            <!-- Pagination -->
-            <div class="flex items-center justify-between mt-4">
-              <div class="text-sm text-gray-700 dark:text-gray-300">
-                Страница {{ contractsPage }}
+            <!-- Loading Orders -->
+            <div v-if="loadingOrders" class="py-6 text-center">
+              <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+            </div>
+            
+            <!-- Orders Table -->
+            <div v-else class="overflow-x-auto">
+              <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                      <tr>
+                        <th 
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                          @click="toggleContractsSort('id')"
+                        >
+                          <div class="flex items-center gap-1">
+                            ID
+                            <span v-if="contractsSortBy === 'id'">
+                              {{ contractsSortOrder === 'asc' ? '↑' : '↓' }}
+                            </span>
+                          </div>
+                        </th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Ответственный</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                      <tr v-if="orders.length === 0">
+                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                          Нет заказов
+                        </td>
+                      </tr>
+                      <tr 
+                        v-for="order in orders" 
+                        :key="order.id" 
+                        class="hover:bg-gray-50 dark:hover:bg-[#4a4a52] cursor-pointer"
+                        @click="openOrderDetailModal(order.id)"
+                      >
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.id }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch || '-' }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ Math.round(order.total_amount).toLocaleString() }} сом</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                            :class="{
+                              'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300': ['delivered', 'Выдан'].includes(order.status),
+                              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300': ['pending', 'issued', 'Частично выдан', 'Частично оплачен'].includes(order.status),
+                              'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300': ['cancelled', 'pending', 'paid', 'Не выдан', 'Не выдано', 'Ожидает оплаты'].includes(order.status)
+                            }"
+                          >
+                            {{ getStatusName(order.status) }}
+                          </span>
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          <div v-if="order.responsible_participant">
+                            {{ order.responsible_participant.name }} {{ order.responsible_participant.lastname }}
+                            <span class="text-gray-500 dark:text-gray-400">({{ order.responsible_participant.personal_number }})</span>
+                          </div>
+                          <span v-else class="text-gray-500 dark:text-gray-400">-</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <div class="flex gap-2">
-                <button
-                  @click="changeContractsPage(-1)"
-                  :disabled="contractsPage === 1"
-                  class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
-                >
-                  Назад
-                </button>
-                <button
-                  @click="changeContractsPage(1)"
-                  :disabled="orders.length < contractsLimit"
-                  class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
-                >
-                  Вперед
-                </button>
+              
+              <!-- Pagination -->
+              <div class="flex items-center justify-between mt-4">
+                <div class="text-sm text-gray-700 dark:text-gray-300">
+                  Страница {{ contractsPage }}
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    @click="changeContractsPage(-1)"
+                    :disabled="contractsPage === 1"
+                    class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
+                  >
+                    Назад
+                  </button>
+                  <button
+                    @click="changeContractsPage(1)"
+                    :disabled="orders.length < contractsLimit"
+                    class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
+                  >
+                    Вперед
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Health Day Tab -->
-        <div v-else-if="activeTab === 'healthday'">
-          <div class="flex items-center justify-between mb-3">
-            <h2 class="text-lg font-semibold dark:text-white">Health Day</h2>
-            <button 
-              @click="openAddHealthDayModal" 
-              class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
-            >
-              Добавить заказ
-            </button>
-    </div>
+          <!-- Health Day Tab -->
+          <div v-else-if="activeTab === 'healthday'">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-lg font-semibold dark:text-white">Health Day</h2>
+              <button 
+                @click="openAddHealthDayModal" 
+                class="inline-flex items-center rounded-md bg-black px-3 py-2 text-white text-sm hover:bg-gray-900 dark:bg-[#3f3f47] dark:hover:bg-[#4a4a52] dark:text-white"
+              >
+                Добавить заказ
+              </button>
+            </div>
 
-          <!-- Loading Health Day Orders -->
-          <div v-if="loadingHealthDayOrders" class="py-6 text-center">
-            <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
-        </div>
-          
-          <!-- Health Day Orders Table -->
+            <!-- Loading Health Day Orders -->
+            <div v-if="loadingHealthDayOrders" class="py-6 text-center">
+              <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+            </div>
+            
+            <!-- Health Day Orders Table -->
             <div v-else class="overflow-x-auto">
-            <div class="inline-block min-w-full align-middle">
-              <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
-              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-[#3f3f47]">
-                  <tr>
-                    <th 
-                      class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
-                      @click="toggleHealthDaySort('id')"
-                    >
-                      <div class="flex items-center gap-1">
-                        ID
-                        <span v-if="healthDaySortBy === 'id'">
-                          {{ healthDaySortOrder === 'asc' ? '↑' : '↓' }}
-                        </span>
-                      </div>
-                    </th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Участник</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
-                    <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Способ оплаты</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Изображения</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
-                    <tr v-if="healthDayOrders.length === 0">
-                      <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-                        Нет заказов
-                    </td>
-                  </tr>
-                    <tr 
-                      v-for="order in healthDayOrders" 
-                      :key="order.id" 
-                      class="hover:bg-gray-50 dark:hover:bg-[#4a4a52] cursor-pointer"
-                      @click="openHealthDayOrderDetailModal(order.id)"
-                    >
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.id }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        <div v-if="order.participant">
-                          <div class="font-medium">{{ order.participant.name }} {{ order.participant.lastname }} {{ order.participant.patronymic }}</div>
-                          <div class="text-xs text-gray-500 dark:text-gray-400">{{ order.participant.personal_number }}</div>
-                        </div>
-                        <span v-else class="text-gray-500 dark:text-gray-400">-</span>
-                      </td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch?.name || '-' }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ Math.round(parseFloat(order.total_amount)).toLocaleString() }} сом</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.payment_method?.name || '-' }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white" @click.stop>
-                        <div v-if="order.images && order.images.length > 0" class="flex gap-1">
-                          <template v-for="img in order.images.slice(0, 3)" :key="img.url">
-                            <img 
-                              v-if="!isPdf(img.url)"
-                              :src="img.url" 
-                              :alt="img.alt"
-                              class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
-                              @click="openImagePreview(img.url)"
-                            >
-                            <a 
-                              v-else 
-                              :href="img.url" 
-                              target="_blank" 
-                              class="w-8 h-8 rounded border-2 border-white dark:border-gray-700 bg-red-50 hover:bg-red-100 flex items-center justify-center hover:z-10 transition-colors"
-                              title="Открыть PDF"
-                            >
-                              <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                              </svg>
-                            </a>
-                          </template>
-                          <span v-if="order.images.length > 3" class="text-xs text-gray-500 dark:text-gray-400 self-center">
-                            +{{ order.images.length - 3 }}
-                          </span>
-                        </div>
-                        <span v-else class="text-gray-400">-</span>
-                      </td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
-                      <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                        <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
-                          :class="{
-                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300': order.status === 'paid',
-                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300': order.status === 'pending',
-                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300': order.status === 'cancelled'
-                          }"
+              <div class="inline-block min-w-full align-middle">
+                <div class="overflow-hidden rounded-lg ring-1 ring-gray-200 bg-white dark:ring-gray-700 dark:bg-[#3f3f47]">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                      <tr>
+                        <th 
+                          class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                          @click="toggleHealthDaySort('id')"
                         >
-                          {{ getStatusName(order.status) }}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                          <div class="flex items-center gap-1">
+                            ID
+                            <span v-if="healthDaySortBy === 'id'">
+                              {{ healthDaySortOrder === 'asc' ? '↑' : '↓' }}
+                            </span>
+                          </div>
+                        </th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Участник</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Филиал</th>
+                        <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Сумма</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Способ оплаты</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Изображения</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Статус</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                      <tr v-if="healthDayOrders.length === 0">
+                        <td colspan="7" class="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                          Нет заказов
+                        </td>
+                      </tr>
+                      <tr 
+                        v-for="order in healthDayOrders" 
+                        :key="order.id" 
+                        class="hover:bg-gray-50 dark:hover:bg-[#4a4a52] cursor-pointer"
+                        @click="openHealthDayOrderDetailModal(order.id)"
+                      >
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.id }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          <div v-if="order.participant">
+                            <div class="font-medium">{{ order.participant.name }} {{ order.participant.lastname }} {{ order.participant.patronymic }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">{{ order.participant.personal_number }}</div>
+                          </div>
+                          <span v-else class="text-gray-500 dark:text-gray-400">-</span>
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.branch?.name || '-' }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-right text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ Math.round(parseFloat(order.total_amount)).toLocaleString() }} сом</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ order.payment_method?.name || '-' }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white" @click.stop>
+                          <div v-if="order.images && order.images.length > 0" class="flex gap-1">
+                            <template v-for="img in order.images.slice(0, 3)" :key="img.url">
+                              <img 
+                                v-if="!isPdf(img.url)"
+                                :src="img.url" 
+                                :alt="img.alt"
+                                class="w-8 h-8 object-cover rounded cursor-pointer hover:scale-110 transition-transform"
+                                @click="openImagePreview(img.url)"
+                              >
+                              <a 
+                                v-else 
+                                :href="img.url" 
+                                target="_blank" 
+                                class="w-8 h-8 rounded border-2 border-white dark:border-gray-700 bg-red-50 hover:bg-red-100 flex items-center justify-center hover:z-10 transition-colors"
+                                title="Открыть PDF"
+                              >
+                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                              </a>
+                            </template>
+                            <span v-if="order.images.length > 3" class="text-xs text-gray-500 dark:text-gray-400 self-center">
+                              +{{ order.images.length - 3 }}
+                            </span>
+                          </div>
+                          <span v-else class="text-gray-400">-</span>
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(order.created_at) }}</td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+                            :class="{
+                              'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300': ['delivered', 'Выдан'].includes(order.status),
+                              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300': ['pending', 'issued', 'Частично выдан', 'Частично оплачен'].includes(order.status),
+                              'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300': ['cancelled', 'pending', 'paid', 'Не выдан', 'Не выдано', 'Ожидает оплаты'].includes(order.status)
+                            }"
+                          >
+                            {{ getStatusName(order.status) }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
+              
+              <!-- Pagination -->
+              <div class="flex items-center justify-between mt-4">
+                <div class="text-sm text-gray-700 dark:text-gray-300">
+                  Страница {{ healthDayPage }}
                 </div>
-                
-                <!-- Pagination -->
-                <div class="flex items-center justify-between mt-4">
-                  <div class="text-sm text-gray-700 dark:text-gray-300">
-                    Страница {{ healthDayPage }}
-                  </div>
-                  <div class="flex gap-2">
-                    <button
-                      @click="changeHealthDayPage(-1)"
-                      :disabled="healthDayPage === 1"
-                      class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
-                    >
-                      Назад
-                    </button>
-                    <button
-                      @click="changeHealthDayPage(1)"
-                      :disabled="healthDayOrders.length < healthDayLimit"
-                      class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
-                    >
-                      Вперед
-                    </button>
-                  </div>
+                <div class="flex gap-2">
+                  <button
+                    @click="changeHealthDayPage(-1)"
+                    :disabled="healthDayPage === 1"
+                    class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
+                  >
+                    Назад
+                  </button>
+                  <button
+                    @click="changeHealthDayPage(1)"
+                    :disabled="healthDayOrders.length < healthDayLimit"
+                    class="px-3 py-1 rounded border border-gray-300 text-sm font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-gray-600 dark:text-white dark:hover:bg-[#4a4a52]"
+                  >
+                    Вперед
+                  </button>
                 </div>
-                </div>
-        </div>
+              </div>
+            </div>
+          </div>
       </div>
     </div>
 
@@ -400,6 +415,7 @@ const contractsSortOrder = ref('desc')
 // Поиск для контрактов
 const searchQuery = ref('')
 const orderIdSearch = ref(null)
+const selectedStatus = ref(null)
 let searchDebounceTimer = null
 
 // Заказы для вкладки Health Day
@@ -506,6 +522,10 @@ const loadOrders = async () => {
     if (orderIdSearch.value) {
       params.order_id = orderIdSearch.value
     }
+
+    if (selectedStatus.value) {
+      params.status = selectedStatus.value
+    }
     
     const response = await api.get('orders/', { params })
     // Handle both array response and paginated response structure if backend changes
@@ -526,7 +546,23 @@ const loadOrders = async () => {
 // Обработчик изменения филиала
 const handleBranchChange = () => {
   contractsPage.value = 1
-  loadOrders()
+  healthDayPage.value = 1
+  if (activeTab.value === 'contracts') {
+    loadOrders()
+  } else {
+    loadHealthDayOrders()
+  }
+}
+
+// Обработчик изменения статуса
+const handleStatusChange = () => {
+  contractsPage.value = 1
+  healthDayPage.value = 1
+  if (activeTab.value === 'contracts') {
+    loadOrders()
+  } else {
+    loadHealthDayOrders()
+  }
 }
 
 // Обработчик ввода поиска с debouncing
@@ -536,7 +572,12 @@ const handleSearchInput = () => {
   }
   searchDebounceTimer = setTimeout(() => {
     contractsPage.value = 1
-    loadOrders()
+    healthDayPage.value = 1
+    if (activeTab.value === 'contracts') {
+      loadOrders()
+    } else {
+      loadHealthDayOrders()
+    }
   }, 300)
 }
 
@@ -547,49 +588,42 @@ const handleOrderIdInput = () => {
   }
   searchDebounceTimer = setTimeout(() => {
     contractsPage.value = 1
-    loadOrders()
+    healthDayPage.value = 1
+    if (activeTab.value === 'contracts') {
+      loadOrders()
+    } else {
+      loadHealthDayOrders()
+    }
   }, 300)
 }
 
-// Сортировка контрактов
-const toggleContractsSort = (column) => {
-  if (contractsSortBy.value === column) {
-    contractsSortOrder.value = contractsSortOrder.value === 'asc' ? 'desc' : 'asc'
-  } else {
-    contractsSortBy.value = column
-    contractsSortOrder.value = 'desc'
-  }
-  loadOrders()
-}
+// ... existing code ...
 
-// Пагинация контрактов
-const changeContractsPage = (delta) => {
-  const newPage = contractsPage.value + delta
-  if (newPage >= 1) {
-    contractsPage.value = newPage
-    loadOrders()
-  }
-}
-
-// Форматирование даты
-const formatDate = (dateString) => {
-  if (!dateString) return '-'
-  const date = new Date(dateString)
-  return date.toLocaleString('ru-RU', {
+const formatDate = (dateStr) => {
+  if (!dateStr) return '-'
+  return new Date(dateStr).toLocaleDateString('ru-RU', {
     year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
+    month: 'long',
+    day: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
   })
 }
 
-// Получение названия статуса
 const getStatusName = (status) => {
   const statusMap = {
-    'paid': 'Оплачен',
-    'pending': 'Ожидание',
-    'cancelled': 'Отменен'
+    'pending': 'Ожидает',
+    'paid': 'Оплачено',
+    'issued': 'Выдано',
+    'partially_issued': 'Частично выдано',
+    'delivered': 'Выдано',
+    'cancelled': 'Отменено',
+    'Выдано': 'Выдано',
+    'Частично выдано': 'Частично выдано',
+    'Не выдано': 'Не выдано',
+    'Не выдан': 'Не выдан',
+    'Выдан': 'Выдан',
+    'Частично выдан': 'Частично выдан'
   }
   return statusMap[status] || status
 }
@@ -606,7 +640,7 @@ const closeOrderDetailModal = () => {
   selectedOrderId.value = null
 }
 
-// Health Day Modal Functions
+// Health Day Modals
 const openAddHealthDayModal = () => {
   addHealthDayModalVisible.value = true
 }
@@ -620,6 +654,25 @@ const handleHealthDayOrderCreated = async () => {
   await loadHealthDayOrders()
 }
 
+// Пагинация и сортировка контрактов
+const changeContractsPage = (delta) => {
+  const newPage = contractsPage.value + delta
+  if (newPage >= 1) {
+    contractsPage.value = newPage
+    loadOrders()
+  }
+}
+
+const toggleContractsSort = (column) => {
+  if (contractsSortBy.value === column) {
+    contractsSortOrder.value = contractsSortOrder.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    contractsSortBy.value = column
+    contractsSortOrder.value = 'desc'
+  }
+  loadOrders()
+}
+
 // Загрузка заказов Health Day
 const loadHealthDayOrders = async () => {
   loadingHealthDayOrders.value = true
@@ -629,6 +682,22 @@ const loadHealthDayOrders = async () => {
       limit: healthDayLimit.value,
       sort_by: healthDaySortBy.value,
       sort_order: healthDaySortOrder.value
+    }
+    
+    if (selectedStatus.value) {
+      params.status = selectedStatus.value
+    }
+
+    if (selectedBranchId.value) {
+      params.branch_id = selectedBranchId.value
+    }
+    
+    if (searchQuery.value && searchQuery.value.trim()) {
+      params.search = searchQuery.value.trim()
+    }
+    
+    if (orderIdSearch.value) {
+      params.order_id = orderIdSearch.value
     }
     
     // Note: Assuming backend returns 'images' field eager loaded as per previous backend changes

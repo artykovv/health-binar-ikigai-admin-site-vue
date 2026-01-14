@@ -269,13 +269,11 @@ const loadOrderDetail = async (orderId) => {
 
 const loadVariantsNames = async (variantIds) => {
   try {
-    const response = await store_api.get('products/variants?skip=0&limit=1000')
+    const response = await store_api.post('variants/names', { ids: variantIds })
     const variants = response.data
     const map = {}
     variants.forEach(variant => {
-      if (variantIds.includes(variant.id)) {
-        map[variant.id] = variant.full_name || variant.variant_name || `Вариант ${variant.id}`
-      }
+      map[variant.id] = variant.name || `Вариант ${variant.id}`
     })
     variantsMap.value = { ...variantsMap.value, ...map }
   } catch (error) {
