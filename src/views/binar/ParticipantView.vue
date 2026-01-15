@@ -730,6 +730,65 @@
               </div>
             </div>
 
+            <!-- Contract Usage Section -->
+            <div class="bg-white rounded-lg ring-1 ring-gray-200 mt-3 dark:bg-[#3f3f47] dark:ring-gray-700 dark:text-white">
+              <div class="px-4 py-3 bg-gray-50 border-b rounded-t-lg dark:bg-[#3f3f47] dark:border-gray-700">
+                <h5 class="m-0 dark:text-white">Контракт (заказ)</h5>
+              </div>
+              
+              <div class="p-4">
+                <div v-if="contractUsageLoading" class="text-center py-4">
+                  <span class="inline-block h-5 w-5 animate-spin rounded-full border-2 border-gray-300 border-t-black dark:border-gray-600 dark:border-t-white"></span>
+                </div>
+                
+                <div v-else-if="contractUsageList.length > 0" class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-[#3f3f47]">
+                      <tr>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID Заказа</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">ID Контракта</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Использовано</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Ответственный</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Дата создания</th>
+                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-white">Действия</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-[#3f3f47]">
+                      <tr v-for="usage in contractUsageList" :key="usage.id" class="hover:bg-gray-50 dark:hover:bg-[#4a4a52]">
+                        <td class="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                          #{{ usage.order_id }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          #{{ usage.contract_id }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          <strong>{{ usage.amount_used }} $</strong>
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          {{ usage.responsible_name || 'Загрузка...' }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          {{ formatDate(usage.created_at) }}
+                        </td>
+                        <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                          <button 
+                            @click="openOrderModal(usage.order_id)" 
+                            class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          >
+                            Детали
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                
+                <div v-else class="text-center py-6 text-gray-500 dark:text-gray-400">
+                  Контракты не найдены
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
         
@@ -777,6 +836,10 @@ const ordersFilter = ref('active')
 const participantOrders = ref([])
 const participantHealthDayOrders = ref([])
 const ordersLoading = ref(false)
+
+// Contract Usage
+const contractUsageList = ref([])
+const contractUsageLoading = ref(false)
 
 // Health Day Modal
 const healthDayModalVisible = ref(false)
@@ -1271,6 +1334,39 @@ watch(activeOrdersTab, (newTab) => {
     }
 })
 
+// Load Contract Usage
+const loadContractUsage = async () => {
+    contractUsageLoading.value = true
+    try {
+        const response = await api.get(`contracts/usages/${participantId}/contract-usage`)
+        const usages = response.data || []
+        
+        // Fetch responsible participant info for each usage
+        for (const usage of usages) {
+            if (usage.order && usage.order.responsible_participant_id) {
+                try {
+                    const participantResponse = await api.get(`participants/${usage.order.responsible_participant_id}`)
+                    const participant = participantResponse.data
+                    // Add full name to usage object
+                    usage.responsible_name = `${participant.lastname || ''} ${participant.name || ''} ${participant.patronymic || ''}`.trim()
+                } catch (error) {
+                    console.error(`Failed to load participant ${usage.order.responsible_participant_id}:`, error)
+                    usage.responsible_name = 'Не удалось загрузить'
+                }
+            } else {
+                usage.responsible_name = '-'
+            }
+        }
+        
+        contractUsageList.value = usages
+    } catch (error) {
+        console.error('Failed to load contract usage:', error)
+        contractUsageList.value = []
+    } finally {
+        contractUsageLoading.value = false
+    }
+}
+
 
 const getContractStatusColor = (statusObj) => {
     const status = statusObj?.status
@@ -1301,7 +1397,8 @@ onMounted(async () => {
     loadBonusData(),
     loadStructureData(),
     loadStageHistory(),
-    loadParticipantOrders()
+    loadParticipantOrders(),
+    loadContractUsage()
   ])
 })
 
